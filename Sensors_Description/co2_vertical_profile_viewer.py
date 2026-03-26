@@ -150,13 +150,135 @@ def parse_user_datetime(raw_value: str, *, is_end: bool) -> datetime | None:
 
 def connect_to_oracle() -> oracledb.Connection:
     cfg = dotenv_values(ENV_PATH)
-    oracledb.init_oracle_client(lib_dir=os.environ["ORACLE_CLIENT_LIB_DIR"])
+
+    # Try to initialize Thick mode by discovering Oracle Instant Client.
+    candidates: list[Path] = []
+
+    # 1) Explicit environment variable
+    env_lib_dir = os.getenv("ORACLE_CLIENT_LIB_DIR")
+    if env_lib_dir:
+        p = Path(env_lib_dir).expanduser()
+        if p.exists():
+            candidates.append(p)
+
+    # 1b) .env configuration fallback
+    cfg_lib_dir = cfg.get("ORACLE_CLIENT_LIB_DIR")
+    if cfg_lib_dir:
+        p = Path(str(cfg_lib_dir)).expanduser()
+        if p.exists():
+            candidates.append(p)
+
+    # 2) Project default (Linux path, harmless on Windows if it doesn't exist)
+    if DEFAULT_ORACLE_CLIENT_LIB_DIR.exists():
+        candidates.append(DEFAULT_ORACLE_CLIENT_LIB_DIR)
+
+    # 3) Platform-specific check helpers
+    def _has_client_lib(path: Path) -> bool:
+        if os.name == "nt":
+            return (path / "oci.dll").exists()
+        elif sys.platform == "darwin":
+            return (path / "libclntsh.dylib").exists()
+        else:
+            return (path / "libclntsh.so").exists()
+
+    # 4) Windows-specific discovery
+    if os.name == "nt":
+        typical_bases = [
+            Path(r"C:\oracle"),
+            Path(r"C:\oracle\instantclient"),
+            Path(r"C:\instantclient"),
+            Path(r"C:\Program Files\Oracle"),
+            Path.home() / "oracle",
+        ]
+        for base in typical_bases:
+            if not base.exists():
+                continue
+            if _has_client_lib(base):
+                candidates.append(base)
+            try:
+                for sub in base.glob("**/instantclient*"):
+                    if sub.is_dir():
+                        candidates.append(sub)
+            except Exception:
+                pass
+
+        # Also scan PATH entries for a folder that has client library
+        for entry in os.environ.get("PATH", "").split(os.pathsep):
+            if not entry:
+                continue
+            p = Path(entry)
+            if p.exists() and _has_client_lib(p):
+                candidates.append(p)
+
+    # Deduplicate keeping order
+    seen: set[str] = set()
+    unique_candidates: list[str] = []
+    for p in candidates:
+        s = str(p)
+        if s not in seen:
+            seen.add(s)
+            unique_candidates.append(s)
+
+    used_lib_dir: str | None = None
+    for lib_dir in unique_candidates:
+        try:
+            oracledb.init_oracle_client(lib_dir=lib_dir)
+            used_lib_dir = lib_dir
+            break
+        except Exception as init_exc:
+            print(
+                f"Warning: failed to initialize Oracle Client at {lib_dir!r}: {init_exc}",
+                file=sys.stderr,
+            )
+
+    # 5) If not found on Windows, ask interactively before attempting any connection in thin mode
+    if used_lib_dir is None and os.name == "nt" and sys.stdin and sys.stdin.isatty():
+        try:
+            user_input = input(
+                "Oracle Instant Client required for encryption. "
+                "Enter full path to the folder containing oci.dll (or leave empty to skip): "
+            ).strip().strip('"').strip("'")
+        except Exception:
+            user_input = ""
+        if user_input:
+            chosen = Path(user_input).expanduser()
+            # If a file path was pasted, use its parent
+            if chosen.is_file():
+                chosen = chosen.parent
+            if chosen.exists() and _has_client_lib(chosen):
+                try:
+                    oracledb.init_oracle_client(lib_dir=str(chosen))
+                    used_lib_dir = str(chosen)
+                except Exception as init_exc:
+                    print(
+                        f"Warning: failed to initialize Oracle Client at {str(chosen)!r}: {init_exc}",
+                        file=sys.stderr,
+                    )
+            else:
+                print(
+                    f"Provided path does not look like an Instant Client directory: {str(chosen)!r}",
+                    file=sys.stderr,
+                )
+
     dsn = oracledb.makedsn(cfg["ORACLE_HOST"], int(cfg["ORACLE_PORT"]), sid=cfg["ORACLE_SID"])
-    connection = oracledb.connect(
-        user=cfg["ORACLE_USER"],
-        password=cfg["ORACLE_PASSWORD"],
-        dsn=dsn,
-    )
+    try:
+        connection = oracledb.connect(
+            user=cfg["ORACLE_USER"],
+            password=cfg["ORACLE_PASSWORD"],
+            dsn=dsn,
+        )
+    except (oracledb.NotSupportedError, oracledb.OperationalError) as exc:
+        # If server mandates Native Network Encryption, thin mode cannot be used.
+        if "DPY-3001" in str(exc) and used_lib_dir is None:
+            raise RuntimeError(
+                "Server requires Native Network Encryption, which needs python-oracledb thick mode.\n"
+                "Install Oracle Instant Client for Windows (Basic or Basic Light) and set the client folder (with oci.dll):\n"
+                "  - either in .env as ORACLE_CLIENT_LIB_DIR=C:\\path\\to\\instantclient_XX_X\n"
+                "  - or as environment variable ORACLE_CLIENT_LIB_DIR, or add that folder to PATH.\n"
+                "Then rerun this script."
+            ) from exc
+        raise
+
     connection.call_timeout = 120_000
     return connection
 
