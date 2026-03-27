@@ -19,14 +19,9 @@ python --version
 
 This project uses the `oracledb` Python package from `requirements.txt`.
 
-- Thin mode: often works without Oracle Instant Client.
-- Thick mode: requires Oracle Instant Client (for some environments, especially when server-side encryption policies require it).
+Windows setup walkthrough: [Oracle Database Setup Guide (Windows)](Oracle_Database_Setup_Windows.md)
 
-If you get an error like `DPY-3001` or `DPI-1047`, install Oracle Instant Client and set:
-
-- `ORACLE_CLIENT_LIB_DIR` to the folder containing `oci.dll` (Windows), `libclntsh.dylib` (macOS), or `libclntsh.so` (Linux).
-
-macOS note: Instant Client may not be needed unless your DB security policy requires Thick mode.
+If your environment needs Oracle client libraries, install Oracle Instant Client and set `ORACLE_CLIENT_LIB_DIR`.
 
 ## 3) Create and Activate a Virtual Environment
 
