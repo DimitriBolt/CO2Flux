@@ -66,9 +66,9 @@ except Exception as exc:  # pragma: no cover - startup guard
 #   "LEO Center"
 #   "LEO East"
 #   "LEO West"
-SLOPE = "LEO East"
+SLOPE = "LEO West"
 X_COORD_M = -4  # Allowed X values [m]: -4, -1, 1, 4
-Y_COORD_M = 4   # Allowed Y values [m]: 4, 10, 18, 24
+Y_COORD_M = +10   # Allowed Y values [m]: 4, 10, 18, 24
 
 # Date format:
 #   "YYYY-Mon-DD HH:MM"  -> example: "2026-Mar-25 00:00"
