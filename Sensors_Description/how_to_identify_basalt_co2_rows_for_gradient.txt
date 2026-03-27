@@ -1,0 +1,72 @@
+How to identify basalt CO2 rows in the CO2 sheet
+
+In the current CO2 worksheet, rows that represent CO2 concentration inside the basalt layer can be identified very clearly. A row should be treated as an internal basalt CO2 time series if all of the following are true:
+
+- B = Carbon dioxide concentration
+- C = C_CO2,basalt
+- I = GMM222
+- E = Primary state / gradient driver
+- F says that this is an internal basalt CO2 concentration used for gradients and surface-normal flux estimates
+- L = leo_center.datavalues or leo_east.datavalues or leo_west.datavalues
+- M has the form dv.sensorid = ... AND dv.variableid = 9
+- AH = CO2
+- AI = Carbon dioxide
+
+These rows represent internal CO2 in basalt pore space, not atmospheric CO2 above the slope.
+
+How to distinguish them from atmospheric CO2 rows
+
+Atmospheric CO2 rows have different markers:
+
+- C = C_CO2,air
+- I = LI-COR
+- L points to ...datavalueslicor
+
+Those rows are atmospheric boundary-condition measurements, not internal basalt CO2 measurements.
+
+How to build a vertical CO2 gradient at one surface location
+
+To build a vertical gradient at one surface point, use rows that have the same:
+
+- G: same slope
+- U: same x coordinate
+- V: same y coordinate
+
+and different:
+
+- W or X: different depth
+
+So one vertical profile is defined by fixed (G, U, V) and multiple depth levels.
+
+Example of one vertical profile
+
+If:
+
+- G = LEO Center
+- U = -4
+- V = 4
+
+then all rows with this same (G, U, V) and I = GMM222 belong to one vertical profile through the basalt. The depth levels are:
+
+- level 1 = 5 cm
+- level 2 = 20 cm
+- level 3 = 35 cm
+- level 4 = 50 cm
+
+This is also visible in the sensor code:
+
+- LEO-C_4_-4_1_GMM222
+- LEO-C_4_-4_2_GMM222
+- LEO-C_4_-4_3_GMM222
+- LEO-C_4_-4_4_GMM222
+
+The final number 1, 2, 3, 4 is the depth level.
+
+Practical Excel rule
+
+In Excel, apply filters and keep only:
+
+- C = C_CO2,basalt
+- I = GMM222
+
+After that, every remaining row is a CO2 time series inside the basalt layer. To build gradients, group the filtered rows by (G, U, V).

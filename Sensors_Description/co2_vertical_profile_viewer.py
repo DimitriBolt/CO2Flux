@@ -6,11 +6,120 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+import tomllib
 
 
-DEFAULT_ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
-LOCAL_LIB_DIR = Path.home() / ".local/lib"
-ORACLE_ENV_READY_FLAG = "CO2_PROFILE_ORACLE_ENV_READY"
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.toml"
+LOCAL_CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.local.toml"
+WORKBOOK_PATH = SCRIPT_DIR / "climate_control_theorist_schema.xlsx"
+ENV_PATH = Path.home() / "Documents" / ".env"
+OUTPUT_DIR = SCRIPT_DIR
+
+
+@dataclass(frozen=True)
+class ProfileSelectionConfig:
+    slope: str
+    x_coord_m: float
+    y_coord_m: float
+    start_date: str
+    end_date: str
+
+
+@dataclass(frozen=True)
+class OracleRuntimeConfig:
+    default_client_lib_dir: Path
+    local_lib_dir: Path
+    env_ready_flag: str
+
+
+@dataclass(frozen=True)
+class ViewerConfig:
+    profile: ProfileSelectionConfig
+    oracle: OracleRuntimeConfig
+
+
+def _load_toml_config(path: Path) -> dict[str, object]:
+    with path.open("rb") as fh:
+        loaded = tomllib.load(fh)
+    if not isinstance(loaded, dict):
+        raise ValueError(f"Config file {path} must contain TOML tables.")
+    return loaded
+
+
+def _merge_config(base: dict[str, object], overrides: dict[str, object]) -> dict[str, object]:
+    merged = dict(base)
+    for key, value in overrides.items():
+        existing = merged.get(key)
+        if isinstance(existing, dict) and isinstance(value, dict):
+            merged[key] = {**existing, **value}
+        else:
+            merged[key] = value
+    return merged
+
+
+def _require_section(config: dict[str, object], section_name: str) -> dict[str, object]:
+    section = config.get(section_name)
+    if not isinstance(section, dict):
+        raise ValueError(f"Missing TOML section [{section_name}] in {CONFIG_PATH}.")
+    return section
+
+
+def _require_str(section: dict[str, object], key: str) -> str:
+    value = section.get(key)
+    if not isinstance(value, str):
+        raise ValueError(f"Config key {key!r} must be a string.")
+    return value
+
+
+def _require_number(section: dict[str, object], key: str) -> float | int:
+    value = section.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"Config key {key!r} must be a number.")
+    return value
+
+
+def load_viewer_config() -> ViewerConfig:
+    if not CONFIG_PATH.exists():
+        raise FileNotFoundError(
+            f"Config file not found: {CONFIG_PATH}. Create it from the repository version."
+        )
+
+    raw_config = _load_toml_config(CONFIG_PATH)
+    if LOCAL_CONFIG_PATH.exists():
+        raw_config = _merge_config(raw_config, _load_toml_config(LOCAL_CONFIG_PATH))
+
+    profile_section = _require_section(raw_config, "profile")
+    oracle_section = _require_section(raw_config, "oracle")
+
+    return ViewerConfig(
+        profile=ProfileSelectionConfig(
+            slope=_require_str(profile_section, "slope"),
+            x_coord_m=_require_number(profile_section, "x_coord_m"),
+            y_coord_m=_require_number(profile_section, "y_coord_m"),
+            start_date=_require_str(profile_section, "start_date"),
+            end_date=_require_str(profile_section, "end_date"),
+        ),
+        oracle=OracleRuntimeConfig(
+            default_client_lib_dir=Path(
+                _require_str(oracle_section, "default_client_lib_dir")
+            ).expanduser(),
+            local_lib_dir=Path(_require_str(oracle_section, "local_lib_dir")).expanduser(),
+            env_ready_flag=_require_str(oracle_section, "env_ready_flag"),
+        ),
+    )
+
+
+VIEWER_CONFIG = load_viewer_config()
+DEFAULT_ORACLE_CLIENT_LIB_DIR = VIEWER_CONFIG.oracle.default_client_lib_dir
+LOCAL_LIB_DIR = VIEWER_CONFIG.oracle.local_lib_dir
+ORACLE_ENV_READY_FLAG = VIEWER_CONFIG.oracle.env_ready_flag
+SLOPE = VIEWER_CONFIG.profile.slope
+X_COORD_M = VIEWER_CONFIG.profile.x_coord_m
+Y_COORD_M = VIEWER_CONFIG.profile.y_coord_m
+START_DATE = VIEWER_CONFIG.profile.start_date
+END_DATE = VIEWER_CONFIG.profile.end_date
 
 
 def _ensure_oracle_runtime_env() -> None:
@@ -61,22 +170,6 @@ except Exception as exc:  # pragma: no cover - startup guard
     ) from exc
 
 
-# Editable parameters
-# Allowed SLOPE values:
-#   "LEO Center"
-#   "LEO East"
-#   "LEO West"
-SLOPE = "LEO West"
-X_COORD_M = -4  # Allowed X values [m]: -4, -1, 1, 4
-Y_COORD_M = +10   # Allowed Y values [m]: 4, 10, 18, 24
-
-# Date format:
-#   "YYYY-Mon-DD HH:MM"  -> example: "2026-Mar-25 00:00"
-#   "YYYY-Mon-DD"        -> start uses 00:00, end uses 23:59
-#   END_DATE = ""        -> run until the last available observation
-START_DATE = "2026-Mar-25 00:00"
-END_DATE =   "2026-Mar-25 23:59"
-
 # Shared plotting limits for all graphs
 CO2_AXIS_MIN_PPM = 0
 CO2_AXIS_MAX_PPM = 8000
@@ -88,12 +181,6 @@ BAR_COLOR = "#2E5EAA"
 SURFACE_LINE_COLOR = "#222222"
 GRID_COLOR = "#CCCCCC"
 
-
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-WORKBOOK_PATH = SCRIPT_DIR / "climate_control_theorist_schema.xlsx"
-ENV_PATH = PROJECT_ROOT / ".env"
-OUTPUT_DIR = SCRIPT_DIR
 
 DISPLAY_DEPTHS_M = [0.0, -0.05, -0.20, -0.35, -0.50]
 NO_DATA_VALUE = -9999.0
@@ -161,7 +248,7 @@ def connect_to_oracle() -> oracledb.Connection:
         if p.exists():
             candidates.append(p)
 
-    # 1b) .env configuration fallback
+    # 1b) Local credentials file fallback
     cfg_lib_dir = cfg.get("ORACLE_CLIENT_LIB_DIR")
     if cfg_lib_dir:
         p = Path(str(cfg_lib_dir)).expanduser()
@@ -273,7 +360,7 @@ def connect_to_oracle() -> oracledb.Connection:
             raise RuntimeError(
                 "Server requires Native Network Encryption, which needs python-oracledb thick mode.\n"
                 "Install Oracle Instant Client for Windows (Basic or Basic Light) and set the client folder (with oci.dll):\n"
-                "  - either in .env as ORACLE_CLIENT_LIB_DIR=C:\\path\\to\\instantclient_XX_X\n"
+                "  - either in ~/Documents/.env as ORACLE_CLIENT_LIB_DIR=C:\\path\\to\\instantclient_XX_X\n"
                 "  - or as environment variable ORACLE_CLIENT_LIB_DIR, or add that folder to PATH.\n"
                 "Then rerun this script."
             ) from exc

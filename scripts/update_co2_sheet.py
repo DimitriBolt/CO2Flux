@@ -14,7 +14,7 @@ from openpyxl.utils import get_column_letter
 
 ROOT = Path("/home/dimitri/PycharmProjects/CO2Flux")
 WORKBOOK_PATH = ROOT / "Sensors_Description" / "climate_control_theorist_schema.xlsx"
-ENV_PATH = ROOT / ".env"
+ENV_PATH = Path.home() / "Documents" / ".env"
 ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
 TODAY = date.today().isoformat()
 GMM222_PATTERN = re.compile(r"^LEO-(?P<slope>[A-Z])_(?P<y>-?\d+)_(?P<x>-?\d+)_(?P<level>\d+)_GMM222$")
