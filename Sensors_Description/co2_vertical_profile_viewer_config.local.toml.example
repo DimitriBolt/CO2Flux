@@ -1,0 +1,9 @@
+# Optional local overrides for one machine.
+# Copy this file to:
+#   co2_vertical_profile_viewer_config.local.toml
+# and set only the keys that differ from co2_vertical_profile_viewer_config.toml.
+
+[oracle]
+default_client_lib_dir = "/path/to/oracle/instantclient"
+local_lib_dir = "~/.local/lib"
+env_ready_flag = "CO2_PROFILE_ORACLE_ENV_READY"

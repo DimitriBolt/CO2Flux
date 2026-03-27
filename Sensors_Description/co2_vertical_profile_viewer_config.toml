@@ -1,0 +1,25 @@
+[profile]
+# Allowed values:
+#   "LEO Center"
+#   "LEO East"
+#   "LEO West"
+slope = "LEO West"
+
+# Allowed X values [m]: -4, -1, 1, 4
+x_coord_m = -4
+
+# Allowed Y values [m]: 4, 10, 18, 24
+y_coord_m = 10
+
+# Date formats:
+#   "YYYY-Mon-DD HH:MM"  -> example: "2026-Mar-25 00:00"
+#   "YYYY-Mon-DD"        -> start uses 00:00, end uses 23:59
+#   ""                   -> END_DATE runs until the last available observation
+start_date = "2026-Mar-25 00:00"
+end_date = "2026-Mar-25 23:59"
+
+[oracle]
+# Machine-specific Oracle runtime settings.
+default_client_lib_dir = "/opt/oracle/instantclient_19_26"
+local_lib_dir = "~/.local/lib"
+env_ready_flag = "CO2_PROFILE_ORACLE_ENV_READY"
