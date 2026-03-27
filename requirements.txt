@@ -11,3 +11,4 @@ oracledb
 pandas
 Pillow
 python-dotenv
+
