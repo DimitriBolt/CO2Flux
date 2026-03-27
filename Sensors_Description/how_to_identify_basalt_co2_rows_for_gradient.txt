@@ -70,3 +70,84 @@ In Excel, apply filters and keep only:
 - I = GMM222
 
 After that, every remaining row is a CO2 time series inside the basalt layer. To build gradients, group the filtered rows by (G, U, V).
+
+How to build SQL queries to extract data from SensorDB
+=======================================================
+
+For each sensor in the Excel schema, all the information needed to construct an SQL query to the Oracle SensorDB database is available.
+
+The query structure is assembled from the following columns:
+
+- L (Oracle table / query path) — table name, e.g., leo_west.datavalues
+- M (Oracle selector / WHERE key) — WHERE condition, e.g., dv.sensorid = 1034 AND dv.variableid = 9
+- N (Time column) — time column name, usually LOCALDATETIME
+- O (Value column) — value column name, usually DATAVALUE
+- AD (Concrete SQL query) — ready-to-use complete SQL query
+
+Column AD already contains a ready-made query that can be used directly or modified as needed.
+
+Example for sensor LEO-W_4_-1_4_GMM222 (row 105 in Excel)
+----------------------------------------------------------
+
+From row 105 cells:
+- L105 = leo_west.datavalues
+- M105 = dv.sensorid = 996 AND dv.variableid = 9
+- AD105 contains the ready query for the entire observation period
+
+Basic query for all data:
+```sql
+SELECT
+    dv.localdatetime,
+    dv.datavalue
+FROM
+    leo_west.datavalues dv
+WHERE
+    dv.sensorid = 996
+    AND dv.variableid = 9
+    AND dv.localdatetime >= DATE '2013-09-11'
+ORDER BY
+    dv.localdatetime;
+```
+
+Query for the last 100 records (newest data first):
+```sql
+SELECT
+    dv.localdatetime,
+    dv.datavalue
+FROM
+    leo_west.datavalues dv
+WHERE
+    dv.sensorid = 1034
+    AND dv.variableid = 9
+    AND dv.localdatetime >= DATE '2026-03-26'
+ORDER BY
+    dv.localdatetime DESC
+FETCH FIRST 100 ROWS ONLY;
+```
+
+Query for the last 100 records in direct chronological order (oldest first):
+```sql
+SELECT * FROM (
+    SELECT
+        dv.localdatetime,
+        dv.datavalue
+    FROM
+        leo_west.datavalues dv
+    WHERE
+        dv.sensorid = 1034
+        AND dv.variableid = 9
+        AND dv.localdatetime >= DATE '2026-03-26'
+    ORDER BY
+        dv.localdatetime DESC
+    FETCH FIRST 100 ROWS ONLY
+) ORDER BY localdatetime ASC;
+```
+
+Key points:
+
+- variableid = 9 is the variable ID for CO2 concentration (constant for all CO2 sensors)
+- sensorid is unique for each combination of (slope, x, y, depth_level)
+- The date filter can be changed depending on the required period
+- FETCH FIRST N ROWS ONLY is Oracle syntax for limiting the number of rows
+- ORDER BY ... DESC sorts from newest to oldest
+- ORDER BY ... ASC sorts from oldest to newest
