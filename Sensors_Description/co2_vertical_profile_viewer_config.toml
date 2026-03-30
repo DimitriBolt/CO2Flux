@@ -6,7 +6,7 @@
 slope = "LEO West"
 
 # Allowed X values [m]: -4, -1, 1, 4
-x_coord_m = 1
+x_coord_m = -1
 
 # Allowed Y values [m]: 4, 10, 18, 24
 y_coord_m = 10
@@ -22,7 +22,7 @@ end_date = "2026-Mar-25 23:59"
 # Coordinates of the manually chosen nearest LI-COR air point at
 # Level 1 (25 cm above surface) for the selected slope.
 # This section is used by co2_viewer_add_surface.py.
-x_coord_m = 2
+x_coord_m = -2
 y_coord_m = 10
 
 [oracle]
