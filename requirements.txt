@@ -2,8 +2,7 @@
 # Install with:
 #   python3 -m pip install -r requirements.txt --break-system-packages
 #
-# Oracle Instant Client is NOT a pip package.
-# For Oracle Thick mode, install Instant Client separately on the machine.
+# Oracle Instant Client is not a pip package.
 
 matplotlib
 openpyxl
@@ -11,3 +10,4 @@ oracledb
 pandas
 Pillow
 python-dotenv
+

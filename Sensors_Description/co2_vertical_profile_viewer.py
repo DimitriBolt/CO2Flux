@@ -14,8 +14,21 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.toml"
 LOCAL_CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.local.toml"
 WORKBOOK_PATH = SCRIPT_DIR / "climate_control_theorist_schema.xlsx"
-ENV_PATH = Path.home() / "Documents" / ".env"
 OUTPUT_DIR = SCRIPT_DIR
+
+
+def _resolve_env_path() -> Path:
+    candidates = [
+        PROJECT_ROOT / ".env",
+        Path.home() / "Documents" / ".env",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+ENV_PATH = _resolve_env_path()
 
 
 @dataclass(frozen=True)
