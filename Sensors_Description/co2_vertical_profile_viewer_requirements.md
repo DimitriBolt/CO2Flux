@@ -1,5 +1,13 @@
 # CO2 Vertical Profile Viewer Requirements
 
+This requirements file is the shared requirements source for:
+
+- `Sensors_Description/co2_vertical_profile_viewer.py`
+- `Sensors_Description/co2_viewer_add_surface.py`
+
+The second script is an extension of the first one, but it inherits the same
+viewer requirements unless a later document explicitly overrides them.
+
 ## Goal
 
 Create a Python program for visualizing the **CO2 concentration profile along one vertical basalt line** for a selected LEO slope and surface point.
