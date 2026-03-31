@@ -1,168 +1,315 @@
+from __future__ import annotations
+
+import pickle
 import os
 import re
+import subprocess
 import sys
-from datetime import datetime
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
-
-from pandas import DataFrame
-
-DEFAULT_ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
-LOCAL_LIB_DIR = Path.home() / ".local/lib"
-ORACLE_ENV_READY_FLAG = "SENSORDB_ORACLE_ENV_READY"
-
-
-def _ensure_oracle_runtime_env():
-    # If Oracle client libraries are installed locally, restart the script with
-    # the required shared-library paths so python-oracledb can use Thick mode.
-    oracle_client_lib_dir = Path(
-        os.getenv("ORACLE_CLIENT_LIB_DIR", str(DEFAULT_ORACLE_CLIENT_LIB_DIR))
-    ).expanduser()
-    if not oracle_client_lib_dir.exists():
-        return
-
-    required_entries = [str(oracle_client_lib_dir)]
-    if LOCAL_LIB_DIR.exists():
-        required_entries.append(str(LOCAL_LIB_DIR))
-
-    current_entries = [
-        entry for entry in os.getenv("LD_LIBRARY_PATH", "").split(os.pathsep) if entry
-    ]
-    missing_entries = [entry for entry in required_entries if entry not in current_entries]
-
-    os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
-    if not missing_entries or os.getenv(ORACLE_ENV_READY_FLAG) == "1":
-        return
-
-    new_env = os.environ.copy()
-    new_env["ORACLE_CLIENT_LIB_DIR"] = str(oracle_client_lib_dir)
-    new_env["LD_LIBRARY_PATH"] = os.pathsep.join(required_entries + current_entries)
-    new_env[ORACLE_ENV_READY_FLAG] = "1"
-    os.execve(sys.executable, [sys.executable, *sys.argv], new_env)
-
-
-_ensure_oracle_runtime_env()
+from typing import Any
 
 import oracledb
 import pandas as pd
 from dotenv import load_dotenv
 
-load_dotenv(Path.home() / "Documents" / ".env")
+
+DEFAULT_ENV_PATH = Path.home() / "Documents" / ".env"
+DEFAULT_ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
+LOCAL_LIB_DIR = Path.home() / ".local/lib"
+ORA_COMPAT_DIR = Path("/tmp/ora_compat")
+ORA_COMPAT_LINK = ORA_COMPAT_DIR / "libaio.so.1"
+ORA_COMPAT_TARGET = Path("/lib/x86_64-linux-gnu/libaio.so.1t64")
+DEFAULT_CALL_TIMEOUT_MS = 120_000
+DEFAULT_ARRAYSIZE = 10_000
 TABLE_NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_$#]*(\.[A-Z][A-Z0-9_$#]*)?$", re.IGNORECASE)
 
-DEFAULT_START_DATE = "2025-12-20"
-DEFAULT_END_DATE = "2026-01-01"
+_ORACLE_CLIENT_INITIALIZED = False
+
+
+def _ensure_libaio_compat_link() -> Path | None:
+    if not ORA_COMPAT_TARGET.exists():
+        return None
+
+    ORA_COMPAT_DIR.mkdir(parents=True, exist_ok=True)
+    if ORA_COMPAT_LINK.is_symlink() or ORA_COMPAT_LINK.exists():
+        if ORA_COMPAT_LINK.resolve() != ORA_COMPAT_TARGET.resolve():
+            ORA_COMPAT_LINK.unlink()
+            ORA_COMPAT_LINK.symlink_to(ORA_COMPAT_TARGET)
+    else:
+        ORA_COMPAT_LINK.symlink_to(ORA_COMPAT_TARGET)
+
+    return ORA_COMPAT_DIR
+
+
+def _runtime_library_entries() -> list[str]:
+    oracle_client_lib_dir = Path(
+        os.getenv("ORACLE_CLIENT_LIB_DIR", str(DEFAULT_ORACLE_CLIENT_LIB_DIR))
+    ).expanduser()
+    if not oracle_client_lib_dir.exists():
+        return []
+
+    os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
+
+    required_entries = [str(oracle_client_lib_dir)]
+    compat_dir = _ensure_libaio_compat_link()
+    if compat_dir is not None:
+        required_entries.append(str(compat_dir))
+    if LOCAL_LIB_DIR.exists():
+        required_entries.append(str(LOCAL_LIB_DIR))
+
+    return required_entries
+
+
+def _prepare_oracle_runtime_env() -> str | None:
+    required_entries = _runtime_library_entries()
+    if not required_entries:
+        return None
+
+    current_entries = [
+        entry for entry in os.getenv("LD_LIBRARY_PATH", "").split(os.pathsep) if entry
+    ]
+    missing_entries = [entry for entry in required_entries if entry not in current_entries]
+    if missing_entries:
+        os.environ["LD_LIBRARY_PATH"] = os.pathsep.join(required_entries + current_entries)
+
+    return os.environ.get("ORACLE_CLIENT_LIB_DIR")
+
+
+load_dotenv(DEFAULT_ENV_PATH)
+_prepare_oracle_runtime_env()
+
+
+def validate_table_name(table_name: str) -> str:
+    normalized = table_name.strip()
+    if not TABLE_NAME_PATTERN.fullmatch(normalized):
+        raise ValueError(f"Invalid Oracle table name: {table_name}")
+    return normalized
+
+
+def _should_use_worker(exc: Exception) -> bool:
+    text = str(exc)
+    return "DPI-1047" in text or "Cannot locate a 64-bit Oracle Client library" in text
+
+
+def _build_worker_env() -> dict[str, str]:
+    env = os.environ.copy()
+    required_entries = _runtime_library_entries()
+    if required_entries:
+        current_entries = [
+            entry for entry in env.get("LD_LIBRARY_PATH", "").split(os.pathsep) if entry
+        ]
+        merged_entries = required_entries + [
+            entry for entry in current_entries if entry not in required_entries
+        ]
+        env["LD_LIBRARY_PATH"] = os.pathsep.join(merged_entries)
+        env["ORACLE_CLIENT_LIB_DIR"] = required_entries[0]
+    return env
+
+
+@dataclass(frozen=True, slots=True)
+class SensorDBConfig:
+    user: str
+    password: str
+    host: str
+    port: int
+    sid: str
+    oracle_client_lib_dir: str
+
+    @classmethod
+    def from_env(cls) -> "SensorDBConfig":
+        user = os.getenv("ORACLE_USER")
+        password = os.getenv("ORACLE_PASSWORD")
+        host = os.getenv("ORACLE_HOST")
+        sid = os.getenv("ORACLE_SID")
+        port_raw = os.getenv("ORACLE_PORT", "1521")
+        oracle_client_lib_dir = os.getenv("ORACLE_CLIENT_LIB_DIR")
+
+        missing = [
+            name
+            for name, value in (
+                ("ORACLE_USER", user),
+                ("ORACLE_PASSWORD", password),
+                ("ORACLE_HOST", host),
+                ("ORACLE_SID", sid),
+                ("ORACLE_CLIENT_LIB_DIR", oracle_client_lib_dir),
+            )
+            if not value
+        ]
+        if missing:
+            missing_text = ", ".join(missing)
+            raise RuntimeError(
+                f"Missing Oracle configuration in {DEFAULT_ENV_PATH}: {missing_text}."
+            )
+
+        return cls(
+            user=user,
+            password=password,
+            host=host,
+            port=int(port_raw),
+            sid=sid,
+            oracle_client_lib_dir=oracle_client_lib_dir,
+        )
 
 
 class SensorDB:
-    """Minimal helper for reading a sensor series from Oracle into pandas."""
+    """Infrastructure helper for Oracle SensorDB connections and SELECT queries."""
 
-    def __init__(self):
-        self._user = os.getenv("ORACLE_USER")
-        self._password = os.getenv("ORACLE_PASSWORD")
-        self._host = os.getenv("ORACLE_HOST")
-        self._port = int(os.getenv("ORACLE_PORT", 1521))
-        self._sid = os.getenv("ORACLE_SID")
-        self._connection = None
-        self._oracle_client_lib_dir = os.getenv("ORACLE_CLIENT_LIB_DIR")
-        self._oracle_client_initialized = False
+    def __init__(
+        self,
+        config: SensorDBConfig | None = None,
+        *,
+        call_timeout_ms: int = DEFAULT_CALL_TIMEOUT_MS,
+        arraysize: int = DEFAULT_ARRAYSIZE,
+    ) -> None:
+        self.config = config or SensorDBConfig.from_env()
+        self.call_timeout_ms = call_timeout_ms
+        self.arraysize = arraysize
+        self._connection: oracledb.Connection | None = None
 
-    def _init_oracle_client(self):
-        if self._oracle_client_initialized:
+    def _init_oracle_client(self) -> None:
+        global _ORACLE_CLIENT_INITIALIZED
+
+        if _ORACLE_CLIENT_INITIALIZED:
             return
-        if not self._oracle_client_lib_dir:
-            raise RuntimeError(
-                "Oracle Thick mode is required for this database connection. "
-                "Set ORACLE_CLIENT_LIB_DIR or install Oracle Instant Client."
-            )
 
-        # SensorDB requires Oracle Thick mode, so the client library must be initialized.
-        oracledb.init_oracle_client(lib_dir=self._oracle_client_lib_dir)
-        self._oracle_client_initialized = True
+        try:
+            oracledb.init_oracle_client(lib_dir=self.config.oracle_client_lib_dir)
+        except oracledb.ProgrammingError as exc:
+            if "already initialized" not in str(exc).lower():
+                raise
+        _ORACLE_CLIENT_INITIALIZED = True
 
-    def connect(self):
-        # Connection parameters are loaded from ~/Documents/.env.
+    def connect(self) -> None:
+        if self._connection is not None:
+            return
+
         self._init_oracle_client()
-        dsn = oracledb.makedsn(self._host, self._port, sid=self._sid)
-        self._connection = oracledb.connect(user=self._user, password=self._password, dsn=dsn)
-        self._connection.call_timeout = 30_000  # 30 seconds
+        dsn = oracledb.makedsn(self.config.host, self.config.port, sid=self.config.sid)
+        self._connection = oracledb.connect(
+            user=self.config.user,
+            password=self.config.password,
+            dsn=dsn,
+        )
+        self._connection.call_timeout = self.call_timeout_ms
 
-    def disconnect(self):
-        if self._connection:
-            self._connection.close()
-            self._connection = None
+    def disconnect(self) -> None:
+        if self._connection is None:
+            return
 
-    def __enter__(self):
-        self.connect()
+        self._connection.close()
+        self._connection = None
+
+    def __enter__(self) -> "SensorDB":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.disconnect()
 
-    def get_value_series(
+    @contextmanager
+    def cursor(self) -> Iterator[oracledb.Cursor]:
+        self.connect()
+        assert self._connection is not None
+        cursor = self._connection.cursor()
+        cursor.arraysize = self.arraysize
+        try:
+            yield cursor
+        finally:
+            cursor.close()
+
+    def fetch_dataframe(
         self,
-        table_name: str,
-        start_date: str = DEFAULT_START_DATE,
-        end_date: str = DEFAULT_END_DATE,
-        row_limit: int | None = None,
+        query: str,
+        params: Mapping[str, Any] | None = None,
     ) -> pd.DataFrame:
-        """Return two columns: timestamp as text and value_si in SI units."""
-        normalized_table_name = table_name.strip().upper()
-        if not TABLE_NAME_PATTERN.fullmatch(normalized_table_name):
-            raise ValueError(f"Invalid Oracle table name: {table_name}")
-        if row_limit is not None and row_limit <= 0:
-            raise ValueError(f"row_limit must be positive, got {row_limit}")
+        try:
+            with self.cursor() as cursor:
+                cursor.execute(query, params or {})
+                columns = [description[0].lower() for description in cursor.description or ()]
+                return pd.DataFrame.from_records(cursor.fetchall(), columns=columns)
+        except oracledb.DatabaseError as exc:
+            if not _should_use_worker(exc):
+                raise
+            return self._fetch_dataframe_via_worker(query, params)
 
-        start_dt = datetime.fromisoformat(start_date)
-        end_dt = datetime.fromisoformat(end_date)
-        # query = f"""
-        #     -- Return timestamp as text so it behaves like a normal pandas column
-        #     -- in this Python/pandas environment.
-        #     SELECT TO_CHAR(t.TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS.FF6') AS timestamp,
-        #            t.VALUE * 1e-6 AS value_si
-        #     FROM {normalized_table_name} t
-        #     WHERE t.TIMESTAMP >= :start_date
-        #       AND t.TIMESTAMP < :end_date
-        #     ORDER BY t.TIMESTAMP
-        # """
+    def fetch_one(
+        self,
+        query: str,
+        params: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        frame = self.fetch_dataframe(query, params)
+        if frame.empty:
+            return None
+        return frame.iloc[0].to_dict()
 
-        query = f"""
-                    -- Return timestamp as text so it behaves like a normal pandas column
-                    -- in this Python/pandas environment.
-                    SELECT
-                        TO_CHAR(dv.localdatetime, 'YYYY-MM-DD HH24:MI:SS') AS localdatetime,
-                        dv.datavalue
-                    FROM
-                        {normalized_table_name} dv
-                    WHERE
-                        dv.sensorid = 994
-                        AND dv.variableid = 9
-                        AND dv.localdatetime >= :start_date
-                        AND dv.localdatetime < :end_date
-                    ORDER BY dv.localdatetime
-                    {f'FETCH FIRST {row_limit} ROWS ONLY' if row_limit else ''}
-                """
+    def _fetch_dataframe_via_worker(
+        self,
+        query: str,
+        params: Mapping[str, Any] | None = None,
+    ) -> pd.DataFrame:
+        payload = {
+            "query": query,
+            "params": dict(params or {}),
+            "call_timeout_ms": self.call_timeout_ms,
+            "arraysize": self.arraysize,
+        }
+        completed = subprocess.run(
+            [sys.executable, __file__, "--worker"],
+            input=pickle.dumps(payload),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            env=_build_worker_env(),
+        )
+        if completed.returncode != 0:
+            stderr = completed.stderr.decode("utf-8", errors="replace").strip()
+            raise RuntimeError(f"Oracle worker failed: {stderr}") from None
+
+        return pickle.loads(completed.stdout)
 
 
-        with self._connection.cursor() as cursor:
-            cursor.arraysize = 10000  # fetch 10k rows per round-trip
-            cursor.execute(query, {
-                "start_date": start_dt,
-                "end_date": end_dt,
-            })
-            result_columns = [description[0].lower() for description in cursor.description]
-            frame = pd.DataFrame.from_records(cursor.fetchall(), columns=result_columns)
+def _worker_main() -> int:
+    request = pickle.loads(sys.stdin.buffer.read())
+    config = SensorDBConfig.from_env()
 
-        return frame
+    try:
+        oracledb.init_oracle_client(lib_dir=config.oracle_client_lib_dir)
+    except oracledb.ProgrammingError as exc:
+        if "already initialized" not in str(exc).lower():
+            raise
+
+    dsn = oracledb.makedsn(config.host, config.port, sid=config.sid)
+    connection = oracledb.connect(
+        user=config.user,
+        password=config.password,
+        dsn=dsn,
+    )
+    connection.call_timeout = int(request["call_timeout_ms"])
+    cursor = connection.cursor()
+    cursor.arraysize = int(request["arraysize"])
+    try:
+        cursor.execute(request["query"], request["params"])
+        columns = [description[0].lower() for description in cursor.description or ()]
+        frame = pd.DataFrame.from_records(cursor.fetchall(), columns=columns)
+        sys.stdout.buffer.write(pickle.dumps(frame))
+        return 0
+    finally:
+        cursor.close()
+        connection.close()
+
+
+__all__ = [
+    "DEFAULT_CALL_TIMEOUT_MS",
+    "DEFAULT_ENV_PATH",
+    "DEFAULT_ORACLE_CLIENT_LIB_DIR",
+    "SensorDB",
+    "SensorDBConfig",
+    "validate_table_name",
+]
+
 
 if __name__ == "__main__":
-    with SensorDB() as sensor_db:
-        CO2: DataFrame = sensor_db.get_value_series(
-            table_name="leo_center.datavalues",
-            start_date=DEFAULT_START_DATE,
-            end_date=DEFAULT_END_DATE,
-            row_limit=100_000,  # limit to 100k rows for testing
-        )
-
-    print(f"{len(CO2)} rows, columns: {', '.join(CO2.columns)}")
-    print("First timestamps:", CO2["localdatetime"].head().tolist())
-    print("First values:", CO2["datavalue"].head().tolist())
+    if len(sys.argv) > 1 and sys.argv[1] == "--worker":
+        raise SystemExit(_worker_main())
