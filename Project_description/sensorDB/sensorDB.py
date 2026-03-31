@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import sys
+import warnings
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -18,6 +19,12 @@ from dotenv import load_dotenv
 
 DEFAULT_ENV_PATH = Path.home() / "Documents" / ".env"
 DEFAULT_ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
+WINDOWS_ORACLE_BASE_DIRS = (
+    Path(r"C:\oracle"),
+    Path(r"C:\oracle\instantclient"),
+    Path(r"C:\instantclient"),
+    Path(r"C:\Program Files\Oracle"),
+)
 LOCAL_LIB_DIR = Path.home() / ".local/lib"
 ORA_COMPAT_DIR = Path("/tmp/ora_compat")
 ORA_COMPAT_LINK = ORA_COMPAT_DIR / "libaio.so.1"
@@ -27,6 +34,71 @@ DEFAULT_ARRAYSIZE = 10_000
 TABLE_NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_$#]*(\.[A-Z][A-Z0-9_$#]*)?$", re.IGNORECASE)
 
 _ORACLE_CLIENT_INITIALIZED = False
+
+
+def _oracle_client_library_name() -> str:
+    if os.name == "nt":
+        return "oci.dll"
+    if sys.platform == "darwin":
+        return "libclntsh.dylib"
+    return "libclntsh.so"
+
+
+def _normalize_existing_dir(raw_path: str | os.PathLike[str] | None) -> Path | None:
+    if not raw_path:
+        return None
+
+    path = Path(raw_path).expanduser()
+    if path.is_file():
+        path = path.parent
+    if not path.exists():
+        return None
+    return path
+
+
+def _directory_has_oracle_client(path: Path) -> bool:
+    candidate = path if path.is_dir() else path.parent
+    return (candidate / _oracle_client_library_name()).exists()
+
+
+def _discover_oracle_client_lib_dir() -> Path | None:
+    candidates: list[Path] = []
+
+    configured = _normalize_existing_dir(os.getenv("ORACLE_CLIENT_LIB_DIR"))
+    if configured is not None:
+        candidates.append(configured)
+
+    if DEFAULT_ORACLE_CLIENT_LIB_DIR.exists():
+        candidates.append(DEFAULT_ORACLE_CLIENT_LIB_DIR)
+
+    if os.name == "nt":
+        for entry in os.getenv("PATH", "").split(os.pathsep):
+            candidate = _normalize_existing_dir(entry)
+            if candidate is not None:
+                candidates.append(candidate)
+
+        for base in (*WINDOWS_ORACLE_BASE_DIRS, Path.home() / "oracle"):
+            if not base.exists():
+                continue
+            candidates.append(base)
+            try:
+                for dll_path in base.rglob("oci.dll"):
+                    if dll_path.is_file():
+                        candidates.append(dll_path.parent)
+            except OSError:
+                continue
+
+    seen: set[str] = set()
+    for candidate in candidates:
+        candidate_text = str(candidate)
+        if candidate_text in seen:
+            continue
+        seen.add(candidate_text)
+        if _directory_has_oracle_client(candidate):
+            os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", candidate_text)
+            return candidate
+
+    return None
 
 
 def _ensure_libaio_compat_link() -> Path | None:
@@ -45,15 +117,16 @@ def _ensure_libaio_compat_link() -> Path | None:
 
 
 def _runtime_library_entries() -> list[str]:
-    oracle_client_lib_dir = Path(
-        os.getenv("ORACLE_CLIENT_LIB_DIR", str(DEFAULT_ORACLE_CLIENT_LIB_DIR))
-    ).expanduser()
-    if not oracle_client_lib_dir.exists():
+    oracle_client_lib_dir = _discover_oracle_client_lib_dir()
+    if oracle_client_lib_dir is None:
         return []
 
     os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
 
     required_entries = [str(oracle_client_lib_dir)]
+    if os.name == "nt":
+        return required_entries
+
     compat_dir = _ensure_libaio_compat_link()
     if compat_dir is not None:
         required_entries.append(str(compat_dir))
@@ -94,10 +167,29 @@ def _should_use_worker(exc: Exception) -> bool:
     return "DPI-1047" in text or "Cannot locate a 64-bit Oracle Client library" in text
 
 
+def _is_call_timeout_error(exc: Exception) -> bool:
+    text = str(exc)
+    return (
+        "DPY-4024" in text
+        or "DPI-1067" in text
+        or "ORA-03156" in text
+        or "call timeout" in text.lower()
+    )
+
+
 def _build_worker_env() -> dict[str, str]:
     env = os.environ.copy()
     required_entries = _runtime_library_entries()
     if required_entries:
+        env["ORACLE_CLIENT_LIB_DIR"] = required_entries[0]
+        if os.name == "nt":
+            current_entries = [entry for entry in env.get("PATH", "").split(os.pathsep) if entry]
+            merged_entries = required_entries + [
+                entry for entry in current_entries if entry not in required_entries
+            ]
+            env["PATH"] = os.pathsep.join(merged_entries)
+            return env
+
         current_entries = [
             entry for entry in env.get("LD_LIBRARY_PATH", "").split(os.pathsep) if entry
         ]
@@ -105,7 +197,6 @@ def _build_worker_env() -> dict[str, str]:
             entry for entry in current_entries if entry not in required_entries
         ]
         env["LD_LIBRARY_PATH"] = os.pathsep.join(merged_entries)
-        env["ORACLE_CLIENT_LIB_DIR"] = required_entries[0]
     return env
 
 
@@ -116,7 +207,7 @@ class SensorDBConfig:
     host: str
     port: int
     sid: str
-    oracle_client_lib_dir: str
+    oracle_client_lib_dir: str | None
 
     @classmethod
     def from_env(cls) -> "SensorDBConfig":
@@ -125,7 +216,12 @@ class SensorDBConfig:
         host = os.getenv("ORACLE_HOST")
         sid = os.getenv("ORACLE_SID")
         port_raw = os.getenv("ORACLE_PORT", "1521")
-        oracle_client_lib_dir = os.getenv("ORACLE_CLIENT_LIB_DIR")
+        discovered_client_dir = _discover_oracle_client_lib_dir()
+        oracle_client_lib_dir = (
+            str(discovered_client_dir)
+            if discovered_client_dir is not None
+            else None
+        )
 
         missing = [
             name
@@ -134,7 +230,6 @@ class SensorDBConfig:
                 ("ORACLE_PASSWORD", password),
                 ("ORACLE_HOST", host),
                 ("ORACLE_SID", sid),
-                ("ORACLE_CLIENT_LIB_DIR", oracle_client_lib_dir),
             )
             if not value
         ]
@@ -176,7 +271,10 @@ class SensorDB:
             return
 
         try:
-            oracledb.init_oracle_client(lib_dir=self.config.oracle_client_lib_dir)
+            init_kwargs: dict[str, Any] = {}
+            if self.config.oracle_client_lib_dir:
+                init_kwargs["lib_dir"] = self.config.oracle_client_lib_dir
+            oracledb.init_oracle_client(**init_kwargs)
         except oracledb.ProgrammingError as exc:
             if "already initialized" not in str(exc).lower():
                 raise
@@ -230,9 +328,20 @@ class SensorDB:
                 columns = [description[0].lower() for description in cursor.description or ()]
                 return pd.DataFrame.from_records(cursor.fetchall(), columns=columns)
         except oracledb.DatabaseError as exc:
-            if not _should_use_worker(exc):
-                raise
-            return self._fetch_dataframe_via_worker(query, params)
+            if _should_use_worker(exc):
+                return self._fetch_dataframe_via_worker(query, params)
+            if self.call_timeout_ms > 0 and _is_call_timeout_error(exc):
+                warnings.warn(
+                    (
+                        f"Oracle call exceeded configured timeout of {self.call_timeout_ms} ms; "
+                        "retrying without a call timeout."
+                    ),
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                self.disconnect()
+                return self._fetch_dataframe_via_worker(query, params, call_timeout_ms=0)
+            raise
 
     def fetch_one(
         self,
@@ -248,11 +357,15 @@ class SensorDB:
         self,
         query: str,
         params: Mapping[str, Any] | None = None,
+        *,
+        call_timeout_ms: int | None = None,
     ) -> pd.DataFrame:
         payload = {
             "query": query,
             "params": dict(params or {}),
-            "call_timeout_ms": self.call_timeout_ms,
+            "call_timeout_ms": (
+                self.call_timeout_ms if call_timeout_ms is None else int(call_timeout_ms)
+            ),
             "arraysize": self.arraysize,
         }
         completed = subprocess.run(
@@ -275,7 +388,10 @@ def _worker_main() -> int:
     config = SensorDBConfig.from_env()
 
     try:
-        oracledb.init_oracle_client(lib_dir=config.oracle_client_lib_dir)
+        init_kwargs: dict[str, Any] = {}
+        if config.oracle_client_lib_dir:
+            init_kwargs["lib_dir"] = config.oracle_client_lib_dir
+        oracledb.init_oracle_client(**init_kwargs)
     except oracledb.ProgrammingError as exc:
         if "already initialized" not in str(exc).lower():
             raise
