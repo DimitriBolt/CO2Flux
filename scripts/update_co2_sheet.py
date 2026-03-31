@@ -13,7 +13,7 @@ from openpyxl.utils import get_column_letter
 
 
 ROOT = Path("/home/dimitri/PycharmProjects/CO2Flux")
-WORKBOOK_PATH = ROOT / "Sensors_Description" / "climate_control_theorist_schema.xlsx"
+WORKBOOK_PATH = ROOT / "Sensors_Description" / "variables_schema.xlsx"
 ENV_PATH = Path.home() / "Documents" / ".env"
 ORACLE_CLIENT_LIB_DIR = Path("/opt/oracle/instantclient_19_26")
 TODAY = date.today().isoformat()

@@ -2,15 +2,15 @@ How to identify basalt CO2 rows in the CO2 sheet
 
 In the current CO2 worksheet, rows that represent CO2 concentration inside the basalt layer can be identified very clearly. A row should be treated as an internal basalt CO2 time series if all of the following are true:
 
-- B = Carbon dioxide concentration
-- C = C_CO2,basalt
-- I = GMM222
-- E = Primary state / gradient driver
-- F says that this is an internal basalt CO2 concentration used for gradients and surface-normal flux estimates
-- L = leo_center.datavalues or leo_east.datavalues or leo_west.datavalues
-- M has the form dv.sensorid = ... AND dv.variableid = 9
-- AH = CO2
-- AI = Carbon dioxide
+- A = Carbon dioxide concentration
+- B = C_CO2,basalt
+- K = GMM222
+- G = Primary state / gradient driver
+- H says that this is an internal basalt CO2 concentration used for gradients and surface-normal flux estimates
+- N = leo_center.datavalues or leo_east.datavalues or leo_west.datavalues
+- O has the form dv.sensorid = ... AND dv.variableid = 9
+- AE = CO2
+- AF = Carbon dioxide
 
 These rows represent internal CO2 in basalt pore space, not atmospheric CO2 above the slope.
 
@@ -18,9 +18,9 @@ How to distinguish them from atmospheric CO2 rows
 
 Atmospheric CO2 rows have different markers:
 
-- C = C_CO2,air
-- I = LI-COR
-- L points to ...datavalueslicor
+- B = C_CO2,air
+- K = LI-COR
+- N points to ...datavalueslicor
 
 Those rows are atmospheric boundary-condition measurements, not internal basalt CO2 measurements.
 
@@ -28,25 +28,25 @@ How to build a vertical CO2 gradient at one surface location
 
 To build a vertical gradient at one surface point, use rows that have the same:
 
-- G: same slope
-- U: same x coordinate
-- V: same y coordinate
+- I: same slope
+- C: same x coordinate
+- D: same y coordinate
 
 and different:
 
-- W or X: different depth
+- E or F: different depth
 
-So one vertical profile is defined by fixed (G, U, V) and multiple depth levels.
+So one vertical profile is defined by fixed (I, C, D) and multiple depth levels.
 
 Example of one vertical profile
 
 If:
 
-- G = LEO Center
-- U = -4
-- V = 4
+- I = LEO Center
+- C = -4
+- D = 4
 
-then all rows with this same (G, U, V) and I = GMM222 belong to one vertical profile through the basalt. The depth levels are:
+then all rows with this same (I, C, D) and K = GMM222 belong to one vertical profile through the basalt. The depth levels are:
 
 - level 1 = 5 cm
 - level 2 = 20 cm
@@ -66,10 +66,10 @@ Practical Excel rule
 
 In Excel, apply filters and keep only:
 
-- C = C_CO2,basalt
-- I = GMM222
+- B = C_CO2,basalt
+- K = GMM222
 
-After that, every remaining row is a CO2 time series inside the basalt layer. To build gradients, group the filtered rows by (G, U, V).
+After that, every remaining row is a CO2 time series inside the basalt layer. To build gradients, group the filtered rows by (I, C, D).
 
 How to build SQL queries to extract data from SensorDB
 =======================================================
@@ -78,21 +78,21 @@ For each sensor in the Excel schema, all the information needed to construct an 
 
 The query structure is assembled from the following columns:
 
-- L (Oracle table / query path) — table name, e.g., leo_west.datavalues
-- M (Oracle selector / WHERE key) — WHERE condition, e.g., dv.sensorid = 1034 AND dv.variableid = 9
-- N (Time column) — time column name, usually LOCALDATETIME
-- O (Value column) — value column name, usually DATAVALUE
-- AD (Concrete SQL query) — ready-to-use complete SQL query
+- N (Oracle table / query path) — table name, e.g., leo_west.datavalues
+- O (Oracle selector / WHERE key) — WHERE condition, e.g., dv.sensorid = 1034 AND dv.variableid = 9
+- P (Time column) — time column name, usually LOCALDATETIME
+- Q (Value column) — value column name, usually DATAVALUE
+- AA (Concrete SQL query) — ready-to-use complete SQL query
 
-Column AD already contains a ready-made query that can be used directly or modified as needed.
+Column AA already contains a ready-made query that can be used directly or modified as needed.
 
 Example for sensor LEO-W_4_-1_4_GMM222 (row 105 in Excel)
 ----------------------------------------------------------
 
 From row 105 cells:
-- L105 = leo_west.datavalues
-- M105 = dv.sensorid = 996 AND dv.variableid = 9
-- AD105 contains the ready query for the entire observation period
+- N105 = leo_west.datavalues
+- O105 = dv.sensorid = 996 AND dv.variableid = 9
+- AA105 contains the ready query for the entire observation period
 
 Basic query for all data:
 ```sql

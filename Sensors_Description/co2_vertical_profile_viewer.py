@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import os
 import sys
 from collections import defaultdict
@@ -11,10 +12,13 @@ import tomllib
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.toml"
+DEFAULT_CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.toml"
 LOCAL_CONFIG_PATH = SCRIPT_DIR / "co2_vertical_profile_viewer_config.local.toml"
-WORKBOOK_PATH = SCRIPT_DIR / "climate_control_theorist_schema.xlsx"
+WORKBOOK_PATH = SCRIPT_DIR / "variables_schema.xlsx"
 OUTPUT_DIR = SCRIPT_DIR
+
+# Global variable to hold the config path, will be set by parse_args()
+CONFIG_PATH = DEFAULT_CONFIG_PATH
 
 
 def _resolve_env_path() -> Path:
@@ -93,13 +97,13 @@ def _require_number(section: dict[str, object], key: str) -> float | int:
     return value
 
 
-def load_viewer_config() -> ViewerConfig:
-    if not CONFIG_PATH.exists():
+def load_viewer_config(config_path: Path) -> ViewerConfig:
+    if not config_path.exists():
         raise FileNotFoundError(
-            f"Config file not found: {CONFIG_PATH}. Create it from the repository version."
+            f"Config file not found: {config_path}. Create it from the repository version."
         )
 
-    raw_config = _load_toml_config(CONFIG_PATH)
+    raw_config = _load_toml_config(config_path)
     if LOCAL_CONFIG_PATH.exists():
         raw_config = _merge_config(raw_config, _load_toml_config(LOCAL_CONFIG_PATH))
 
@@ -124,18 +128,40 @@ def load_viewer_config() -> ViewerConfig:
     )
 
 
-VIEWER_CONFIG = load_viewer_config()
-DEFAULT_ORACLE_CLIENT_LIB_DIR = VIEWER_CONFIG.oracle.default_client_lib_dir
-LOCAL_LIB_DIR = VIEWER_CONFIG.oracle.local_lib_dir
-ORACLE_ENV_READY_FLAG = VIEWER_CONFIG.oracle.env_ready_flag
-SLOPE = VIEWER_CONFIG.profile.slope
-X_COORD_M = VIEWER_CONFIG.profile.x_coord_m
-Y_COORD_M = VIEWER_CONFIG.profile.y_coord_m
-START_DATE = VIEWER_CONFIG.profile.start_date
-END_DATE = VIEWER_CONFIG.profile.end_date
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="CO2 vertical profile viewer for basalt measurements"
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG_PATH,
+        help=f"Path to TOML configuration file (default: {DEFAULT_CONFIG_PATH})",
+    )
+    return parser.parse_args()
+
+
+# These will be initialized in main()
+VIEWER_CONFIG: ViewerConfig = None
+DEFAULT_ORACLE_CLIENT_LIB_DIR: Path = None
+LOCAL_LIB_DIR: Path = None
+ORACLE_ENV_READY_FLAG: str = None
+SLOPE: str = None
+X_COORD_M: float = None
+Y_COORD_M: float = None
+START_DATE: str = None
+END_DATE: str = None
 
 
 def _ensure_oracle_runtime_env() -> None:
+    # Check if we already ran this setup (via env flag)
+    if os.getenv(ORACLE_ENV_READY_FLAG) == "1":
+        return
+
+    if DEFAULT_ORACLE_CLIENT_LIB_DIR is None or LOCAL_LIB_DIR is None or ORACLE_ENV_READY_FLAG is None:
+        # Config not loaded yet, cannot setup environment
+        return
+
     oracle_client_lib_dir = Path(
         os.getenv("ORACLE_CLIENT_LIB_DIR", str(DEFAULT_ORACLE_CLIENT_LIB_DIR))
     ).expanduser()
@@ -151,18 +177,17 @@ def _ensure_oracle_runtime_env() -> None:
     ]
     missing_entries = [entry for entry in required_entries if entry not in current_entries]
 
-    os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
-    if not missing_entries or os.getenv(ORACLE_ENV_READY_FLAG) == "1":
-        return
-
-    new_env = os.environ.copy()
-    new_env["ORACLE_CLIENT_LIB_DIR"] = str(oracle_client_lib_dir)
-    new_env["LD_LIBRARY_PATH"] = os.pathsep.join(required_entries + current_entries)
-    new_env[ORACLE_ENV_READY_FLAG] = "1"
-    os.execve(sys.executable, [sys.executable, *sys.argv], new_env)
-
-
-_ensure_oracle_runtime_env()
+    # If there are missing entries, we need to restart with proper LD_LIBRARY_PATH
+    if missing_entries:
+        print(f"Restarting with LD_LIBRARY_PATH including: {', '.join(required_entries)}", file=sys.stderr)
+        new_env = os.environ.copy()
+        new_env["ORACLE_CLIENT_LIB_DIR"] = str(oracle_client_lib_dir)
+        new_env["LD_LIBRARY_PATH"] = os.pathsep.join(required_entries + current_entries)
+        new_env[ORACLE_ENV_READY_FLAG] = "1"
+        os.execve(sys.executable, [sys.executable, *sys.argv], new_env)
+    else:
+        # Paths are already set, just ensure env var is set
+        os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
 
 try:
     import matplotlib
@@ -395,24 +420,24 @@ def load_profile_sensors() -> list[ProfileSensor]:
 
     sensors: list[ProfileSensor] = []
     for row_idx in range(4, sheet.max_row + 1):
-        if sheet[f"C{row_idx}"].value != "C_CO2,basalt":
+        if sheet[f"B{row_idx}"].value != "C_CO2,basalt":
             continue
-        if sheet[f"I{row_idx}"].value != "GMM222":
+        if sheet[f"K{row_idx}"].value != "GMM222":
             continue
-        if sheet[f"G{row_idx}"].value != SLOPE:
+        if sheet[f"I{row_idx}"].value != SLOPE:
             continue
-        if not float_matches(sheet[f"U{row_idx}"].value, X_COORD_M):
+        if not float_matches(sheet[f"C{row_idx}"].value, X_COORD_M):
             continue
-        if not float_matches(sheet[f"V{row_idx}"].value, Y_COORD_M):
+        if not float_matches(sheet[f"D{row_idx}"].value, Y_COORD_M):
             continue
 
         sensors.append(
             ProfileSensor(
-                sensor_id=int(sheet[f"J{row_idx}"].value),
-                sensor_code=str(sheet[f"K{row_idx}"].value),
-                table_name=str(sheet[f"L{row_idx}"].value),
-                variable_id=int(sheet[f"AG{row_idx}"].value),
-                depth_m=float(sheet[f"W{row_idx}"].value),
+                sensor_id=int(sheet[f"L{row_idx}"].value),
+                sensor_code=str(sheet[f"M{row_idx}"].value),
+                table_name=str(sheet[f"N{row_idx}"].value),
+                variable_id=int(sheet[f"AD{row_idx}"].value),
+                depth_m=float(sheet[f"E{row_idx}"].value),
             )
         )
 
@@ -603,6 +628,31 @@ def draw_frame(
 
 
 def main() -> None:
+    global VIEWER_CONFIG, DEFAULT_ORACLE_CLIENT_LIB_DIR, LOCAL_LIB_DIR, ORACLE_ENV_READY_FLAG
+    global SLOPE, X_COORD_M, Y_COORD_M, START_DATE, END_DATE
+
+    # Parse command line arguments
+    args = parse_args()
+
+    # Load configuration from specified file
+    VIEWER_CONFIG = load_viewer_config(args.config)
+    DEFAULT_ORACLE_CLIENT_LIB_DIR = VIEWER_CONFIG.oracle.default_client_lib_dir
+    LOCAL_LIB_DIR = VIEWER_CONFIG.oracle.local_lib_dir
+    ORACLE_ENV_READY_FLAG = VIEWER_CONFIG.oracle.env_ready_flag
+    SLOPE = VIEWER_CONFIG.profile.slope
+    X_COORD_M = VIEWER_CONFIG.profile.x_coord_m
+    Y_COORD_M = VIEWER_CONFIG.profile.y_coord_m
+    START_DATE = VIEWER_CONFIG.profile.start_date
+    END_DATE = VIEWER_CONFIG.profile.end_date
+
+    # Ensure Oracle runtime environment is set up
+    _ensure_oracle_runtime_env()
+
+    print(f"Using config file: {args.config}")
+    print(f"Profile: {SLOPE}, X={X_COORD_M}, Y={Y_COORD_M}")
+    print(f"Time range: {START_DATE} to {END_DATE}")
+    print()
+
     start_dt = parse_user_datetime(START_DATE, is_end=False)
     if start_dt is None:
         raise ValueError("START_DATE must be provided.")

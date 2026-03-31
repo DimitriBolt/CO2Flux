@@ -4,7 +4,7 @@
 
 For tasks in `Sensors_Description` related to:
 
-- `climate_control_theorist_schema.xlsx`
+- `variables_schema.xlsx`
 - CO2 viewer scripts
 - Oracle SensorDB access
 
@@ -19,8 +19,8 @@ Then open the canonical task-specific documents referenced from that file.
 ### Workbook
 
 - The canonical human-readable rulebook for extending
-  `Sensors_Description/climate_control_theorist_schema.xlsx` is:
-  `Sensors_Description/climate_control_theorist_schema_notes.md`
+  `Sensors_Description/variables_schema.xlsx` is:
+  `Sensors_Description/variables_schema_notes.md`
 - The executable source of truth for the `CO2` sheet is:
   `scripts/update_co2_sheet.py`
 
@@ -40,7 +40,7 @@ Then open the canonical task-specific documents referenced from that file.
 - Credentials live in:
   `/home/dimitri/Documents/.env`
 - Connection instructions for this environment are documented in:
-  `Sensors_Description/climate_control_theorist_schema_notes.md`
+  `Sensors_Description/variables_schema_notes.md`
 
 ## Working style for repeated tasks
 

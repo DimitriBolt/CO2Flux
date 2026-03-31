@@ -7,7 +7,7 @@ This file is the compact working memory for repeated CO2Flux tasks in
 
 Use it as the entry point before:
 
-- extending `climate_control_theorist_schema.xlsx`
+- extending `variables_schema.xlsx`
 - building or extending CO2 profile viewers
 - connecting to Oracle SensorDB for validation or extraction
 
@@ -17,11 +17,11 @@ Use it as the entry point before:
 
 Primary rulebook:
 
-- `Sensors_Description/climate_control_theorist_schema_notes.md`
+- `Sensors_Description/variables_schema_notes.md`
 
 This document is the canonical memory for:
 
-- how `climate_control_theorist_schema.xlsx` is structured
+- how `variables_schema.xlsx` is structured
 - how rows are selected and validated
 - how the `CO2` sheet is assembled
 - how basalt rows differ from atmospheric rows
@@ -52,21 +52,21 @@ These two files contain mirrored Russian / English notes for:
 - building SQL for basalt CO2
 - building SQL for atmospheric CO2 in air
 
-## Repeated workflow: extending climate_control_theorist_schema.xlsx
+## Repeated workflow: extending variables_schema.xlsx
 
 When working on the workbook again, follow this order:
 
-1. Start with `Sensors_Description/climate_control_theorist_schema_notes.md`.
+1. Start with `Sensors_Description/variables_schema_notes.md`.
 2. Treat `scripts/update_co2_sheet.py` as the executable source of truth for
    the `CO2` sheet.
 3. Preserve the rule: one row = one meaningful time series.
 4. Keep Oracle extraction fields complete:
-   `L`, `M`, `N`, `O`, `AD`, `AF`, `AG:AK`.
+   `N`, `O`, `P`, `Q`, `AA`, `AC`, `AD:AG`.
 5. Validate rows against Oracle, not only against inventory metadata.
 6. For basalt CO2:
-   use `C = C_CO2,basalt`, `I = GMM222`, `variableid = 9`.
+   use `B = C_CO2,basalt`, `K = GMM222`, `variableid = 9`.
 7. For atmospheric CO2:
-   use `C = C_CO2,air`, `I = LI-COR`, `...datavalueslicor`,
+   use `B = C_CO2,air`, `K = LI-COR`, `...datavalueslicor`,
    `variableid = 56`.
 
 ## Repeated workflow: extending viewer scripts
@@ -107,7 +107,7 @@ explicitly changes them.
 Primary connection memory:
 
 - see `Oracle connection instructions` in
-  `Sensors_Description/climate_control_theorist_schema_notes.md`
+  `Sensors_Description/variables_schema_notes.md`
 
 Environment-specific rules already established:
 

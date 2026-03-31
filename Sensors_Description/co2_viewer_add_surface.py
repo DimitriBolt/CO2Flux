@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import argparse
 from dataclasses import dataclass
+from pathlib import Path
 
 import co2_vertical_profile_viewer as base
 
@@ -18,8 +20,8 @@ class SurfaceAirSelectionConfig:
     y_coord_m: float
 
 
-def load_surface_air_config() -> SurfaceAirSelectionConfig:
-    raw_config = base._load_toml_config(base.CONFIG_PATH)
+def load_surface_air_config(config_path: Path) -> SurfaceAirSelectionConfig:
+    raw_config = base._load_toml_config(config_path)
     if base.LOCAL_CONFIG_PATH.exists():
         raw_config = base._merge_config(raw_config, base._load_toml_config(base.LOCAL_CONFIG_PATH))
 
@@ -30,9 +32,10 @@ def load_surface_air_config() -> SurfaceAirSelectionConfig:
     )
 
 
-SURFACE_AIR_CONFIG = load_surface_air_config()
-AIR_X_COORD_M = SURFACE_AIR_CONFIG.x_coord_m
-AIR_Y_COORD_M = SURFACE_AIR_CONFIG.y_coord_m
+# These will be initialized in main()
+SURFACE_AIR_CONFIG: SurfaceAirSelectionConfig = None
+AIR_X_COORD_M: float = None
+AIR_Y_COORD_M: float = None
 
 
 def load_surface_air_sensor() -> base.ProfileSensor:
@@ -41,25 +44,25 @@ def load_surface_air_sensor() -> base.ProfileSensor:
 
     matches: list[base.ProfileSensor] = []
     for row_idx in range(4, sheet.max_row + 1):
-        if sheet[f"C{row_idx}"].value != "C_CO2,air":
+        if sheet[f"B{row_idx}"].value != "C_CO2,air":
             continue
-        if sheet[f"I{row_idx}"].value != "LI-COR":
+        if sheet[f"K{row_idx}"].value != "LI-COR":
             continue
-        if sheet[f"G{row_idx}"].value != base.SLOPE:
+        if sheet[f"I{row_idx}"].value != base.SLOPE:
             continue
-        if not base.float_matches(sheet[f"U{row_idx}"].value, AIR_X_COORD_M):
+        if not base.float_matches(sheet[f"C{row_idx}"].value, AIR_X_COORD_M):
             continue
-        if not base.float_matches(sheet[f"V{row_idx}"].value, AIR_Y_COORD_M):
+        if not base.float_matches(sheet[f"D{row_idx}"].value, AIR_Y_COORD_M):
             continue
-        if not base.float_matches(sheet[f"W{row_idx}"].value, AIR_LEVEL_M):
+        if not base.float_matches(sheet[f"E{row_idx}"].value, AIR_LEVEL_M):
             continue
 
         matches.append(
             base.ProfileSensor(
-                sensor_id=int(sheet[f"J{row_idx}"].value),
-                sensor_code=str(sheet[f"K{row_idx}"].value),
-                table_name=str(sheet[f"L{row_idx}"].value),
-                variable_id=int(sheet[f"AG{row_idx}"].value),
+                sensor_id=int(sheet[f"L{row_idx}"].value),
+                sensor_code=str(sheet[f"M{row_idx}"].value),
+                table_name=str(sheet[f"N{row_idx}"].value),
+                variable_id=int(sheet[f"AD{row_idx}"].value),
                 depth_m=AIR_LEVEL_M,
             )
         )
@@ -192,7 +195,50 @@ def draw_frame(
     figure.tight_layout()
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="CO2 vertical profile viewer with atmospheric surface point"
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=base.DEFAULT_CONFIG_PATH,
+        help=f"Path to TOML configuration file (default: {base.DEFAULT_CONFIG_PATH})",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    global SURFACE_AIR_CONFIG, AIR_X_COORD_M, AIR_Y_COORD_M
+
+    # Parse command line arguments
+    args = parse_args()
+
+    # Initialize base module configuration
+    base.VIEWER_CONFIG = base.load_viewer_config(args.config)
+    base.DEFAULT_ORACLE_CLIENT_LIB_DIR = base.VIEWER_CONFIG.oracle.default_client_lib_dir
+    base.LOCAL_LIB_DIR = base.VIEWER_CONFIG.oracle.local_lib_dir
+    base.ORACLE_ENV_READY_FLAG = base.VIEWER_CONFIG.oracle.env_ready_flag
+    base.SLOPE = base.VIEWER_CONFIG.profile.slope
+    base.X_COORD_M = base.VIEWER_CONFIG.profile.x_coord_m
+    base.Y_COORD_M = base.VIEWER_CONFIG.profile.y_coord_m
+    base.START_DATE = base.VIEWER_CONFIG.profile.start_date
+    base.END_DATE = base.VIEWER_CONFIG.profile.end_date
+
+    # Load surface air configuration
+    SURFACE_AIR_CONFIG = load_surface_air_config(args.config)
+    AIR_X_COORD_M = SURFACE_AIR_CONFIG.x_coord_m
+    AIR_Y_COORD_M = SURFACE_AIR_CONFIG.y_coord_m
+
+    # Ensure Oracle runtime environment is set up
+    base._ensure_oracle_runtime_env()
+
+    print(f"Using config file: {args.config}")
+    print(f"Basalt profile: {base.SLOPE}, X={base.X_COORD_M}, Y={base.Y_COORD_M}")
+    print(f"Surface air point: X={AIR_X_COORD_M}, Y={AIR_Y_COORD_M}")
+    print(f"Time range: {base.START_DATE} to {base.END_DATE}")
+    print()
+
     start_dt = base.parse_user_datetime(base.START_DATE, is_end=False)
     if start_dt is None:
         raise ValueError("START_DATE must be provided.")
