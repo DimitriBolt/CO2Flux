@@ -19,6 +19,9 @@ OUTPUT_DIR = SCRIPT_DIR
 
 # Global variable to hold the config path, will be set by parse_args()
 CONFIG_PATH = DEFAULT_CONFIG_PATH
+ORA_COMPAT_DIR = Path("/tmp/ora_compat")
+ORA_COMPAT_LINK = ORA_COMPAT_DIR / "libaio.so.1"
+ORA_COMPAT_TARGET = Path("/lib/x86_64-linux-gnu/libaio.so.1t64")
 
 
 def _resolve_env_path() -> Path:
@@ -154,10 +157,6 @@ END_DATE: str = None
 
 
 def _ensure_oracle_runtime_env() -> None:
-    # Check if we already ran this setup (via env flag)
-    if os.getenv(ORACLE_ENV_READY_FLAG) == "1":
-        return
-
     if DEFAULT_ORACLE_CLIENT_LIB_DIR is None or LOCAL_LIB_DIR is None or ORACLE_ENV_READY_FLAG is None:
         # Config not loaded yet, cannot setup environment
         return
@@ -168,26 +167,58 @@ def _ensure_oracle_runtime_env() -> None:
     if not oracle_client_lib_dir.exists():
         return
 
-    required_entries = [str(oracle_client_lib_dir)]
-    if LOCAL_LIB_DIR.exists():
-        required_entries.append(str(LOCAL_LIB_DIR))
+    def _ensure_libaio_compat_link() -> Path | None:
+        if os.name == "nt" or sys.platform == "darwin":
+            return None
+        if not ORA_COMPAT_TARGET.exists():
+            return None
 
+        ORA_COMPAT_DIR.mkdir(parents=True, exist_ok=True)
+        if ORA_COMPAT_LINK.is_symlink() or ORA_COMPAT_LINK.exists():
+            if ORA_COMPAT_LINK.resolve() != ORA_COMPAT_TARGET.resolve():
+                ORA_COMPAT_LINK.unlink()
+                ORA_COMPAT_LINK.symlink_to(ORA_COMPAT_TARGET)
+        else:
+            ORA_COMPAT_LINK.symlink_to(ORA_COMPAT_TARGET)
+
+        return ORA_COMPAT_DIR
+
+    required_entries = [str(oracle_client_lib_dir)]
+    if os.name != "nt":
+        compat_dir = _ensure_libaio_compat_link()
+        if compat_dir is not None:
+            required_entries.append(str(compat_dir))
+        if LOCAL_LIB_DIR.exists():
+            required_entries.append(str(LOCAL_LIB_DIR))
+
+    path_var = "PATH" if os.name == "nt" else "LD_LIBRARY_PATH"
     current_entries = [
-        entry for entry in os.getenv("LD_LIBRARY_PATH", "").split(os.pathsep) if entry
+        entry for entry in os.getenv(path_var, "").split(os.pathsep) if entry
     ]
     missing_entries = [entry for entry in required_entries if entry not in current_entries]
 
-    # If there are missing entries, we need to restart with proper LD_LIBRARY_PATH
     if missing_entries:
-        print(f"Restarting with LD_LIBRARY_PATH including: {', '.join(required_entries)}", file=sys.stderr)
+        if os.getenv(ORACLE_ENV_READY_FLAG) == "1":
+            print(
+                f"Warning: Oracle runtime env still missing after restart attempt: {', '.join(missing_entries)}",
+                file=sys.stderr,
+            )
+            os.environ["ORACLE_CLIENT_LIB_DIR"] = str(oracle_client_lib_dir)
+            os.environ[path_var] = os.pathsep.join(required_entries + current_entries)
+            return
+
+        print(f"Restarting with {path_var} including: {', '.join(required_entries)}", file=sys.stderr)
         new_env = os.environ.copy()
         new_env["ORACLE_CLIENT_LIB_DIR"] = str(oracle_client_lib_dir)
-        new_env["LD_LIBRARY_PATH"] = os.pathsep.join(required_entries + current_entries)
+        new_env[path_var] = os.pathsep.join(required_entries + current_entries)
         new_env[ORACLE_ENV_READY_FLAG] = "1"
-        os.execve(sys.executable, [sys.executable, *sys.argv], new_env)
-    else:
-        # Paths are already set, just ensure env var is set
-        os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
+        restart_argv = list(getattr(sys, "orig_argv", [])) or [sys.executable, *sys.argv]
+        if restart_argv:
+            restart_argv[0] = sys.executable
+        os.execve(sys.executable, restart_argv, new_env)
+
+    os.environ.setdefault("ORACLE_CLIENT_LIB_DIR", str(oracle_client_lib_dir))
+    os.environ.setdefault(ORACLE_ENV_READY_FLAG, "1")
 
 try:
     import matplotlib
@@ -395,11 +426,24 @@ def connect_to_oracle() -> oracledb.Connection:
     except (oracledb.NotSupportedError, oracledb.OperationalError) as exc:
         # If server mandates Native Network Encryption, thin mode cannot be used.
         if "DPY-3001" in str(exc) and used_lib_dir is None:
+            if os.name == "nt":
+                help_text = (
+                    "Install Oracle Instant Client for Windows (Basic or Basic Light) and set the client folder "
+                    "(with oci.dll):\n"
+                    "  - either in ~/Documents/.env as ORACLE_CLIENT_LIB_DIR=C:\\path\\to\\instantclient_XX_X\n"
+                    "  - or as environment variable ORACLE_CLIENT_LIB_DIR, or add that folder to PATH."
+                )
+            else:
+                help_text = (
+                    "Ensure Oracle Instant Client is available and the process starts with Oracle runtime paths.\n"
+                    "Expected Linux setup in this project:\n"
+                    "  - ORACLE_CLIENT_LIB_DIR=/opt/oracle/instantclient_19_26\n"
+                    "  - LD_LIBRARY_PATH includes /opt/oracle/instantclient_19_26\n"
+                    "  - LD_LIBRARY_PATH includes /tmp/ora_compat and ~/.local/lib when present"
+                )
             raise RuntimeError(
                 "Server requires Native Network Encryption, which needs python-oracledb thick mode.\n"
-                "Install Oracle Instant Client for Windows (Basic or Basic Light) and set the client folder (with oci.dll):\n"
-                "  - either in ~/Documents/.env as ORACLE_CLIENT_LIB_DIR=C:\\path\\to\\instantclient_XX_X\n"
-                "  - or as environment variable ORACLE_CLIENT_LIB_DIR, or add that folder to PATH.\n"
+                f"{help_text}\n"
                 "Then rerun this script."
             ) from exc
         raise

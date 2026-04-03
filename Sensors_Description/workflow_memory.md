@@ -10,6 +10,7 @@ Use it as the entry point before:
 - extending `variables_schema.xlsx`
 - building or extending CO2 profile viewers
 - connecting to Oracle SensorDB for validation or extraction
+- searching for an ideal common period for a basalt CO2 vertical
 
 ## Canonical documents
 
@@ -51,6 +52,21 @@ These two files contain mirrored Russian / English notes for:
 - grouping basalt verticals
 - building SQL for basalt CO2
 - building SQL for atmospheric CO2 in air
+
+### Basalt vertical ideal-period analysis
+
+Canonical workflow:
+
+- `Project_description/sensorDB/ideal_vertical_period_workflow.md`
+
+This document is the canonical memory for:
+
+- resolving one basalt vertical from `(slope, x, y)` in `variables_schema.xlsx`
+- extracting the shared time axis for a vertical triplet from Oracle SensorDB
+- handling duplicate `(sensorid, timestamp)` rows safely
+- finding the longest continuous common period with valid values and no
+  outliers beyond `15%` from the period mean
+- updating the corresponding Jupyter notebook for that vertical
 
 ## Repeated workflow: extending variables_schema.xlsx
 

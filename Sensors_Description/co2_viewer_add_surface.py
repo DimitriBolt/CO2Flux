@@ -1,10 +1,17 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import co2_vertical_profile_viewer as base
+import pandas as pd
+
+
+SENSOR_DB_DIR = Path(__file__).resolve().parent.parent / "Project_description" / "sensorDB"
+if str(SENSOR_DB_DIR) not in sys.path:
+    sys.path.insert(0, str(SENSOR_DB_DIR))
 
 
 AIR_LEVEL_M = 0.25
@@ -38,60 +45,45 @@ AIR_X_COORD_M: float = None
 AIR_Y_COORD_M: float = None
 
 
-def load_surface_air_sensor() -> base.ProfileSensor:
-    workbook = base.load_workbook(base.WORKBOOK_PATH, data_only=True)
-    sheet = workbook["CO2"]
+def load_surface_air_sensor() -> "AirCO2Series":
+    from air_co2_catalog import AirCO2Catalog
 
-    matches: list[base.ProfileSensor] = []
-    for row_idx in range(4, sheet.max_row + 1):
-        if sheet[f"B{row_idx}"].value != "C_CO2,air":
-            continue
-        if sheet[f"K{row_idx}"].value != "LI-COR":
-            continue
-        if sheet[f"I{row_idx}"].value != base.SLOPE:
-            continue
-        if not base.float_matches(sheet[f"C{row_idx}"].value, AIR_X_COORD_M):
-            continue
-        if not base.float_matches(sheet[f"D{row_idx}"].value, AIR_Y_COORD_M):
-            continue
-        if not base.float_matches(sheet[f"E{row_idx}"].value, AIR_LEVEL_M):
-            continue
-
-        matches.append(
-            base.ProfileSensor(
-                sensor_id=int(sheet[f"L{row_idx}"].value),
-                sensor_code=str(sheet[f"M{row_idx}"].value),
-                table_name=str(sheet[f"N{row_idx}"].value),
-                variable_id=int(sheet[f"AD{row_idx}"].value),
-                depth_m=AIR_LEVEL_M,
-            )
-        )
-
-    if not matches:
-        raise ValueError(
-            "No atmospheric CO2 row was found for "
-            f"slope={base.SLOPE!r}, X={AIR_X_COORD_M}, Y={AIR_Y_COORD_M}, Z={AIR_LEVEL_M}."
-        )
-    if len(matches) > 1:
-        sensor_codes = ", ".join(sensor.sensor_code for sensor in matches)
-        raise ValueError(
-            "Multiple atmospheric CO2 rows matched the requested surface-air point: "
-            f"{sensor_codes}"
-        )
-    return matches[0]
+    catalog = AirCO2Catalog(workbook_path=base.WORKBOOK_PATH)
+    return catalog.get_sensor(
+        slope=base.SLOPE,
+        x_coord_m=AIR_X_COORD_M,
+        y_coord_m=AIR_Y_COORD_M,
+        height_m=AIR_LEVEL_M,
+    )
 
 
 def build_frames_with_surface_air(
     basalt_frames: list[tuple[base.datetime, dict[float, float]]],
-    air_series: list[base.Measurement],
+    air_series: pd.Series | list[base.Measurement],
 ) -> list[tuple[base.datetime, dict[float, float]]]:
+    if isinstance(air_series, pd.Series):
+        normalized_air_series = [
+            (
+                timestamp.to_pydatetime() if isinstance(timestamp, pd.Timestamp) else timestamp,
+                float(value),
+            )
+            for timestamp, value in air_series.sort_index().items()
+        ]
+    else:
+        normalized_air_series = [
+            (measurement.timestamp, measurement.value) for measurement in air_series
+        ]
+
     air_index = 0
     last_air_value: float | None = None
     frames: list[tuple[base.datetime, dict[float, float]]] = []
 
     for frame_time, basalt_values in basalt_frames:
-        while air_index < len(air_series) and air_series[air_index].timestamp <= frame_time:
-            last_air_value = air_series[air_index].value
+        while (
+            air_index < len(normalized_air_series)
+            and normalized_air_series[air_index][0] <= frame_time
+        ):
+            last_air_value = normalized_air_series[air_index][1]
             air_index += 1
 
         combined_values = basalt_values.copy()
@@ -256,19 +248,23 @@ def main() -> None:
             sensor.depth_m: base.fetch_measurements(cursor, sensor, start_dt, requested_end_dt)
             for sensor in profile_sensors
         }
-        air_series = base.fetch_measurements(cursor, air_sensor, start_dt, requested_end_dt)
     finally:
         cursor.close()
         connection.close()
+
+    air_series = air_sensor.fetch_series(
+        start_datetime=start_dt,
+        end_datetime=requested_end_dt,
+    )
 
     resolved_end_dt = base.resolve_end_datetime(requested_end_dt, basalt_series_by_depth)
     basalt_frames = base.build_frames(basalt_series_by_depth, resolved_end_dt)
     frames = build_frames_with_surface_air(basalt_frames, air_series)
 
-    if not air_series:
+    if air_series.empty:
         print(
             "Warning: no air observations were found in the selected interval for "
-            f"{air_sensor.sensor_code}. The animation will contain basalt only."
+            f"{air_sensor.sensor_code or air_sensor.sensor_id}. The animation will contain basalt only."
         )
 
     output_stem = base.build_output_stem(start_dt, resolved_end_dt)
