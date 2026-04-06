@@ -72,7 +72,6 @@ Find the file matching your coordinates:
 From the notebook, extract:
 - **Start timestamp** of the ideal period
 - **End timestamp** of the ideal period
-- **Time step** (should be 15 minutes)
 
 ### Step 3: Extract Time Series from Oracle Database
 
