@@ -61,12 +61,23 @@ Canonical workflow:
 
 This document is the canonical memory for:
 
-- resolving one basalt vertical from `(slope, x, y)` in `variables_schema.xlsx`
-- extracting the shared time axis for a vertical triplet from Oracle SensorDB
-- handling duplicate `(sensorid, timestamp)` rows safely
+- resolving the target vertical from `Sensors_Description/config.toml`
+  by default:
+  `slope`, basalt `x/y` from `[profile]`, air `x/y` from `[surface_air]`
+- validating the resolved basalt and air rows against `variables_schema.xlsx`
+- extracting the shared time axis for the basalt triplet from Oracle SensorDB
+- collapsing basalt near-duplicate timestamps into practical `15-minute` slots
+- aligning air by freshness-limited `last known value` for ideal-period work:
+  use the last real air observation only while its age is within
+  `1.5 * modal air step`, where the practical air step is computed after
+  rounding raw air gaps to the nearest `15 min`
 - finding the longest continuous common period with valid values and no
   outliers beyond `15%` from the period mean
-- updating the corresponding Jupyter notebook for that vertical
+- saving the final Jupyter notebook into
+  `Project_description/sensorDB/Ideal_period/`
+- ordering ideal-period notebook blocks as:
+  air first, then basalt from shallowest to deepest
+- adding the finished ideal-period notebook to Git
 
 ## Repeated workflow: extending variables_schema.xlsx
 
@@ -152,3 +163,7 @@ Before doing the same kind of work again:
 3. Reuse the established conventions instead of inventing new ones.
 4. Prefer extending by clone when the current scientific script is already
    trusted by the user.
+5. For ideal-period tasks, take the target coordinates from
+   `Sensors_Description/config.toml` unless the user explicitly says otherwise.
+6. Save finished ideal-period notebooks in
+   `Project_description/sensorDB/Ideal_period/` and add them to Git.
