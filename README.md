@@ -115,3 +115,23 @@ Recommended workflow:
 1. Keep shared defaults in `co2_vertical_profile_viewer_config.toml`.
 2. Put machine- or run-specific overrides in `co2_vertical_profile_viewer_config.local.toml`.
 3. Run the script again.
+
+## 9) Statistical Analysis and Linear Regression
+
+See the full guide for extracting raw time series from Oracle, aligning depths on a
+common time axis, running hypothesis tests, and fitting linear/least-squares models:
+
+**[Sensors_Description/statistical_analysis_guide.md](Sensors_Description/statistical_analysis_guide.md)**
+
+Topics covered:
+
+- Extracting `Measurement` data as pandas DataFrames
+- Time-axis alignment across sensor depths
+- Descriptive statistics (mean, std, variance, correlation matrix)
+- Normality tests: Shapiro-Wilk, Kolmogorov-Smirnov
+- Non-parametric tests: Mann-Whitney U, Kruskal-Wallis
+- Pearson and Spearman correlation with p-values
+- Simple and multiple linear regression (`scipy.stats.linregress`, `numpy.linalg.lstsq`)
+- Full OLS summary with confidence intervals (`statsmodels`)
+- Trend analysis (CO2 vs. elapsed time)
+- Plotting regression results with matplotlib
