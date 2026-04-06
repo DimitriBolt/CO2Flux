@@ -353,7 +353,7 @@ from statsmodels.graphics.gofplots import qqplot
 
 If you have questions about:
 - Data access or SQL queries → Contact Dimitri
-- Scientific interpretation → Contact Professor Gabitov
+- Scientific interpretation → Contact Professor Gabitov or Joel Maldonado
 - Statistical methods → Refer to standard time series analysis references
 
 ---
