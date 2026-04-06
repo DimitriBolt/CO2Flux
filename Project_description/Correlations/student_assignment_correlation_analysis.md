@@ -343,26 +343,10 @@ from statsmodels.graphics.gofplots import qqplot
 
 ---
 
-## Timeline and Deliverables
-
-**Recommended approach:**
-1. Week 1: Steps 1-3 (data acquisition, basic stats, autocorrelation)
-2. Week 2: Task 3 (cross-correlation)
-3. Week 3: Task 4 (CLT interval)
-4. Week 4: Task 5 (PCA)
-
 **Final deliverable format:**
 - Your choice: Jupyter notebook, Python script + figures, or PDF report
 - Must include all plots, tables, and interpretations requested above
 - Code should be well-commented and reproducible
-
----
-
-## Additional Resources
-
-- **Workflow documentation**: [ideal_vertical_period_workflow.md](https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/sensorDB/ideal_vertical_period_workflow.md)
-- **Architecture notes**: [co2_basalt_timeseries_architecture.md](https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/sensorDB/co2_basalt_timeseries_architecture.md)
-- **Sensor catalog notes**: [variables_schema_notes.md](https://github.com/DimitriBolt/CO2Flux/blob/main/Sensors_Description/variables_schema_notes.md)
 
 ---
 
