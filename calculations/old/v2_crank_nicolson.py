@@ -515,10 +515,12 @@ def run(D_s_init: float = 4.5e-6) -> None:
     # Predictions for plotting
     C_pred = forward_solver(beta_opt, C_surface, C_data[0])
     time_s = df["time_s"].to_numpy()
-    out_stem = Path(__file__).resolve().parent / "v2"
+    _out_dir = Path(__file__).resolve().parent / "out" / "V2"
+    _out_dir.mkdir(parents=True, exist_ok=True)
+    out_stem = _out_dir / "v2"
     plot_results(time_s, C_data, C_pred, beta_opt, sigma_sq, out_stem)
 
-    dashboard_path = Path(__file__).resolve().parent / "v2_diagnostic_dashboard.png"
+    dashboard_path = _out_dir / "v2_diagnostic_dashboard.png"
     plot_diagnostic_dashboard(
         time_s, C_data, C_pred, residuals_vec, beta_opt, Cov, dashboard_path
     )

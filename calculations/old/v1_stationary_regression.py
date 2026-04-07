@@ -257,7 +257,9 @@ def run() -> np.ndarray:
     print(f"      Feed D_s = {beta_opt[0]:.4e} m²/s into Version 2 as x₀[0].")
     print()
 
-    out_path = Path(__file__).resolve().parent / "v1_profile_fit.png"
+    out_dir = Path(__file__).resolve().parent / "out" / "V1"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "v1_profile_fit.png"
     plot_results(beta_opt, Cov, C_mean, C_surf_mean, out_path)
 
     return beta_opt

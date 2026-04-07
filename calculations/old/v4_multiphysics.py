@@ -617,7 +617,8 @@ def run(D_s_init: float = 4.5e-6) -> None:
     print(f"(ceiling = {UPPER[0]:.0e} m²/s,  result = {beta_opt[0]:.2e} m²/s)")
 
     # ── Plots ─────────────────────────────────────────────────────────────────
-    out_dir = Path(__file__).resolve().parent
+    out_dir = Path(__file__).resolve().parent / "out" / "V4"
+    out_dir.mkdir(parents=True, exist_ok=True)
     C_pred  = forward_solver_v4(beta_opt, C_surface, C_data[0], T_soil)
 
     plot_temperature_field(T_soil, n_t, out_dir / "v4_temperature_field.png")

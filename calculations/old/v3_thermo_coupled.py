@@ -585,7 +585,8 @@ def run(D_s_init: float = 4.5e-6) -> None:
     print("      Correlation(D_s, S_0) exposed in dashboard Panel 3.")
 
     # ── Plots ─────────────────────────────────────────────────────────────────
-    out_dir  = Path(__file__).resolve().parent
+    out_dir  = Path(__file__).resolve().parent / "out" / "V3"
+    out_dir.mkdir(parents=True, exist_ok=True)
     time_s   = df["time_s"].to_numpy()
     C_pred   = forward_solver_thermo(beta_opt, C_surface, C_data[0], T_soil)
 
