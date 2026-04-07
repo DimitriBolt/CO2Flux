@@ -201,37 +201,57 @@ def solve_crank_nicolson(
 
 def _build_initial_profile(
     C_air_0: float,
-    C_obs_0: np.ndarray,
+    D_eff: float,
+    S_shallow: float,
+    S_bulk: float,
 ) -> np.ndarray:
     """
-    Build C(z, t=0) in mol/m³ by interpolating from the surface through
-    the sensor depths down to z = L.
+    Analytical steady-state profile satisfying the Robin top BC and
+    zero-flux bottom BC.  Eliminates the "cold start" shockwave that an
+    interpolation-based IC creates at the bottom of the column.
 
-    With the Robin BC the surface node is free to float, so the initial
-    guess extrapolates half a step above the shallowest sensor rather than
-    pinning to C_air.
+    Derived by integrating  D_eff · C''(z) + S(z) = 0  twice:
+
+        C(z) = −(S_sh·ℓ²/D) exp(−z/ℓ) − (S_bk/2D) z² + A·z + B
+
+    where A enforces dC/dz|_{z=L} = 0  and B enforces the Robin BC at z=0.
     """
-    surface_guess = C_obs_0[0] - (C_obs_0[1] - C_obs_0[0]) * 0.5
-    z_anchors = np.concatenate([[0.0], SENSOR_DEPTHS, [L]])
-    c_anchors = np.concatenate([[surface_guess], C_obs_0, [C_obs_0[-1]]])
-    return np.interp(Z_GRID, z_anchors, c_anchors)
+    ell = ELL_S
+
+    A = -(S_shallow * ell / D_eff) * np.exp(-L / ell) + (S_bulk * L / D_eff)
+
+    B = (C_air_0
+         - (D_eff / K_G) * (S_shallow * ell / D_eff + A)
+         + S_shallow * ell**2 / D_eff)
+
+    C_init = (
+        -(S_shallow * ell**2 / D_eff) * np.exp(-Z_GRID / ell)
+        - (S_bulk / (2.0 * D_eff)) * Z_GRID**2
+        + A * Z_GRID
+        + B
+    )
+    return C_init
 
 
 def _residuals_vector(
     scaled_params: np.ndarray,
     C_air_molar: np.ndarray,
     C_obs_molar: np.ndarray,
-    C_init_molar: np.ndarray,
     D_eff_fixed: float,
 ) -> np.ndarray:
     """
     Return the flattened 1D residual vector for the TRF optimizer.
     Optimizer fits scaled multipliers for S_shallow and S_bulk;
     physical value = multiplier × 1e-6.
+
+    The initial condition is recomputed analytically for every parameter
+    guess so the simulation always starts in perfect steady-state
+    equilibrium with the guessed sources — no cold-start shockwave.
     """
     S_shallow = scaled_params[0] * 1e-6   # → mol/m³/s
     S_bulk    = scaled_params[1] * 1e-6   # → mol/m³/s
 
+    C_init_molar = _build_initial_profile(C_air_molar[0], D_eff_fixed, S_shallow, S_bulk)
     C_sim = solve_crank_nicolson(C_air_molar, C_init_molar, D_eff_fixed, S_shallow, S_bulk)
     return (C_sim[:, SENSOR_INDICES] - C_obs_molar).flatten()
 
@@ -262,10 +282,8 @@ def fit_transient_model(
     C_air_molar = ppm_to_molar(C_air_ppm)
     C_obs_molar = ppm_to_molar(C_obs_ppm)
 
-    # ── 2. Build initial condition in molar space ─────────────────────────────
-    C_init_molar = _build_initial_profile(C_air_molar[0], C_obs_molar[0])
-
-    # ── 3. TRF least-squares (2 dims: S_shallow, S_bulk) ─────────────────────
+    # ── 2. TRF least-squares (2 dims: S_shallow, S_bulk) ─────────────────────
+    #   IC is computed analytically inside _residuals_vector for every guess.
     #   physical = scaled × 1e-6
     #   S_shallow: [0,   5e-5]  → scaled [0.0, 50]
     #   S_bulk:    [0,   1e-5]  → scaled [0.0, 10]
@@ -273,11 +291,11 @@ def fit_transient_model(
     guess  = [5.0, 1.0]
 
     print(f"\n  TRF optimisation (D_eff = {D_eff_fixed:.3e} m²/s, "
-          f"Robin BC, soft_l1 loss, molar-strict)...")
+          f"Robin BC, analytical IC, soft_l1 loss, molar-strict)...")
 
     res = least_squares(
         _residuals_vector, guess,
-        args=(C_air_molar, C_obs_molar, C_init_molar, D_eff_fixed),
+        args=(C_air_molar, C_obs_molar, D_eff_fixed),
         bounds=bounds,
         method="trf",
         loss="soft_l1",
@@ -295,7 +313,8 @@ def fit_transient_model(
     print(f"    RSS (mol) = {rss:.4e}  ({res.nfev} function evals)")
     print(f"    TRF cost  = {res.cost:.4e}  (soft_l1 robust cost)")
 
-    # ── 4. Final forward run with optimal physical params ─────────────────────
+    # ── 3. Final forward run with optimal physical params ─────────────────────
+    C_init_molar = _build_initial_profile(C_air_molar[0], D_eff_fixed, opt_S_sh, opt_S_bk)
     C_sim_molar = solve_crank_nicolson(
         C_air_molar, C_init_molar, D_eff_fixed, opt_S_sh, opt_S_bk,
     )

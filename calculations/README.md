@@ -237,7 +237,7 @@ However, fitting all three simultaneously from a sparse sensor array creates an 
 | $S_{\mathrm{sh}}$ [μmol/m³/s] | Fitted | $[0,\; 50]$ |
 | $S_{\mathrm{bk}}$ [μmol/m³/s] | Fitted | $[0,\; 10]$ |
 
-### 3.3 V1 — Time-Invariant Sources (Locked $D_{\mathrm{eff}}$, Molar-Strict, Multi-Start)
+### 3.3 V1 — Time-Invariant Sources (Robin BC, TRF, Locked $D_{\mathrm{eff}}$, Analytical IC)
 
 Version 1 assumes **time-constant** source amplitudes over the 48-hour fitting window. The source profile $S(z)$ has spatial structure (shallow exponential + bulk uniform) but does not vary with time. The effective diffusivity is **locked** to the M1 Track B value ($2.047 \times 10^{-6}$ m²/s); only $S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$ are optimized.
 
@@ -272,7 +272,7 @@ python v2_crank_nicolson_pipeline.py
 
 The pipeline:
 1. Loads composite profile via the same data/QC chain as M1
-2. Builds initial $C(z, 0)$ in mol/m³ by interpolation through sensor observations
+2. Computes analytical steady-state $C(z, 0)$ for each optimizer guess (Robin + zero-flux BCs)
 3. Locks $D_{\mathrm{eff}}$ at M1 Track B value ($2.047 \times 10^{-6}$ m²/s)
 4. Runs TRF least-squares optimisation (`soft_l1` loss) fitting only $S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$
 5. Reports Fourier mesh number $F_o$ diagnostic
@@ -289,7 +289,11 @@ This initial transient inversion (V1) relies on several provisional assumptions 
 
 - **Time-Invariant Sources (V1):** Version 1 assumes time-constant source amplitudes over the localized 48-hour fitting window. **Roadmap for V2:** The next iteration will couple $S_{\mathrm{total}}(z,t)$ to measured temperature $T(t)$, recognizing that shallow biological production responds dynamically to environmental forcing.
 - **Top Boundary Coupling (implemented):** The model enforces a Robin gas-exchange condition at the surface: $-D_{\mathrm{eff}} \partial_z C(0,t) = k_g(C(0,t) - C_{\mathrm{air}}(t))$, with $k_g = 10^{-5}$ m/s. This lets the surface node float naturally above ambient air concentration, representing the physical reality that the rate of CO₂ diffusing upward from the soil must match the rate escaping into the atmosphere. The initial Dirichlet assumption ($C(0,t) = C_{\mathrm{air}}$) caused $S_{\mathrm{shallow}}$ to hit its upper bound.
-- **Initial Conditions:** The $t=0$ state is currently estimated using linear interpolation between the atmospheric concentration and the sensor depths. Short fitting windows may result in the optimizer compensating for a poor initial condition. Future runs will incorporate a spin-up period prior to the fitting window.
+- **Initial Conditions (implemented):** Rather than interpolating a crude linear guess between sensors, the $t=0$ profile is computed from the **exact analytical steady-state solution** of the diffusion–reaction ODE with Robin top BC and zero-flux bottom BC:
+
+  $$C_{\mathrm{init}}(z) = -\frac{S_{\mathrm{sh}} \ell^2}{D_{\mathrm{eff}}} e^{-z/\ell} - \frac{S_{\mathrm{bk}}}{2D_{\mathrm{eff}}} z^2 + Az + B$$
+
+  The constants $A$ and $B$ enforce the boundary conditions. This IC is **recomputed inside the optimizer** for every parameter guess, so the simulation always starts in perfect equilibrium with the guessed sources — eliminating the cold-start shockwave that an interpolation IC creates at the column bottom.
 - **M1 Anchoring Strategy (implemented):** The M1 SVD pipeline yields an independent $D_{\mathrm{eff}}$ estimate (Track B: $2.047 \times 10^{-6}$ m²/s). The production M2-V1 implementation **locks** $D_{\mathrm{eff}}$ at this M1 value and fits only the two source amplitudes ($S_{\mathrm{sh}}$, $S_{\mathrm{bk}}$), reducing the problem to 2 free parameters. This eliminates the $D/S$ identifiability degeneracy and rigorously demonstrates compatibility between the steady-state and transient models.
 
 ### 3.6 Identifiability and Optimization Constraints
@@ -302,6 +306,7 @@ Extracting $D_{\mathrm{eff}}$, $S_{\mathrm{shallow}}$, and $S_{\mathrm{bulk}}$ s
 - Strict molar unit system eliminating hybrid-unit numerical artefacts.
 - $D_{\mathrm{eff}}$ locked to M1 Track B estimate ($2.047 \times 10^{-6}$ m²/s), reducing the fit to 2 free parameters and eliminating the $D/S$ degeneracy.
 - Robin BC freeing the surface node from the Dirichlet straitjacket that previously caused $S_{\mathrm{shallow}}$ to saturate at its upper bound.
+- Analytical steady-state initial condition recomputed per optimizer guess, eliminating cold-start boundary shockwaves.
 
 **Planned mitigations:**
 - Regularization on source magnitudes.
