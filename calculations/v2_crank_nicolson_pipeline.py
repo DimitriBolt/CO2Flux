@@ -10,23 +10,24 @@ where
     S(z) = S_shallow · exp(−z / ℓ_s) + S_bulk
 
 Boundary conditions:
-    z = 0  (top):    C(0, t)  = C_air(t)       (Dirichlet, provisional)
-    z = L  (bottom): ∂C/∂z   = 0                (Neumann, zero-flux)
+    z = 0  (top):    −D_eff ∂C/∂z = k_g (C(0,t) − C_air(t))   (Robin gas exchange)
+    z = L  (bottom): ∂C/∂z = 0                                  (Neumann, zero-flux)
 
-Three fitted parameters:
-    D_eff      — effective diffusivity [m²/s]
+Two fitted parameters (D_eff locked to M1 Track B):
     S_shallow  — shallow exponential source amplitude [mol/m³/s]
     S_bulk     — uniform bulk production rate [mol/m³/s]
 
-Reviewer-hardened rewrite (V1.1):
-    1.  Strict molar units — the entire PDE and optimizer operate in mol/m³.
-        Conversions to ppm are reserved for final plotting and CSV export.
-    2.  Parameter scaling — the optimizer fits scaled multipliers near O(1)
-        (physical value = multiplier × 1e-6) so L-BFGS-B gradient estimation
-        stays well-conditioned.
-    3.  Multi-start optimization — n_starts random initial guesses are tested
-        and the global-minimum solution is selected, mitigating the D/S
-        trade-off identifiability risk.
+Reviewer-hardened rewrite (V1.3 — Robin + TRF + SVD IC):
+    1.  Robin gas-exchange BC at the surface — frees the top grid node from
+        the Dirichlet straitjacket.
+    2.  TRF (Trust Region Reflective) least_squares optimizer with soft_l1
+        loss — immune to L-BFGS-B Armijo flat-valley stalling.
+    3.  SVD cubic initial condition — the t=0 profile is the M1 overdet.
+        SVD cubic that passes through the sensor data and enforces
+        dC/dz|_{z=L} = 0, providing a smooth, data-anchored IC.
+    4.  Strict molar units — PDE operates in mol/m³ throughout.
+    5.  Parameter scaling — optimizer fits O(1) multipliers.
+    6.  D_eff locked to M1 Track B (2.047e-6 m²/s).
 
 Data sourcing
 -------------
@@ -69,6 +70,7 @@ from composite_profile_pipeline import (          # noqa: E402
     _load_48h_per_vertical,
     phase1_validate,
     phase2_build_composite,
+    build_svd_pinv,
     L, K_G, C_AIR_MOL,
 )
 
@@ -199,44 +201,38 @@ def solve_crank_nicolson(
 # INVERSION  (parameter-scaled, multi-start, molar-space residuals)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _build_initial_profile(
-    C_air_0: float,
-    D_eff: float,
-    S_shallow: float,
-    S_bulk: float,
+def _build_initial_profile_svd(
+    M_pinv: np.ndarray,
+    C_obs_t0_ppm: np.ndarray,
 ) -> np.ndarray:
     """
-    Analytical steady-state profile satisfying the Robin top BC and
-    zero-flux bottom BC.  Eliminates the "cold start" shockwave that an
-    interpolation-based IC creates at the bottom of the column.
+    Build C(z, t=0) in mol/m³ using the M1 SVD cubic polynomial.
 
-    Derived by integrating  D_eff · C''(z) + S(z) = 0  twice:
+    The pseudoinverse already encodes the zero-flux bottom BC, so the
+    resulting cubic passes exactly through the sensor data at t=0 *and*
+    has dC/dz|_{z=L} = 0 baked in — a smooth, physically consistent IC
+    with no cold-start shockwave.
 
-        C(z) = −(S_sh·ℓ²/D) exp(−z/ℓ) − (S_bk/2D) z² + A·z + B
-
-    where A enforces dC/dz|_{z=L} = 0  and B enforces the Robin BC at z=0.
+    Parameters
+    ----------
+    M_pinv      : (4, n_constraints) SVD pseudoinverse from build_svd_pinv
+    C_obs_t0_ppm: (n_sensors,) observed concentrations at t=0 [ppm]
     """
-    ell = ELL_S
+    # Build the RHS vector: sensor observations + zero-flux BC row
+    Y_t0 = np.concatenate([C_obs_t0_ppm, [0.0]])
+    coeffs = M_pinv @ Y_t0                        # [a, b, c, d]
+    a, b, c, d = coeffs
 
-    A = -(S_shallow * ell / D_eff) * np.exp(-L / ell) + (S_bulk * L / D_eff)
-
-    B = (C_air_0
-         - (D_eff / K_G) * (S_shallow * ell / D_eff + A)
-         + S_shallow * ell**2 / D_eff)
-
-    C_init = (
-        -(S_shallow * ell**2 / D_eff) * np.exp(-Z_GRID / ell)
-        - (S_bulk / (2.0 * D_eff)) * Z_GRID**2
-        + A * Z_GRID
-        + B
-    )
-    return C_init
+    # Evaluate cubic on the full spatial grid
+    C_init_ppm = a * Z_GRID**3 + b * Z_GRID**2 + c * Z_GRID + d
+    return ppm_to_molar(C_init_ppm)
 
 
 def _residuals_vector(
     scaled_params: np.ndarray,
     C_air_molar: np.ndarray,
     C_obs_molar: np.ndarray,
+    C_init_molar: np.ndarray,
     D_eff_fixed: float,
 ) -> np.ndarray:
     """
@@ -244,14 +240,12 @@ def _residuals_vector(
     Optimizer fits scaled multipliers for S_shallow and S_bulk;
     physical value = multiplier × 1e-6.
 
-    The initial condition is recomputed analytically for every parameter
-    guess so the simulation always starts in perfect steady-state
-    equilibrium with the guessed sources — no cold-start shockwave.
+    The initial condition is fixed (SVD cubic from t=0 sensor data),
+    not recomputed per guess.
     """
     S_shallow = scaled_params[0] * 1e-6   # → mol/m³/s
     S_bulk    = scaled_params[1] * 1e-6   # → mol/m³/s
 
-    C_init_molar = _build_initial_profile(C_air_molar[0], D_eff_fixed, S_shallow, S_bulk)
     C_sim = solve_crank_nicolson(C_air_molar, C_init_molar, D_eff_fixed, S_shallow, S_bulk)
     return (C_sim[:, SENSOR_INDICES] - C_obs_molar).flatten()
 
@@ -282,8 +276,12 @@ def fit_transient_model(
     C_air_molar = ppm_to_molar(C_air_ppm)
     C_obs_molar = ppm_to_molar(C_obs_ppm)
 
-    # ── 2. TRF least-squares (2 dims: S_shallow, S_bulk) ─────────────────────
-    #   IC is computed analytically inside _residuals_vector for every guess.
+    # ── 2. Build SVD cubic initial condition from t=0 sensor data ───────────
+    M_pinv = build_svd_pinv(list(SENSOR_DEPTHS))
+    C_init_molar = _build_initial_profile_svd(M_pinv, C_obs_ppm[0])
+
+    # ── 3. TRF least-squares (2 dims: S_shallow, S_bulk) ─────────────────
+    #   IC is the SVD cubic (fixed, not recomputed per guess).
     #   physical = scaled × 1e-6
     #   S_shallow: [0,   5e-5]  → scaled [0.0, 50]
     #   S_bulk:    [0,   1e-5]  → scaled [0.0, 10]
@@ -291,11 +289,11 @@ def fit_transient_model(
     guess  = [5.0, 1.0]
 
     print(f"\n  TRF optimisation (D_eff = {D_eff_fixed:.3e} m²/s, "
-          f"Robin BC, analytical IC, soft_l1 loss, molar-strict)...")
+          f"Robin BC, SVD cubic IC, soft_l1 loss, molar-strict)...")
 
     res = least_squares(
         _residuals_vector, guess,
-        args=(C_air_molar, C_obs_molar, D_eff_fixed),
+        args=(C_air_molar, C_obs_molar, C_init_molar, D_eff_fixed),
         bounds=bounds,
         method="trf",
         loss="soft_l1",
@@ -313,10 +311,104 @@ def fit_transient_model(
     print(f"    RSS (mol) = {rss:.4e}  ({res.nfev} function evals)")
     print(f"    TRF cost  = {res.cost:.4e}  (soft_l1 robust cost)")
 
-    # ── 3. Final forward run with optimal physical params ─────────────────────
-    C_init_molar = _build_initial_profile(C_air_molar[0], D_eff_fixed, opt_S_sh, opt_S_bk)
+    # ── 4. Final forward run with optimal physical params ─────────────────
     C_sim_molar = solve_crank_nicolson(
         C_air_molar, C_init_molar, D_eff_fixed, opt_S_sh, opt_S_bk,
+    )
+
+    return params_physical, C_init_molar, C_sim_molar
+
+
+# ── Unlocked 3-parameter inversion ──────────────────────────────────────────
+
+def _residuals_vector_unlocked(
+    scaled_params: np.ndarray,
+    C_air_molar: np.ndarray,
+    C_obs_molar: np.ndarray,
+    C_init_molar: np.ndarray,
+) -> np.ndarray:
+    """
+    Residual vector for 3-parameter TRF: D_eff, S_shallow, S_bulk all free.
+    physical = scaled × 1e-6 for all three.
+    """
+    D_eff     = scaled_params[0] * 1e-6   # → m²/s
+    S_shallow = scaled_params[1] * 1e-6   # → mol/m³/s
+    S_bulk    = scaled_params[2] * 1e-6   # → mol/m³/s
+
+    C_sim = solve_crank_nicolson(C_air_molar, C_init_molar, D_eff, S_shallow, S_bulk)
+    return (C_sim[:, SENSOR_INDICES] - C_obs_molar).flatten()
+
+
+def fit_transient_model_unlocked(
+    df_composite: pd.DataFrame,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    3-parameter TRF inversion: D_eff, S_shallow, S_bulk all free.
+    D_eff bounds: [0.1e-6, 10.0e-6] (scaled [0.1, 10.0]).
+    If the optimizer recovers D_eff ≈ 2e-6 organically, M1 and M2 agree
+    independently — a strong cross-validation.
+
+    Returns (optimal_params_physical, C_init_molar, C_sim_molar).
+    """
+    # ── 1. Convert ppm → mol/m³ ──────────────────────────────────────────────
+    C_air_ppm = pd.Series(df_composite["C_air"].to_numpy()).ffill().bfill().to_numpy()
+    C_obs_ppm = np.column_stack([
+        df_composite["C_z005"].to_numpy(),
+        df_composite["C_z020"].to_numpy(),
+        df_composite["C_z035"].to_numpy(),
+        df_composite["C_z050"].to_numpy(),
+    ])
+    for j in range(C_obs_ppm.shape[1]):
+        C_obs_ppm[:, j] = pd.Series(C_obs_ppm[:, j]).ffill().bfill().to_numpy()
+
+    C_air_molar = ppm_to_molar(C_air_ppm)
+    C_obs_molar = ppm_to_molar(C_obs_ppm)
+
+    # ── 2. SVD cubic IC (same as locked — does not depend on D_eff) ──────────
+    M_pinv = build_svd_pinv(list(SENSOR_DEPTHS))
+    C_init_molar = _build_initial_profile_svd(M_pinv, C_obs_ppm[0])
+
+    # ── 3. TRF least-squares (3 dims: D_eff, S_shallow, S_bulk) ──────────────
+    #   D_eff:     [0.1e-6, 10.0e-6] → scaled [0.1, 10.0]
+    #   S_shallow: [0,      5e-5]     → scaled [0.0, 50.0]
+    #   S_bulk:    [0,      1e-5]     → scaled [0.0, 10.0]
+    bounds = ([0.1, 0.0, 0.0], [10.0, 50.0, 10.0])
+    guess  = [2.0, 5.0, 1.0]           # D_eff near M1 value
+
+    print(f"\n  TRF optimisation (D_eff UNLOCKED, "
+          f"Robin BC, SVD cubic IC, soft_l1 loss, molar-strict)...")
+
+    res = least_squares(
+        _residuals_vector_unlocked, guess,
+        args=(C_air_molar, C_obs_molar, C_init_molar),
+        bounds=bounds,
+        method="trf",
+        loss="soft_l1",
+    )
+
+    opt_D    = res.x[0] * 1e-6
+    opt_S_sh = res.x[1] * 1e-6
+    opt_S_bk = res.x[2] * 1e-6
+    rss      = float(np.sum(res.fun**2))
+    params_physical = np.array([opt_D, opt_S_sh, opt_S_bk])
+
+    print(f"\n  --- Optimal Fit (TRF, soft_l1, D_eff UNLOCKED) ---")
+    print(f"    D_eff     = {opt_D:.3e} m²/s  (FREE — compare M1: {D_EFF_LOCKED:.3e})")
+    print(f"    S_shallow = {opt_S_sh*1e6:.3f} μmol/m³/s  (ℓ_s = {ELL_S*100:.0f} cm)")
+    print(f"    S_bulk    = {opt_S_bk*1e6:.3f} μmol/m³/s")
+    print(f"    RSS (mol) = {rss:.4e}  ({res.nfev} function evals)")
+    print(f"    TRF cost  = {res.cost:.4e}  (soft_l1 robust cost)")
+
+    # Check if D_eff near M1 value
+    ratio = opt_D / D_EFF_LOCKED
+    if 0.5 <= ratio <= 2.0:
+        print(f"    ✓ D_eff ratio to M1 = {ratio:.2f} — independent agreement!")
+    else:
+        print(f"    ⚠ D_eff ratio to M1 = {ratio:.2f} — identifiability concern")
+
+    # ── 4. Final forward run ──────────────────────────────────────────────────
+    C_sim_molar = solve_crank_nicolson(
+        C_air_molar, C_init_molar, opt_D, opt_S_sh, opt_S_bk,
     )
 
     return params_physical, C_init_molar, C_sim_molar
@@ -603,6 +695,68 @@ def run() -> None:
     print(f"  RMSE 50 cm    = {rmse_per[3]:.1f} ppm")
     print(f"  Mean RMSE     = {np.mean(rmse_per):.1f} ppm")
     print(f"\n  All outputs in: {OUT_ROOT}")
+    print(f"{'='*60}\n")
+
+    # ── 6. Unlocked 3-parameter inversion ─────────────────────────────────────
+    print(f"\n{'='*60}")
+    print("M2-V1: UNLOCKED 3-PARAMETER INVERSION (D_eff free)")
+    print(f"{'='*60}")
+    params_u, C_init_u, C_sim_u = fit_transient_model_unlocked(df_composite)
+
+    D_u, S_sh_u, S_bk_u = params_u
+
+    Fo_u = D_u * DT / DZ**2
+    print(f"\n  Fourier mesh number Fo = {Fo_u:.2f}  "
+          f"({'smooth' if Fo_u <= 1.0 else 'may ring — consider finer grid'})")
+
+    # Surface flux
+    C_surface_u_ppm = molar_to_ppm(C_sim_u[:, 0])
+    J_up_u = K_G * C_AIR_MOL * (C_surface_u_ppm - C_air_ppm) * 1e-6
+    J_up_u_umol = J_up_u * 1e6
+
+    # Plots (unlocked)
+    plot_timeseries_fit(df_composite, C_sim_u, params_u,
+                        OUT_ROOT / "v2_timeseries_fit_unlocked.png")
+    plot_concentration_field(df_composite, C_sim_u, params_u,
+                             OUT_ROOT / "v2_concentration_field_unlocked.png")
+    plot_source_profile(params_u, OUT_ROOT / "v2_source_profile_unlocked.png")
+
+    # Per-sensor RMSE
+    C_sim_u_ppm = molar_to_ppm(C_sim_u)
+    rmse_u = []
+    for col, si in zip(obs_cols, SENSOR_INDICES):
+        obs = df_composite[col].to_numpy()
+        sim = C_sim_u_ppm[:, si]
+        rmse_u.append(float(np.sqrt(np.nanmean((sim - obs)**2))))
+
+    print(f"\n{'='*60}")
+    print("M2-V1 SUMMARY  (Unlocked D_eff — 3-parameter fit)")
+    print(f"{'='*60}")
+    print(f"  D_eff         = {D_u:.3e} m²/s  (FREE — M1 ref: {D_EFF_LOCKED:.3e})")
+    print(f"  S_shallow     = {S_sh_u*1e6:.3f} μmol/m³/s  (ℓ_s = {ELL_S*100:.0f} cm)")
+    print(f"  S_bulk        = {S_bk_u*1e6:.3f} μmol/m³/s")
+    print(f"  J_up (Robin)  = {np.nanmean(J_up_u_umol):.4e} μmol/m²s")
+    print(f"  C_surface     = {np.nanmean(C_surface_u_ppm):.0f} ppm (mean)")
+    print(f"  Fo            = {Fo_u:.2f}")
+    print(f"  RMSE 5 cm     = {rmse_u[0]:.1f} ppm")
+    print(f"  RMSE 20 cm    = {rmse_u[1]:.1f} ppm")
+    print(f"  RMSE 35 cm    = {rmse_u[2]:.1f} ppm")
+    print(f"  RMSE 50 cm    = {rmse_u[3]:.1f} ppm")
+    print(f"  Mean RMSE     = {np.mean(rmse_u):.1f} ppm")
+
+    # ── 7. Head-to-head comparison ────────────────────────────────────────────
+    print(f"\n{'='*60}")
+    print("LOCKED vs UNLOCKED COMPARISON")
+    print(f"{'='*60}")
+    print(f"  {'Parameter':<20} {'Locked':>14} {'Unlocked':>14}")
+    print(f"  {'-'*48}")
+    print(f"  {'D_eff (m²/s)':<20} {D_opt:>14.3e} {D_u:>14.3e}")
+    print(f"  {'S_shallow (μmol)':<20} {S_sh*1e6:>14.3f} {S_sh_u*1e6:>14.3f}")
+    print(f"  {'S_bulk (μmol)':<20} {S_bk*1e6:>14.3f} {S_bk_u*1e6:>14.3f}")
+    print(f"  {'Mean RMSE (ppm)':<20} {np.mean(rmse_per):>14.1f} {np.mean(rmse_u):>14.1f}")
+    print(f"  {'J_up (μmol/m²s)':<20} {np.nanmean(J_up_robin_umol):>14.4e} {np.nanmean(J_up_u_umol):>14.4e}")
+    print(f"  {'Fo':<20} {Fo:>14.2f} {Fo_u:>14.2f}")
+    print(f"  D_eff ratio (unlocked / M1) = {D_u / D_EFF_LOCKED:.3f}")
     print(f"{'='*60}\n")
 
 

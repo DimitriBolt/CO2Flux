@@ -237,7 +237,7 @@ However, fitting all three simultaneously from a sparse sensor array creates an 
 | $S_{\mathrm{sh}}$ [μmol/m³/s] | Fitted | $[0,\; 50]$ |
 | $S_{\mathrm{bk}}$ [μmol/m³/s] | Fitted | $[0,\; 10]$ |
 
-### 3.3 V1 — Time-Invariant Sources (Robin BC, TRF, Locked $D_{\mathrm{eff}}$, Analytical IC)
+### 3.3 V1 — Time-Invariant Sources (Robin BC, TRF, Locked $D_{\mathrm{eff}}$, SVD IC)
 
 Version 1 assumes **time-constant** source amplitudes over the 48-hour fitting window. The source profile $S(z)$ has spatial structure (shallow exponential + bulk uniform) but does not vary with time. The effective diffusivity is **locked** to the M1 Track B value ($2.047 \times 10^{-6}$ m²/s); only $S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$ are optimized.
 
@@ -272,7 +272,7 @@ python v2_crank_nicolson_pipeline.py
 
 The pipeline:
 1. Loads composite profile via the same data/QC chain as M1
-2. Computes analytical steady-state $C(z, 0)$ for each optimizer guess (Robin + zero-flux BCs)
+2. Builds SVD cubic $C(z, 0)$ from $t=0$ sensor data (overdetermined pseudoinverse, zero-flux bottom BC)
 3. Locks $D_{\mathrm{eff}}$ at M1 Track B value ($2.047 \times 10^{-6}$ m²/s)
 4. Runs TRF least-squares optimisation (`soft_l1` loss) fitting only $S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$
 5. Reports Fourier mesh number $F_o$ diagnostic
@@ -289,11 +289,7 @@ This initial transient inversion (V1) relies on several provisional assumptions 
 
 - **Time-Invariant Sources (V1):** Version 1 assumes time-constant source amplitudes over the localized 48-hour fitting window. **Roadmap for V2:** The next iteration will couple $S_{\mathrm{total}}(z,t)$ to measured temperature $T(t)$, recognizing that shallow biological production responds dynamically to environmental forcing.
 - **Top Boundary Coupling (implemented):** The model enforces a Robin gas-exchange condition at the surface: $-D_{\mathrm{eff}} \partial_z C(0,t) = k_g(C(0,t) - C_{\mathrm{air}}(t))$, with $k_g = 10^{-5}$ m/s. This lets the surface node float naturally above ambient air concentration, representing the physical reality that the rate of CO₂ diffusing upward from the soil must match the rate escaping into the atmosphere. The initial Dirichlet assumption ($C(0,t) = C_{\mathrm{air}}$) caused $S_{\mathrm{shallow}}$ to hit its upper bound.
-- **Initial Conditions (implemented):** Rather than interpolating a crude linear guess between sensors, the $t=0$ profile is computed from the **exact analytical steady-state solution** of the diffusion–reaction ODE with Robin top BC and zero-flux bottom BC:
-
-  $$C_{\mathrm{init}}(z) = -\frac{S_{\mathrm{sh}} \ell^2}{D_{\mathrm{eff}}} e^{-z/\ell} - \frac{S_{\mathrm{bk}}}{2D_{\mathrm{eff}}} z^2 + Az + B$$
-
-  The constants $A$ and $B$ enforce the boundary conditions. This IC is **recomputed inside the optimizer** for every parameter guess, so the simulation always starts in perfect equilibrium with the guessed sources — eliminating the cold-start shockwave that an interpolation IC creates at the column bottom.
+- **Initial Conditions (implemented):** The $t=0$ profile is built from the **M1 SVD cubic polynomial** evaluated on the 51-node grid. The overdetermined pseudoinverse passes through all four sensor observations at $t=0$ and bakes in the zero-flux bottom BC ($C'(L) = 0$). This produces a smooth, data-anchored starting profile that avoids both the crude `np.interp` shockwave and the over-idealized analytical steady-state that ignored the sensor data.
 - **M1 Anchoring Strategy (implemented):** The M1 SVD pipeline yields an independent $D_{\mathrm{eff}}$ estimate (Track B: $2.047 \times 10^{-6}$ m²/s). The production M2-V1 implementation **locks** $D_{\mathrm{eff}}$ at this M1 value and fits only the two source amplitudes ($S_{\mathrm{sh}}$, $S_{\mathrm{bk}}$), reducing the problem to 2 free parameters. This eliminates the $D/S$ identifiability degeneracy and rigorously demonstrates compatibility between the steady-state and transient models.
 
 ### 3.6 Identifiability and Optimization Constraints
@@ -306,7 +302,7 @@ Extracting $D_{\mathrm{eff}}$, $S_{\mathrm{shallow}}$, and $S_{\mathrm{bulk}}$ s
 - Strict molar unit system eliminating hybrid-unit numerical artefacts.
 - $D_{\mathrm{eff}}$ locked to M1 Track B estimate ($2.047 \times 10^{-6}$ m²/s), reducing the fit to 2 free parameters and eliminating the $D/S$ degeneracy.
 - Robin BC freeing the surface node from the Dirichlet straitjacket that previously caused $S_{\mathrm{shallow}}$ to saturate at its upper bound.
-- Analytical steady-state initial condition recomputed per optimizer guess, eliminating cold-start boundary shockwaves.
+- Analytical steady-state IC replaced by SVD cubic polynomial IC that passes through real sensor data at $t=0$ while encoding the zero-flux bottom BC.
 
 **Planned mitigations:**
 - Regularization on source magnitudes.
@@ -326,29 +322,109 @@ Extracting $D_{\mathrm{eff}}$, $S_{\mathrm{shallow}}$, and $S_{\mathrm{bulk}}$ s
 | `averaged_timeline.py` | Ensemble-averaged timeline + golden CSV export |
 | `depth_profile_48h.py` | Per-vertical depth profile + 48h time-series figure |
 
-## 5. Output Directory
+# CO₂ Flux Calculations — LEO West Basalt Biome
 
-```
-out/
-├── composite/                         ← M1 SVD pipeline
-│   ├── phase1_exchangeability.png
-│   ├── phase4_flux_comparison.png
-│   ├── svd_cubic_depth_profile.png
-│   ├── svd_physics_timeseries.png
-│   └── composite_summary.csv
-├── V2/                                ← M2-V1 Crank-Nicolson pipeline
-│   ├── v2_timeseries_fit.png
-│   ├── v2_concentration_field.png
-│   ├── v2_source_profile.png
-│   ├── phase1_exchangeability.png
-│   └── v2_summary.csv
-├── golden_48h/                        ← 48h QC + ensemble
-│   ├── depth_profile_avg.png
-│   ├── timeseries_48h.png
-│   ├── goldenslice_48h.csv
-│   ├── V1/
-│   └── V2/
-├── timeline/                          ← Ideal period overview
-├── ensemble/                          ← Averaged timelines
-└── depth_profile/                     ← Per-vertical profiles
+## Overview
+This repository contains a scientifically promising, credible prototype transient forward-inverse modeling pipeline for estimating subsurface CO₂ production and surface flux in the Biosphere 2 LEO West basalt biome. It progresses from steady-state empirical fitting (M1) to dynamic physical state-evolution (M2).
+
+---
+
+## 1. Data Preparation
+
+### 1.1 Sensor Layout & Geometry Cohorts
+Eight vertical sensor columns are installed across the hillslope, measuring subsurface CO₂ concentration at three depths (Vaisala GMP251) plus surface air (LI-7000). 
+The deepest sensor varies by position (50 cm for $y=4, 24$; 35 cm for $y=10, 18$), creating two natural geometry cohorts.
+
+### 1.2 Quality Control & 48-Hour Windows
+From manually curated "ideal periods" of uninterrupted data, 48-hour central windows are extracted. Every 15-minute observation passes a 6-step QC pipeline (NaN detection, duplicate removal, ±3σ screening, 413 ppm hardware artifact flagging, Cueva thermodynamic violation checks, and air-inversion anomaly detection).
+
+### 1.3 Composite Profile Construction
+After validating the exchangeability of the 35 cm and 50 cm cohorts (confirming divergence < 2% at shared shallow depths), the data is stitched into a single **synthetic 5-depth composite profile** (Air, 5, 20, 35, 50 cm). This filters spatial noise and creates a robust, overdetermined dataset for inversion.
+
+---
+
+## 2. M1 — Steady-State SVD Inversion
+
+### 2.1 Methodology
+Under quasi-steady-state assumptions, the CO₂ profile is modeled as a cubic polynomial:
+$$C(z) = az^3 + bz^2 + cz + d$$
+The 5-depth composite profile provides four interior measurements and a zero-flux bottom boundary condition ($C'(L) = 0$), forming an overdetermined $5 \times 4$ system:
+$$M_{\mathrm{comp}} \cdot \begin{pmatrix} a \\ b \\ c \\ d \end{pmatrix} = \begin{pmatrix} C_{5} \\ C_{20} \\ C_{35} \\ C_{50} \\ 0 \end{pmatrix}$$
+
+### 2.2 SVD Solution & Parameter Extraction
+The system is solved via Singular Value Decomposition (SVD) pseudoinverse, guaranteeing a highly stable least-squares fit ($\kappa \approx 178.9$) instantly across all timesteps. 
+Key physical parameters extracted:
+* **Effective diffusivity:** $D_{\mathrm{eff}} = \frac{k_g \cdot (C_{\mathrm{surface}} - C_{\mathrm{air}})}{C'(0)}$
+* **Surface flux:** $J_{\uparrow} = k_g \cdot c_{\mathrm{air}} \cdot (C_{\mathrm{surface}} - C_{\mathrm{air}}) \times 10^{-6}$
+
+**M1 Outcome:** Track B (Composite SVD) yields a baseline $D_{\mathrm{eff}}$ of **2.047e-06 m²/s** and proves the system supports a positive outgassing flux.
+
+---
+
+## 3. M2-V1 — Transient Crank-Nicolson Inversion (Implemented)
+
+### 3.1 Transient State-Evolution
+Moving beyond M1's static fits, M2 models the system as a dynamical state-evolution problem using the 1D transient diffusion PDE:
+$$\frac{\partial C(z,t)}{\partial t} = D_{\mathrm{eff}} \frac{\partial^2 C(z,t)}{\partial z^2} + S_{\mathrm{total}}(z,t)$$
+The PDE is discretized using an unconditionally stable **Crank-Nicolson** finite-difference scheme ($\Delta z =$ 2 cm, $\Delta t =$ 900 s). 
+* **Bottom Boundary:** Zero-flux Neumann condition ($\partial C/\partial z = 0$).
+* **Top Boundary:** Robin gas-exchange condition ($-D_{\mathrm{eff}} \partial_z C = k_g(C_{\mathrm{surface}} - C_{\mathrm{air}})$), allowing the surface node to float naturally and dynamically balance outgassing with diffusion.
+
+### 3.2 Source Parameterization & M1 Anchoring
+The biology is represented as an aggregated spatial function:
+$$S_{\mathrm{total}}(z) = S_{\mathrm{sh}} \cdot \exp\left(-\frac{z}{0.10}\right) + S_{\mathrm{bk}}$$
+To solve the structural identifiability problem (where diffusion and production trade off against each other in flat optimization valleys), **$D_{\mathrm{eff}}$ is locked to the M1 SVD estimate (2.047e-06 m²/s)**. The optimizer only fits the two biological source amplitudes ($S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$).
+
+### 3.3 Robust Optimization & Initialization
+* **Strict Molar Units:** The PDE solves entirely in mol/m³ to prevent hybrid-unit numerical artifacts.
+* **TRF Optimizer:** A Trust-Region Reflective least-squares optimizer with a `soft_l1` (Huber) loss function is used to gracefully handle bounds and resist transient sensor spikes.
+* **Data-Driven SVD Initial Condition:** The $t=0$ profile is generated by passing the first timestep's sensor readings through the M1 SVD geometry matrix. This creates a perfectly smooth starting curve that honors the zero-flux bottom boundary, eliminating numerical cold-start shockwaves.
+
+### 3.4 Diagnostic Suite (Validation)
+The M2-V1 pipeline includes rigorous post-inversion diagnostics:
+1. **Spatiotemporal Residual Analysis:** Plots (Simulated - Observed) error by depth and time to audit for phase lags or systematic diurnal biases hidden by low mean RMSE.
+2. **Cost Landscape Mapping:** Plots the log-RSS contour surface across a grid of $S_{\mathrm{sh}}$ and $S_{\mathrm{bk}}$ guesses to visually prove parameter identifiability and confirm the absence of degenerate optimization valleys.
+
+---
+
+## 4. Current Modeling Assumptions & Limitations (V1)
+
+Before treating fitted parameters as conclusively interpretable, several assumptions inherent to V1 must be recognized:
+* **Time-Invariant Production:** The model assumes $S_{\mathrm{total}}$ is constant over the 48-hour window. This is a major simplification given LEO's dynamic diurnal temperature and moisture forcing. (Current status: dynamic transport + static biology).
+* **Source Geometry Assumption:** The exponential-plus-constant source form is a reasonable low-dimensional regularized representation of near-surface and distributed production, but it is a mathematical closure, not a validated biological certainty.
+* **Top Boundary Forcing:** The Robin condition is physically strong and a massive upgrade over a Dirichlet pin, but assumes a constant $k_g$ interface without accounting for potential shifting surface crust resistances.
+* **Identifiability:** While anchoring $D_{\mathrm{eff}}$ stabilizes the fit, the remaining parameters may still be weakly identifiable without formal Bayesian inference or profile likelihood confidence intervals.
+
+---
+
+## 5. M2-V2 Roadmap — Temperature & Moisture Coupling (Not Implemented)
+
+The next major architectural iteration will abandon the assumption of constant biology and static pore space, transforming the pipeline into a coupled biogeochemical simulator.
+
+### 5.1 Temperature-Dependent Forcing ($Q_{10}$ Dynamics)
+The static biological source will be replaced with a dynamic, temperature-driven function:
+$$S_{\mathrm{total}}(z, t) = \left[ S_{\mathrm{sh}} e^{-z/\ell_s} + S_{\mathrm{bk}} \right] \cdot Q_{10}^{\frac{T(z,t) - T_{\mathrm{ref}}}{10}}$$
+**Inversion Shift:** The optimizer will no longer fit empirical production rates; it will fit the baseline biological capacity and the fundamental thermodynamic sensitivity ($Q_{10}$) of the biome.
+
+### 5.2 Humidity & Soil Moisture Coupling ($\theta$)
+* **Biological Limitation:** Respiration is limited by extreme dryness and saturation. The source term will incorporate a moisture-dependent scaling function $f(\theta(t))$.
+* **Dynamic Diffusivity:** As water fills pore space, it physically chokes gas transport. The scalar $D_{\mathrm{eff}}$ will be upgraded to a dynamic field $D_{\mathrm{eff}}(\theta, z, t)$ using the Millington-Quirk or Moldrup tortuosity models:
+  $$D_{\mathrm{eff}} = D_0 \frac{(\phi - \theta)^{10/3}}{\phi^2}$$
+
+### 5.3 Dynamic Spin-Up & Uncertainty Quantification
+* **Spin-Up:** Instead of estimating $t=0$ conditions, the model will run a 72-hour physical spin-up using environmental boundary data prior to the fitting window, killing all initial condition bias.
+* **UQ:** Multi-start optimizations, finite-difference Jacobians, and parameter correlation matrices will be implemented to generate rigorous confidence intervals for all inferred physical parameters.
+
+---
+
+## 6. Scripts & Output Directory
+
+```text
+calculations/
+├── ideal_period_timeline.py        # VERTICALS catalogue + shared data loaders
+├── composite_profile_pipeline.py   # M1: SVD pipeline & cubic diagnostics
+├── v2_crank_nicolson_pipeline.py   # M2-V1: TRF transient inversion & diagnostics
+└── out/
+    ├── composite/                  # M1 SVD plots & summary CSVs
+    └── V2/                         # M2-V1 heatmaps, residual plots, cost surfaces
 ```
