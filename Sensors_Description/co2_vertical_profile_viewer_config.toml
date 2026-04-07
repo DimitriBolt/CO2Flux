@@ -1,6 +1,5 @@
 [profile]
 slope = "LEO West"
-<<<<<<< HEAD
 
 # Allowed X values [m]: -4, -1, 1, 4
 x_coord_m = +1
@@ -21,16 +20,6 @@ end_date = "2026-Mar-25 23:59"
 # This section is used by co2_viewer_add_surface.py.
 x_coord_m = 2
 y_coord_m = 10 # Should be the same as in the [profile] section.
-=======
-x_coord_m = 1
-y_coord_m = 24
-start_date = "2025-AUG-25"
-end_date   = "2025-SEP-13"
-
-[surface_air]
-x_coord_m = 0
-y_coord_m = 24
->>>>>>> 3a655c1ca38264790ef80ccce4df345acabdcc0a
 
 [oracle]
 default_client_lib_dir = "/opt/oracle/instantclient_19_26"
