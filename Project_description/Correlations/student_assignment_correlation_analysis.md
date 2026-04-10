@@ -66,7 +66,7 @@ Check the corresponding ideal period notebook in the repository:
 
 Find the file matching your coordinates:
 - Matthew: `co2_ideal_period_LEO_West_x1_y24.ipynb`
-- Chris: `co2_ideal_period_LEO_West_x1_y4.ipynb`
+- Chris: `co2_ideal_period_LEO_West_x-1_y4.ipynb`
 - Matias: `co2_ideal_period_LEO_West_x-1_y24.ipynb`
 
 From the notebook, extract:
