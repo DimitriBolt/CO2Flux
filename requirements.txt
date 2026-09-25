@@ -5,9 +5,10 @@
 # Oracle Instant Client is not a pip package.
 
 matplotlib
+numpy
 openpyxl
 oracledb
 pandas
 Pillow
 python-dotenv
-
+pyarrow

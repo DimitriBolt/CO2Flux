@@ -2,6 +2,21 @@
 
 CO2Flux contains scripts to query Oracle data and generate CO2 outputs (including the vertical profile viewer GIF and JPEG exports).
 
+## Исследование CO₂ по идеям И. Р. Габитова - начать чтение
+
+**[Оглавление исследования и последовательность глав](Project_description/Research_log/README.md)**
+
+Исследование использует данные и инструменты CO2Flux. Главы оформлены как Jupyter
+notebooks с сохранёнными результатами, формулами и графиками на русском языке.
+Подробные пояснения методов и инструкции запуска вынесены в
+[справочник](Project_description/Research_log/details/README.md).
+Для чтения опубликованных глав подключение к Oracle не требуется.
+
+В оглавлении указаны выполненные этапы, открытые вопросы и следующий шаг.
+Ниже сохранено техническое руководство: установка, база данных и прежние инструменты
+визуализации. Оно остаётся самостоятельной документацией к вычислительной основе
+исследования. Старые материалы проекта не заменяются новыми главами.
+
 ## 1) Install Python
 
 Use Python 3.11 or newer.
@@ -96,9 +111,8 @@ Outputs are written under `Sensors_Description` as:
 - animated GIF
 - final JPEG
 
-Example profile output:
-
-![CO2 vertical profile example](Sensors_Description/co2_profile_LEO_West_x-4_y10_2026-Mar-25_00-00_to_2026-Mar-25_23-59.jpg)
+Profile images are generated locally by the viewer; their filenames include the
+selected slope, coordinates and time interval. See the [viewer directory](Sensors_Description/).
 
 ## 8) Change Coordinates, Dates, and Extraction Settings
 

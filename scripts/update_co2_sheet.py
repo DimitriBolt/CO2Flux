@@ -130,6 +130,43 @@ def end_label(dt: datetime | None) -> str:
     return "present" if dt.date().isoformat() == TODAY else dt.date().isoformat()
 
 
+def resolve_sensor_id(record: dict[str, object]) -> int:
+    """Return an integer sensor id from a record dict.
+
+    The workbook layout can vary between exports; try a few likely columns
+    (J, L, K) and coerce to int where possible.
+    """
+    # First try explicit likely columns
+    for key in ("J", "L", "K"):
+        val = record.get(key)
+        if isinstance(val, (int, float)):
+            return int(val)
+        if isinstance(val, str):
+            s = val.strip()
+            if s.isdigit() or (s.startswith("-") and s[1:].isdigit()):
+                return int(s)
+
+    # Then search all string values for an explicit dv.sensorid = N pattern
+    m_pat = re.compile(r"dv\.sensorid\s*=\s*(-?\d+)")
+    for val in record.values():
+        if isinstance(val, str):
+            m = m_pat.search(val)
+            if m:
+                return int(m.group(1))
+
+    # Fallback: look for any small integer inside any string value (avoid year-like 4-digit numbers > 1900)
+    int_pat = re.compile(r"(?<!\d)(-?\d{1,4})(?!\d)")
+    for val in record.values():
+        if isinstance(val, str):
+            m = int_pat.search(val)
+            if m:
+                v = int(m.group(1))
+                if abs(v) < 10000:
+                    return v
+
+    raise ValueError(f"Could not resolve sensor id from record columns J/L/K: {record}")
+
+
 def make_series_query(table: str, sensor_id: int, variable_id: int, start_date: str | None = None) -> str:
     where_lines = [
         f"    dv.sensorid = {sensor_id}",
@@ -299,9 +336,10 @@ def update_sensor_record(
     record["AH"] = variable_code
     record["AI"] = variable_name
     record["AJ"] = units
-    bounds = fetch_bounds_sensor(cur, table, int(record["J"]), variable_id)
+    sensor_id = resolve_sensor_id(record)
+    bounds = fetch_bounds_sensor(cur, table, sensor_id, variable_id)
     start_date = date_label(bounds.first_dt)
-    record["AD"] = make_series_query(table, int(record["J"]), variable_id, start_date=start_date or None)
+    record["AD"] = make_series_query(table, sensor_id, variable_id, start_date=start_date or None)
     if bounds.has_data:
         record["AA"] = date_label(bounds.first_dt)
         record["AB"] = end_label(bounds.last_dt)
@@ -330,9 +368,10 @@ def update_full_series_sensor_record(cur: oracledb.Cursor, record: dict[str, obj
     table = str(record["L"])
     variable_id = int(record["AG"])
     start_date = str(record.get("AA") or "").strip() or None
-    bounds = fetch_bounds_sensor(cur, table, int(record["J"]), variable_id, start_date=start_date)
+    sensor_id = resolve_sensor_id(record)
+    bounds = fetch_bounds_sensor(cur, table, sensor_id, variable_id, start_date=start_date)
     query_start = start_date or date_label(bounds.first_dt) or None
-    record["AD"] = make_series_query(table, int(record["J"]), variable_id, start_date=query_start)
+    record["AD"] = make_series_query(table, sensor_id, variable_id, start_date=query_start)
     record["AA"] = date_label(bounds.first_dt)
     record["AB"] = end_label(bounds.last_dt)
     record["AC"] = note if bounds.has_data else NO_ZERO_ROWS
@@ -433,7 +472,10 @@ def main() -> None:
         )
 
     for record in support_rows:
-        series_id = int(record["J"]) if isinstance(record["J"], (int, float)) else None
+        try:
+            series_id = resolve_sensor_id(record)
+        except Exception:
+            series_id = None
         if series_id == 1275 and record["B"] == "Water vapor concentration":
             update_sensor_record(
                 cur,

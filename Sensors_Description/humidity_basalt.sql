@@ -22,7 +22,7 @@ SELECT
 FROM
     leo_west.datavalues dv
 WHERE
-    dv.sensorid = 52
+    dv.sensorid = 204
     AND dv.variableid = 6
     AND dv.localdatetime >= TO_DATE('2026-03-25 00:00', 'YYYY-MM-DD HH24:MI')
     AND dv.localdatetime <= TO_DATE('2026-03-25 23:59', 'YYYY-MM-DD HH24:MI')
