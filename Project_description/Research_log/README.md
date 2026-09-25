@@ -9,10 +9,10 @@ Dimitri Bolt · направление по идеям И. Р. Габитова 
 $\mathbf C_v(t)=(C_{v,D1}(t),C_{v,D2}(t),C_{v,D3}(t))$.
 На первом этапе на временном интервале $W$ оцениваем
 
-```math
-\mathbf C_v\big|_W\ \longmapsto\ \{A_{v,j}(W),\ \phi_{v,j}(W),\ \Delta_{v,jk}(W)\},
+$$
+\mathbf C_v\big|_W\ \longmapsto\ \lbrace A_{v,j}(W),\ \phi_{v,j}(W),\ \Delta_{v,jk}(W)\rbrace,
 \qquad \Delta_{v,jk}=\frac{24}{2\pi}\mathrm{wrap}_{2\pi}(\phi_{v,k}-\phi_{v,j}).
-```
+$$
 
 Здесь $A,\phi$ — амплитуда и фаза максимума 24-часовой гармоники;
 $\mathrm{wrap}_{2\pi}$ выбирает ветвь $[-\pi,\pi)$, $\Delta$ выражена в часах.
