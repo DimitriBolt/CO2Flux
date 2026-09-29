@@ -277,13 +277,27 @@ def trajectory_segments(table, kind, levels=("D1", "D2", "D3")):
     return segments, colors
 
 
-def plot_trajectory(table, kind, levels=("D1", "D2", "D3")):
+def trajectory_display_groups(table):
+    """Display the saved monthly status and existing boundary caveat, without re-admission."""
+    boundary = table.get("context_admission_note", pd.Series("", index=table.index)).fillna("").ne("")
+    definitions = [
+        (table.admission_status.eq("confirmed") & ~boundary, "Основание I.G.", "o", "circle"),
+        (table.admission_status.eq("confirmed") & boundary, "Граничное окружение", "s", "square-open"),
+        (table.admission_status.eq("unconfirmed"), "Предварительно, без допуска", "D", "diamond-open"),
+    ]
+    return [(table.loc[mask], f"{label} · {int(table.loc[mask].calculation_status.eq('computed').sum())} суток", marker, symbol)
+            for mask, label, marker, symbol in definitions]
+
+
+def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False):
     """Date-colored 3D trajectory with continuous fit-quality display, no selection."""
     from matplotlib.colors import Normalize
     from matplotlib.lines import Line2D
     from mpl_toolkits.mplot3d.art3d import Line3DCollection
     if kind not in ("H", "A"):
         raise ValueError("kind must be H or A")
+    if preliminary:
+        table = table.loc[table.admission_status.isin(["confirmed", "unconfirmed"])].copy()
     selected = table.loc[table.calculation_status.eq("computed")].sort_values("date")
     xyz = selected[[f"{kind}_{level}" for level in levels]].to_numpy(float)
     finite = np.isfinite(xyz).all(axis=1)
@@ -292,14 +306,32 @@ def plot_trajectory(table, kind, levels=("D1", "D2", "D3")):
     size = 12 + 42*np.nan_to_num(np.clip(quality, 0, 1), nan=0)
     norm = Normalize(mdates.date2num(pd.to_datetime(table.date).min()),
                      mdates.date2num(pd.to_datetime(table.date).max()))
+    if preliminary:
+        norm = Normalize(dates.min(), dates.max())
     fig = plt.figure(figsize=(11, 9))
     ax = fig.add_subplot(111, projection="3d", computed_zorder=False)
-    segments, color_dates = trajectory_segments(table, kind, levels)
+    groups = trajectory_display_groups(table) if preliminary else [(table, "", "o", "circle")]
+    segments, color_dates = [], []
+    for group, _, _, _ in groups:
+        pieces, times = trajectory_segments(group, kind, levels)
+        segments.extend(pieces)
+        color_dates.extend(times)
     links = Line3DCollection(segments, cmap="viridis", norm=norm, linewidths=.65, alpha=.35)
     links.set_array(np.asarray(color_dates))
     ax.add_collection3d(links)
-    points = ax.scatter(*xyz[finite].T, c=dates[finite], cmap="viridis", norm=norm,
-                        s=size[finite], alpha=.88, depthshade=False, edgecolors="none")
+    legend = []
+    for group, label, marker, _ in groups:
+        mask = selected.index.isin(group.index) & finite
+        if not mask.any():
+            continue
+        filled = marker == "o"
+        ax.scatter(*xyz[mask].T, c=dates[mask] if filled else None, cmap="viridis" if filled else None,
+                   norm=norm if filled else None, s=size[mask], alpha=.88, depthshade=False,
+                   marker=marker, facecolors=None if filled else "none",
+                   edgecolors="none" if filled else plt.cm.viridis(norm(dates[mask])), linewidths=.85)
+        if preliminary:
+            legend.append(Line2D([], [], marker=marker, linestyle="none", color="#52616b",
+                                 markerfacecolor="#52616b" if filled else "none", markersize=5, label=label))
     sensitive = selected[[f"phase_status_{level}" for level in levels]].eq("known_sensitive").any(axis=1).to_numpy() & finite
     if kind == "H" and sensitive.any():
         ax.scatter(*xyz[sensitive].T, marker="o", facecolors="none", edgecolors="#555555", s=35, linewidths=.9,
@@ -316,21 +348,41 @@ def plot_trajectory(table, kind, levels=("D1", "D2", "D3")):
             setter(0, max(1., np.nanmax(values)*1.06))
     ax.view_init(elev=24, azim=-56)
     ax.set_box_aspect((1, 1, 1))
-    colorbar = fig.colorbar(points, ax=ax, shrink=.62, pad=.11)
+    colorbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap="viridis"), ax=ax, shrink=.62, pad=.11)
     ticks = pd.to_datetime(["2017-10-01", "2018-07-01", "2019-04-01", "2020-01-01", "2020-08-31"])
+    if preliminary:
+        ticks = pd.date_range(pd.to_datetime(selected.date).min(), pd.to_datetime(selected.date).max(), periods=6)
     colorbar.set_ticks(mdates.date2num(ticks), labels=[date.strftime("%m.%Y") for date in ticks])
     colorbar.set_label("Дата, местное время базы")
     if kind == "H":
-        ax.legend(handles=[Line2D([], [], marker="o", linestyle="none", color="#555555",
+        legend.append(Line2D([], [], marker="o", linestyle="none", color="#555555",
                                  markerfacecolor="none", markeredgewidth=.9, markersize=4,
-                                 label="D3: чувствительная фаза 22.11.2017")], loc="upper left", fontsize=9)
-    fig.suptitle(f"Траектория {kind}(d) · W_R4_C-4 · D1/D2/D3\n01.10.2017–31.08.2020 · {finite.sum()} суточных точек", fontsize=15, y=.97)
+                                 label="D3: чувствительная фаза 22.11.2017"))
+    if legend:
+        fig.legend(handles=legend, loc="upper left", bbox_to_anchor=(.045, .91), fontsize=9, frameon=False)
+    period = "01.10.2017–31.08.2020"
+    if preliminary:
+        first, last = pd.to_datetime(selected.date).agg(["min", "max"])
+        period = f"{first:%d.%m.%Y}–{last:%d.%m.%Y}"
+    fig.suptitle(f"Траектория {kind}(d) · W_R4_C-4 · D1/D2/D3\n{period} · {finite.sum()} суточных точек", fontsize=15, y=.97)
     footer = ("H: 0 ≡ 24 ч; связи разрезаны на гранях куба. " if kind == "H" else "A: высота гармоники относительно её постоянного уровня. ")
     footer += "Пропуски не соединены.\nПлощадь точки: min R² трёх подгонок (не порог и не погрешность фазы).\n"
     footer += f"Неопределённых H: {selected[[f'H_{l}' for l in levels]].isna().any(axis=1).sum()}; надёжность остальных фаз отдельно не установлена."
     fig.text(.5, .035, footer, ha="center", fontsize=10)
     fig.subplots_adjust(left=.03, right=.86, bottom=.14, top=.89)
     return fig
+
+
+def show_trajectory(table, kind, *, preliminary=False):
+    """Store a static PNG directly in notebook output, using the same display function."""
+    from IPython.display import Image, display
+    fig = plot_trajectory(table, kind, preliminary=preliminary)
+    try:
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png", dpi=160)
+        display(Image(data=buffer.getvalue()))
+    finally:
+        plt.close(fig)
 
 
 def save_trajectories(table, diagnostics, directory=HERE / "output/ch02"):
@@ -387,10 +439,8 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminar
     fig = go.Figure()
     groups = [(table, selected, "Суточные оценки", "circle")]
     if preliminary:
-        groups = [(table.loc[table.admission_status.eq(status)], selected.loc[selected.admission_status.eq(status)], label, symbol)
-                  for status, label, symbol in [
-                      ("confirmed", "Месяц подтверждён I.G.; методы различаются", "circle"),
-                      ("unconfirmed", "Месячный допуск не установлен", "diamond-open")]]
+        groups = [(source, selected.loc[selected.index.isin(source.index)], label, symbol)
+                  for source, label, _, symbol in trajectory_display_groups(table)]
     for source, _, label, _ in groups:
         segments, colors = trajectory_segments(source, kind, levels)
         coords, link_colors = [], []
@@ -434,9 +484,10 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminar
     title = f"{kind}(d) · W_R4_C-4 · 783 суток · 01.10.2017–31.08.2020"
     if preliminary:
         first, last = pd.to_datetime(selected.date).agg(["min", "max"])
-        title = f"Предварительная {kind}(d) · W_R4_C-4<br>{len(selected)} суток · {first:%d.%m.%Y}–{last:%d.%m.%Y}"
+        title = f"Траектория {kind}(d) · W_R4_C-4<br>{len(selected)} суток · {first:%d.%m.%Y}–{last:%d.%m.%Y}"
         missing = int((~finite).sum())
         explanation += f"<br>Неопределённые координаты: {missing} суток. Отказ аудита исключён. Месячный допуск не гарантирует надёжность фазы."
+        explanation += "<br>Пустые ромбы — предварительные расчёты без месячного допуска; пустые квадраты — неподтверждённое окружение граничных суток. Методы отличаются от I.G."
     fig.update_layout(title=title,
         template="plotly_white",scene=dict(**axes,aspectmode="cube",dragmode="orbit"),
         margin=dict(l=20,r=20,t=130 if preliminary else 100,b=120 if preliminary else 90),legend=dict(x=0,y=1.12 if preliminary else 1.06),
