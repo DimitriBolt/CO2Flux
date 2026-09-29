@@ -346,11 +346,14 @@ def save_trajectories(table, diagnostics, directory=HERE / "output/ch02"):
 
 
 
-def interactive_trajectory(table, kind, levels=("D1", "D2", "D3")):
+def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False):
     """Plotly view of saved vectors; reuse the static plot's torus links."""
     import plotly.graph_objects as go
     if kind not in ("H", "A"):
         raise ValueError("kind must be H or A")
+    if preliminary:
+        # Explicit audit refusals never enter the exploratory figures, even if fitted.
+        table = table.loc[table.admission_status.isin(["confirmed", "unconfirmed"])].copy()
     selected = table.loc[table.calculation_status.eq("computed")].sort_values("date")
     xyz = selected[[f"{kind}_{level}" for level in levels]].to_numpy(float)
     finite = np.isfinite(xyz).all(axis=1)
@@ -358,11 +361,22 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3")):
     dates = mdates.date2num(pd.to_datetime(selected.date))
     low, high = mdates.date2num(pd.to_datetime(table.date).agg(["min", "max"]))
     ticks = pd.to_datetime(["2017-10-01", "2018-07-01", "2019-04-01", "2020-01-01", "2020-08-31"])
+    if preliminary:
+        if selected.empty:
+            raise ValueError("Нет определённых координат для предварительного графика")
+        low, high = dates.min(), dates.max()
+        ticks = pd.date_range(pd.to_datetime(selected.date).min(), pd.to_datetime(selected.date).max(), periods=6)
     status = {"not_assessed": "надёжность отдельно не установлена",
               "known_sensitive": "известная чувствительная фаза", "undefined": "фаза не определена"}
     notes = selected.apply(lambda row: "<br>".join(
         f"{level}: {status.get(row[f'phase_status_{level}'], 'нет оценки')}"
         for level in levels), axis=1)
+    if preliminary:
+        labels = {"confirmed": "Месяц: опубликованное подтверждение I.G. (методы различаются)",
+                  "unconfirmed": "Месяц: научный допуск не установлен"}
+        notes += "<br>" + selected.admission_status.map(labels)
+        if "context_admission_note" in selected:
+            notes += "<br>" + selected.context_admission_note.fillna("")
     custom = [[date.strftime("%d.%m.%Y"), *[float(row[f"R2_{l}"]) for l in levels], note]
               for date, (_, row), note in zip(pd.to_datetime(selected.date), selected.iterrows(), notes)]
     unit = "ч" if kind == "H" else "ppm"
@@ -371,23 +385,37 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3")):
              + "R² D1/D2/D3: %{customdata[1]:.5f} / %{customdata[2]:.5f} / %{customdata[3]:.5f}<br>"
              + "%{customdata[4]}<extra></extra>")
     fig = go.Figure()
-    segments, colors = trajectory_segments(table, kind, levels)
-    coords, link_colors = [], []
-    for segment, date in zip(segments, colors):
-        coords.extend([segment[0].tolist(), segment[1].tolist(), [None]*3])
-        link_colors.extend([date, date, date])
-    if coords:
-        points = list(zip(*coords))
-        fig.add_trace(go.Scatter3d(x=points[0], y=points[1], z=points[2], mode="lines",
-            line=dict(color=link_colors, colorscale="Viridis", cmin=low, cmax=high, width=2),
-            opacity=.28, hoverinfo="skip", showlegend=False, connectgaps=False))
+    groups = [(table, selected, "Суточные оценки", "circle")]
+    if preliminary:
+        groups = [(table.loc[table.admission_status.eq(status)], selected.loc[selected.admission_status.eq(status)], label, symbol)
+                  for status, label, symbol in [
+                      ("confirmed", "Месяц подтверждён I.G.; методы различаются", "circle"),
+                      ("unconfirmed", "Месячный допуск не установлен", "diamond-open")]]
+    for source, _, label, _ in groups:
+        segments, colors = trajectory_segments(source, kind, levels)
+        coords, link_colors = [], []
+        for segment, date in zip(segments, colors):
+            coords.extend([segment[0].tolist(), segment[1].tolist(), [None]*3])
+            link_colors.extend([date, date, date])
+        if coords:
+            points = list(zip(*coords))
+            fig.add_trace(go.Scatter3d(x=points[0], y=points[1], z=points[2], mode="lines",
+                line=dict(color=link_colors, colorscale="Viridis", cmin=low, cmax=high, width=2),
+                legendgroup=label, opacity=.28, hoverinfo="skip", showlegend=False, connectgaps=False))
     quality = selected[[f"R2_{level}" for level in levels]].min(axis=1).to_numpy()
-    fig.add_trace(go.Scatter3d(x=xyz[:,0], y=xyz[:,1], z=xyz[:,2], mode="markers",
-        customdata=custom, hovertemplate=hover, name="Суточные оценки", showlegend=False,
-        marker=dict(color=dates.tolist(), colorscale="Viridis", cmin=low, cmax=high,
-                    size=np.sqrt(12+42*np.nan_to_num(np.clip(quality,0,1),nan=0)).tolist(),
-                    opacity=.9, colorbar=dict(title="Дата",tickvals=mdates.date2num(ticks).tolist(),
-                    ticktext=[d.strftime("%m.%Y") for d in ticks]))))
+    colorbar_shown = False
+    for _, points, label, symbol in groups:
+        positions = np.flatnonzero(selected.index.isin(points.index))
+        if not len(positions):
+            continue
+        fig.add_trace(go.Scatter3d(x=xyz[positions,0], y=xyz[positions,1], z=xyz[positions,2], mode="markers",
+            customdata=[custom[i] for i in positions], hovertemplate=hover, name=label, legendgroup=label, showlegend=preliminary,
+            marker=dict(color=dates[positions].tolist(), colorscale="Viridis", cmin=low, cmax=high,
+                        symbol=symbol, showscale=not colorbar_shown,
+                        size=np.sqrt(12+42*np.nan_to_num(np.clip(quality[positions],0,1),nan=0)).tolist(),
+                        opacity=.9, colorbar=dict(title="Дата",tickvals=mdates.date2num(ticks).tolist(),
+                        ticktext=[d.strftime("%m.%Y") for d in ticks]))))
+        colorbar_shown = True
     sensitive = selected[[f"phase_status_{level}" for level in levels]].eq("known_sensitive").any(axis=1).to_numpy()
     if kind == "H" and sensitive.any():
         fig.add_trace(go.Scatter3d(x=xyz[sensitive,0], y=xyz[sensitive,1], z=xyz[sensitive,2],
@@ -403,12 +431,37 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3")):
             axes[axis].update(rangemode="tozero")
     explanation = ("0 ≡ 24 ч: противоположные грани отождествлены; связи разрезаны на гранях. " if kind=="H" else "Амплитуда относительно постоянного уровня гармоники. ")
     explanation += "Пропуски не соединены.<br>Размер: min R² без порога; надёжность остальных фаз отдельно не установлена. Связи — ориентир порядка точек."
-    fig.update_layout(title=f"{kind}(d) · W_R4_C-4 · 783 суток · 01.10.2017–31.08.2020",
+    title = f"{kind}(d) · W_R4_C-4 · 783 суток · 01.10.2017–31.08.2020"
+    if preliminary:
+        first, last = pd.to_datetime(selected.date).agg(["min", "max"])
+        title = f"Предварительная {kind}(d) · W_R4_C-4<br>{len(selected)} суток · {first:%d.%m.%Y}–{last:%d.%m.%Y}"
+        missing = int((~finite).sum())
+        explanation += f"<br>Неопределённые координаты: {missing} суток. Отказ аудита исключён. Месячный допуск не гарантирует надёжность фазы."
+    fig.update_layout(title=title,
         template="plotly_white",scene=dict(**axes,aspectmode="cube",dragmode="orbit"),
-        margin=dict(l=20,r=20,t=100,b=90),legend=dict(x=0,y=1.06),
+        margin=dict(l=20,r=20,t=130 if preliminary else 100,b=120 if preliminary else 90),legend=dict(x=0,y=1.12 if preliminary else 1.06),
         annotations=[dict(text=explanation,x=.5,y=-.09,xref="paper",yref="paper",showarrow=False)],
         uirevision=f"chapter02-{kind}")
+    if preliminary:
+        fig.update_layout(title=dict(x=.03, y=.98, yanchor="top", font=dict(size=14)),
+            legend=dict(orientation="h", x=0, y=1.02, yanchor="bottom", font=dict(size=11)),
+            margin=dict(l=10, r=10, t=170, b=120), scene_camera=dict(eye=dict(x=1.7, y=1.7, z=1.7)))
     return fig
+
+
+def save_preliminary_interactive(table, kind, path):
+    """Self-contained browser view with wrapping notes outside the 3D canvas."""
+    fig = interactive_trajectory(table, kind, preliminary=True)
+    notes = fig.layout.annotations[0].text
+    fig.layout.annotations = ()
+    fig.update_layout(margin=dict(b=10), height=740)
+    html = fig.to_html(include_plotlyjs=True, full_html=True,
+                      config={"scrollZoom": True, "responsive": True, "displaylogo": False})
+    html = html.replace("<head>", '<head><meta name="viewport" content="width=device-width, initial-scale=1">'
+                        '<style>body{margin:0;font:14px Arial,sans-serif;color:#2a3f5f}'
+                        '.trajectory-note{padding:12px 24px 24px;line-height:1.5;max-width:1100px;margin:auto}</style>')
+    html = html.replace("</body>", f'<div class="trajectory-note">{notes}</div></body>')
+    Path(path).write_text(html)
 
 
 def open_saved_trajectories(open_browser=True):
