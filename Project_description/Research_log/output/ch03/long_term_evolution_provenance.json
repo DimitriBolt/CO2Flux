@@ -1,0 +1,68 @@
+{
+  "source_main_commit": "5b44f644651954e467ee70bfc2a31beee09b5a1f",
+  "parameters": {
+    "procedure_version": "2026-09-29",
+    "source_main_commit": "5b44f644651954e467ee70bfc2a31beee09b5a1f",
+    "column": "W_R4_C-4",
+    "sensor_ids": {
+      "D1": 994,
+      "D2": 1010,
+      "D3": 1026
+    },
+    "start": "2017-10-01",
+    "end_exclusive": "2020-09-01",
+    "expected_main_days": 783,
+    "min_pairs": 10,
+    "min_iso_weeks_each_year": 2,
+    "bootstrap_repetitions": 2000,
+    "primary_block_days": 7,
+    "block_days": [
+      7,
+      3,
+      14
+    ],
+    "confidence": 0.95,
+    "seed": 20260929,
+    "period_hours": 24,
+    "resultant_numerical_tolerance": 1e-12,
+    "phase_local_half_arc_hours": 6,
+    "quantile_method": "linear",
+    "coverage_variants": [
+      "pairwise",
+      "all_years_common"
+    ],
+    "block_rule": "moving full calendar blocks; every pair covered; at least two distinct blocks",
+    "multiplicity": "pointwise intervals only; no family-wide significance claim"
+  },
+  "input_provenance_sha256": "d235063bda8ac45b2d73f7032761dd3eff6acd9b12b4b4e09b279451aa0e98aa",
+  "frozen_inputs": {
+    "long_term_evolution_input.csv": "f3306ac370d796afafaf0369da496d19a92679d1302973137d971583247b0e95",
+    "long_term_evolution_calendar_input.csv": "c398400a9ff7f16748fb242a1351545de969c4b1d2ee8e650153aceb86210e74",
+    "long_term_evolution_parameters.json": "84f61e4a2b432600f35de4d1cc3f7ae261db35321f2222f15a2508895cbb0aee"
+  },
+  "code_sha256": {
+    "chapter03_evolution.py": "87bbb09057e87b1ddb2cb6549cf01cfa13a2dbc9884e5dbf059a328651feca24",
+    "long_term_evolution.py": "be366ea3c9d867899fa81ea6feb068fb09ebe0b937c35e97f65e96d7e67a3273"
+  },
+  "runtime": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.7+dfsg1"
+  },
+  "output_sha256": {
+    "long_term_evolution_calendar.csv": "c743ad05ad41d8e8ab08fe5840e2a1e86de65855eb1feaa6b04fd34c8fe7415d",
+    "long_term_evolution_monthly_coverage.csv": "f86734c03e2c6d91a5ba08dfd8fa2db6b9f5cbab42d07ddbbb67ab430f3ae62c",
+    "long_term_evolution_comparisons.csv": "4843da230fcaa69f898a08250bf7c1311d5cab37e78893eaba59b78fcbf5f8f5",
+    "long_term_evolution_paired_dates.csv": "5eb9fb872caa933da16396665eb2441efeba6a0af55edbddc954f36367863b69",
+    "long_term_evolution_coverage_sensitivity.csv": "62fefcb78edc8e156f367f7ddbf0f4c9510a2552e3108d2d183f5a1d0a4cf3b8",
+    "long_term_evolution_reproducibility.csv": "5de421f97d922b98f0da8e6a06c38279e1869e3ebde2ea3944a2861c755da643",
+    "long_term_evolution_separate_2013.csv": "9cb62f7265803a825c965ce4f5687ab59642f6a16a3f2fcea8755f1eb7efe26b",
+    "long_term_evolution_boundary_dates.csv": "13390086296d1389ad945f7ff7147d95196c9f54e33d289fbbdd6ed0e6aca3cc",
+    "long_term_evolution_calendar.png": "1666db35a7e6d9d07475c3e43d829c44b7fc648ac367ecdb6ecce18fd02a60fb",
+    "long_term_evolution_amplitudes.png": "86dcdaa2f0a00c0cf7737fc0c022d6d0e1b3060d2ee57b9971856e36696059bc",
+    "long_term_evolution_phase_shifts.png": "378c4189a4ca6e9f82fcbe01aa9e072c0e4170eb850d4171ddc43fe5cf621026",
+    "long_term_evolution_summary.json": "ea2c62f65f8bd155f10209214737a62c649632b01041ce49e5db131fa010b0ba"
+  },
+  "raw_fits_recomputed": false,
+  "oracle_access": false
+}

@@ -1,0 +1,40 @@
+{
+  "main_days": 783,
+  "planned_year_month_pairs": 34,
+  "per_sensor": {
+    "D1": {
+      "coverage_eligible": 30,
+      "bootstrap_available": 3,
+      "amplitude_positive_intervals": 0,
+      "amplitude_negative_intervals": 0,
+      "phase_positive_intervals": 0,
+      "phase_negative_intervals": 1,
+      "phase_local_intervals": 3
+    },
+    "D2": {
+      "coverage_eligible": 30,
+      "bootstrap_available": 3,
+      "amplitude_positive_intervals": 1,
+      "amplitude_negative_intervals": 1,
+      "phase_positive_intervals": 0,
+      "phase_negative_intervals": 1,
+      "phase_local_intervals": 3
+    },
+    "D3": {
+      "coverage_eligible": 30,
+      "bootstrap_available": 3,
+      "amplitude_positive_intervals": 0,
+      "amplitude_negative_intervals": 0,
+      "phase_positive_intervals": 1,
+      "phase_negative_intervals": 1,
+      "phase_local_intervals": 3
+    }
+  },
+  "bootstrap_coverage_by_length": {
+    "7": 3,
+    "3": 9,
+    "14": 2
+  },
+  "disjoint_year_comparison_pairs": 0,
+  "pointwise_not_simultaneous_intervals": true
+}

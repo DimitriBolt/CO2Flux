@@ -1,0 +1,34 @@
+{
+  "procedure_version": "2026-09-29",
+  "source_main_commit": "5b44f644651954e467ee70bfc2a31beee09b5a1f",
+  "column": "W_R4_C-4",
+  "sensor_ids": {
+    "D1": 994,
+    "D2": 1010,
+    "D3": 1026
+  },
+  "start": "2017-10-01",
+  "end_exclusive": "2020-09-01",
+  "expected_main_days": 783,
+  "min_pairs": 10,
+  "min_iso_weeks_each_year": 2,
+  "bootstrap_repetitions": 2000,
+  "primary_block_days": 7,
+  "block_days": [
+    7,
+    3,
+    14
+  ],
+  "confidence": 0.95,
+  "seed": 20260929,
+  "period_hours": 24,
+  "resultant_numerical_tolerance": 1e-12,
+  "phase_local_half_arc_hours": 6,
+  "quantile_method": "linear",
+  "coverage_variants": [
+    "pairwise",
+    "all_years_common"
+  ],
+  "block_rule": "moving full calendar blocks; every pair covered; at least two distinct blocks",
+  "multiplicity": "pointwise intervals only; no family-wide significance claim"
+}

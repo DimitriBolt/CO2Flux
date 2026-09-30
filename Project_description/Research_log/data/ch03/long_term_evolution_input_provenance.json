@@ -1,0 +1,33 @@
+{
+  "source_main_commit": "5b44f644651954e467ee70bfc2a31beee09b5a1f",
+  "approval_date": "2026-09-29",
+  "execution_date": "2026-09-30",
+  "source_files_sha256": {
+    "Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_preliminary_trajectories.csv": "a25e1cfb5fdc95c463b27917144449a8617e2c36bacdca91b01095b57c849e0d",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_provenance.json": "5a1532bee270128707020323cb483a4ac2f7cd3052b1a7220c25328a0e29dccd",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_daily.csv": "5dc4142e1d68a380dd5d6f5b2cdbca8685629989b555ab45a0d796ec5f4bc584",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_2013-09-01_to_2013-10-01_trajectories.csv": "ba0a32a727aa4aa3356af45fca228654af597dd46244aba465b594e607dce4a2",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_trajectories.csv": "de271d74ec6c804bc30dc89e1407e6139bae62652b87c25fd8a71872cfc4bb74",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_monthly.csv": "33237b34515f82051dba2e9ffee41d9fb3658833d21b9f30e973172c257cf834",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_preliminary_checks.json": "413164b12ac13ba8a0272828b05d8a9bcdcc09865e97607164a24b490e70996d",
+    "Project_description/Papers/LEO_CO2_sensor_audit_2026-06-30.pdf": "cf669565bdd817e6199e35bc78984c680973da01f6a7b851588a246be32a9560"
+  },
+  "group_counts": {
+    "main": 783,
+    "separate_2013": 6,
+    "boundary": 3,
+    "preliminary_excluded": 1244,
+    "audit_excluded": 3
+  },
+  "reference_max_absolute_difference": {
+    "W_R4_C-4_2017-10-01_to_2020-09-01": 0.0,
+    "W_R4_C-4_2013-09-01_to_2013-10-01": 0.0
+  },
+  "frozen_sha256": {
+    "long_term_evolution_input.csv": "f3306ac370d796afafaf0369da496d19a92679d1302973137d971583247b0e95",
+    "long_term_evolution_calendar_input.csv": "c398400a9ff7f16748fb242a1351545de969c4b1d2ee8e650153aceb86210e74",
+    "long_term_evolution_parameters.json": "84f61e4a2b432600f35de4d1cc3f7ae261db35321f2222f15a2508895cbb0aee"
+  },
+  "origin": "Exact approved subset of existing Chapter 2 characteristics; no new extraction or harmonic fit",
+  "phase_limits": "Inherited not_assessed; D3 2017-11-22 known_sensitive retained"
+}
