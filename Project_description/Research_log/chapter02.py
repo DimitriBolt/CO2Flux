@@ -1,8 +1,7 @@
-"""Глава 2: длительные суточные траектории и исторический пример ноября.
+"""Глава 2: утверждённый месячный допуск, прежний метод H/A и его отображение.
 
-load_november() читает сохранённые CSV без Oracle. Обработка повторов в других
-частях месяца остаётся вопросом для I.G. Старые вызовы example_* без даты
-по-прежнему относятся к 16 ноября. В PyCharm доступны те же рисунки, что и в notebook.
+Исторические примеры сохранены; они не определяют текущий допуск архива.
+Основной запуск: prepare_chapter02.py --final [--refresh].
 """
 
 from contextlib import redirect_stdout
@@ -41,7 +40,7 @@ STUCK_INTERVALS = (
 
 
 def calculation_calendar(raw, sensor_ids, start, end_exclusive,
-                         diagnostic_constants, approved_exclusions):
+                         diagnostic_constants, approved_exclusions, *, constants_require_decision=True):
     """Календарь A/B/C без средних, подгонок, H(d) или A(d).
 
     Использует прежние trend_window_mask()/observation_intervals() и контекст
@@ -81,7 +80,7 @@ def calculation_calendar(raw, sensor_ids, start, end_exclusive,
     for level, sid in sensor_ids.items():
         rows = selected.loc[selected.sensorid.eq(sid)].sort_values("localdatetime", kind="stable").reset_index(drop=True)
         rows["known_exclusion"] = False
-        rows["diagnostic_constant"] = False
+        rows["diagnostic_constant"] = rows.get("constant_run_hours", pd.Series(0., index=rows.index)).ge(1)
         for table, flag in ((approved_exclusions, "known_exclusion"),
                             (diagnostic_constants, "diagnostic_constant")):
             for interval in table.loc[table.level.eq(level)].itertuples():
@@ -114,7 +113,7 @@ def calculation_calendar(raw, sensor_ids, start, end_exclusive,
             entry[f"{level}_range_rows_required"] = int((needed & ~band & ~service).sum())
             entry[f"{level}_approved_exclusion_rows_required"] = int((needed & context.known_exclusion).sum())
             entry[f"{level}_constant_rows_required"] = int((needed & context.diagnostic_constant).sum())
-            pending = needed & context.diagnostic_constant & ~context.known_exclusion & band
+            pending = needed & context.diagnostic_constant & ~context.known_exclusion & band & constants_require_decision
             entry[f"{level}_unresolved_constant_rows_required"] = int(pending.sum())
             valid = band & ~context.known_exclusion
             work = context.assign(datavalue=context.datavalue.where(valid))
@@ -124,6 +123,19 @@ def calculation_calendar(raw, sensor_ids, start, end_exclusive,
             for label, mask in (("records", valid), ("window", column.trend_window_mask(work))):
                 intervals = observation_intervals(times, mask, column.GAP_FACTOR)
                 entry[f"{level}_{label}"] = any(a <= day and next_day <= b for a, b in intervals)
+            doubtful = context.get("doubt_reason", pd.Series("", index=context.index)).ne("") & valid
+            entry[f"{level}_doubtful_rows_context"] = int(doubtful.sum())
+            entry[f"{level}_doubtful_rows_required"] = int((needed & doubtful).sum())
+            # This is a sensitivity check of temporal eligibility, NOT an
+            # automatic cleaning decision. The original work values are kept.
+            # Reuse the exact same window/coverage rules, including the support
+            # observation at/after the next midnight and timestamp jitter.
+            unambiguous_window = entry[f"{level}_window"]
+            if unambiguous_window and doubtful.any():
+                alternate = work.assign(datavalue=work.datavalue.mask(doubtful))
+                intervals = observation_intervals(times, column.trend_window_mask(alternate), column.GAP_FACTOR)
+                unambiguous_window = any(a <= day and next_day <= b for a, b in intervals)
+            entry[f"{level}_unambiguous_window"] = unambiguous_window
             if not entry[f"{level}_window"]:
                 detail = ("нет измерений суток" if day_times.empty else
                           "неполное покрытие суток" if not entry[f"{level}_records"] else
@@ -211,6 +223,229 @@ def calculate_trajectories(raw, sensor_ids, calendar, approved_exclusions):
     return table.reset_index(), diagnostics
 
 
+# Approved implementation, 30 September 2026. These definitions complete the
+# numerical I.G. rules; they are not attributed to the report's unknown code.
+ADMISSION_PARAMETERS = dict(service_limit=-9999, concentration_min_exclusive=0,
+    concentration_max=3000, window_samples=7, mad_scale=1.4826, mad_multiplier=6,
+    cadence_ratio=column.GAP_FACTOR, bins_hours=6, minimum_per_bin=2,
+    minimum_days=10, monthly_concentration_min=100, monthly_concentration_max=2000,
+    monthly_amplitude_min=8, period_hours=24)
+
+
+def clean_admission_measurements(raw, sensor_ids, approved_exclusions):
+    """Immutable input; unique timestamp work view with a reproducible decision log.
+
+    Seven original consecutive timestamps, including invalid ones, form a window.
+    All seven must be finite and its six spacings must have max/min <= the
+    existing gap factor (1.5). Thus invalid values, gaps and cadence transitions
+    cannot be silently jumped. Non-centred windows are never used at boundaries.
+    Only the centre outside the MAD band with all six neighbours inside is
+    unambiguous. Adjacent candidates are retained, never removed iteratively.
+    """
+    parts = []
+    for level, sid in sensor_ids.items():
+        source = raw.loc[raw.sensorid.eq(sid)].copy()
+        source['localdatetime'] = pd.to_datetime(source.localdatetime)
+        if source.localdatetime.isna().any():
+            raise ValueError('Undefined source timestamps')
+        grouped = source.groupby('localdatetime', sort=True).datavalue
+        work = grouped.agg(datavalue='first', source_rows='size').reset_index()
+        conflict = grouped.nunique(dropna=False).gt(1).to_numpy()
+        work['sensorid'], work['variableid'], work['level'] = sid, 9, level
+        work['original_value'] = work.datavalue
+        work['exact_duplicate_extra'] = np.where(conflict, 0, work.source_rows-1)
+        reason = np.full(len(work), '', dtype=object)
+        y = work.datavalue.to_numpy(float, copy=True)
+        reason[~np.isfinite(y)] = 'nonfinite'
+        reason[np.isfinite(y) & ((y <= 0) | (y > 3000))] = 'outside_0_3000'
+        reason[y <= -9999] = 'service_code'
+        reason[conflict] = 'conflicting_timestamp'
+        for row in approved_exclusions.loc[approved_exclusions.level.eq(level)].itertuples():
+            mask = work.localdatetime.between(row.start, row.end).to_numpy()
+            reason[mask & (reason == '')] = 'approved_individual_exclusion'
+        y[reason != ''] = np.nan
+        doubtful = np.full(len(work), '', dtype=object)
+        eligible = np.zeros(len(work), dtype=bool)
+        candidate = np.zeros(len(work), dtype=bool)
+        isolated = np.zeros(len(work), dtype=bool)
+        if len(work) >= 7:
+            windows = np.lib.stride_tricks.sliding_window_view(y, 7)
+            dt = np.diff(work.localdatetime.to_numpy()).astype('timedelta64[ns]').astype(float)/1e9
+            spacings = np.lib.stride_tricks.sliding_window_view(dt, 6)
+            valid = np.isfinite(windows).all(axis=1) & (spacings.min(axis=1) > 0)
+            valid &= spacings.max(axis=1) <= column.GAP_FACTOR*spacings.min(axis=1)
+            med = np.median(windows, axis=1)
+            dev = np.abs(windows-med[:, None])
+            mad = np.median(dev, axis=1)
+            band = 6*1.4826*mad
+            outside = dev > band[:, None]
+            candidate[3:-3] = valid & (mad > 0) & outside[:, 3]
+            isolated[3:-3] = candidate[3:-3] & (outside.sum(axis=1) == 1)
+            # A constant seven-point window is not doubtful. A non-flat zero-MAD
+            # centre is retained and flagged; multi-point excursions are retained.
+            zero = valid & (mad == 0) & (dev[:, 3] > 0)
+            doubtful[3:-3][zero] = 'zero_MAD_deviation'
+            eligible[3:-3] = valid
+        adjacent = np.roll(candidate, 1) | np.roll(candidate, -1)
+        removable = isolated & ~adjacent
+        doubtful[candidate & ~removable] = 'ambiguous_excursion'
+        reason[removable] = 'isolated_7_sample_MAD_spike'
+        y[removable] = np.nan
+        work['datavalue'] = y
+        work['exclusion_reason'], work['doubt_reason'] = reason, doubtful
+        work['despike_window_eligible'] = eligible
+        # Diagnostic only: no duration of a constant run changes admission.
+        same = work.original_value.eq(work.original_value.shift()) & ~conflict
+        step = work.localdatetime.diff().dt.total_seconds()
+        same &= step.le(column.GAP_FACTOR*step[step.gt(0)].median())
+        groups = (~same).cumsum()
+        bounds = work.groupby(groups).localdatetime.agg(['min', 'max'])
+        work['constant_run_hours'] = groups.map((bounds['max']-bounds['min']).dt.total_seconds()/3600)
+        parts.append(work)
+    return pd.concat(parts, ignore_index=True)
+
+
+def monthly_day_fit(frame):
+    """Raw-concentration fit for the monthly gate, NOT the residual H/A fit."""
+    frame = frame.loc[np.isfinite(frame.datavalue)]
+    counts = frame.localdatetime.dt.hour.floordiv(6).value_counts().reindex(range(4), fill_value=0)
+    if (counts < 2).any() or frame.localdatetime.duplicated().any():
+        return None
+    try:
+        fit = fit_diurnal(frame.localdatetime, frame.datavalue)
+    except ValueError:
+        return None
+    return dict(concentration=float(frame.datavalue.median()), amplitude=fit['amplitude_ppm'],
+                n_obs=len(frame), r_squared=fit['r_squared'])
+
+
+def admission_day_bounds(frame, fit):
+    """Enclose ALL subsets of unresolved samples, not just keep-all/drop-all.
+
+    With <= 10 doubtful samples enumerate exactly (a computation shortcut only).
+    Otherwise use a rigorous LS perturbation bound and concentration extrema;
+    an inconclusive enclosure is reported, never used to certify admission.
+    No replacement/interpolation of doubtful observations is considered.
+    """
+    frame = frame.loc[np.isfinite(frame.datavalue)].reset_index(drop=True)
+    indices = np.flatnonzero(frame.doubt_reason.ne('').to_numpy())
+    if not len(indices):
+        return dict(c_lo=fit['concentration'], c_hi=fit['concentration'],
+                    a_lo=fit['amplitude'], a_hi=fit['amplitude'], guaranteed=True, bounds='exact')
+    if len(indices) <= 10:
+        values, guaranteed = [], True
+        for mask in range(1 << len(indices)):
+            keep = np.ones(len(frame), bool)
+            keep[indices[[bool(mask & (1 << j)) for j in range(len(indices))]]] = False
+            part = monthly_day_fit(frame.loc[keep])
+            guaranteed &= part is not None
+            if part is not None:
+                values.append(part)
+        return dict(c_lo=min(x['concentration'] for x in values), c_hi=max(x['concentration'] for x in values),
+                    a_lo=min(x['amplitude'] for x in values), a_hi=max(x['amplitude'] for x in values),
+                    guaranteed=guaranteed, bounds='exact_subsets')
+    guaranteed = monthly_day_fit(frame.loc[frame.doubt_reason.eq('')]) is not None
+    t = (frame.localdatetime-frame.localdatetime.dt.normalize()).dt.total_seconds().to_numpy()/3600
+    x = np.column_stack([np.ones(len(t)), np.cos(2*np.pi*t/24), np.sin(2*np.pi*t/24)])
+    y = frame.datavalue.to_numpy()
+    beta = np.linalg.lstsq(x, y, rcond=None)[0]
+    # X_remaining' X_remaining >= X_certain' X_certain in the PSD ordering.
+    certain = frame.doubt_reason.eq('').to_numpy()
+    lower_eigenvalue = np.linalg.eigvalsh(x[certain].T @ x[certain]).min()
+    radius = (np.linalg.norm(x[indices], axis=1)*np.abs(y-x @ beta)[indices]).sum()
+    radius = radius/lower_eigenvalue if lower_eigenvalue > 0 else np.inf
+    return dict(c_lo=float(y.min()), c_hi=float(y.max()),
+                a_lo=max(0, fit['amplitude']-radius), a_hi=fit['amplitude']+radius,
+                guaranteed=guaranteed, bounds='certified_enclosure')
+
+
+def _monthly_median_bounds(days, prefix):
+    """Extrema over optional valid days, allowing every count >= ten."""
+    certain = days.loc[days.guaranteed]
+    optional = days.loc[~days.guaranteed]
+    lows, highs = [], []
+    for n in range(max(0, 10-len(certain)), len(optional)+1):
+        lows.append(np.median(np.r_[certain[prefix+'_lo'], np.sort(optional[prefix+'_lo'])[:n]]))
+        highs.append(np.median(np.r_[certain[prefix+'_hi'], np.sort(optional[prefix+'_hi'])[::-1][:n]]))
+    return (min(lows), max(highs)) if lows else (np.nan, np.nan)
+
+
+def monthly_admission(work, sensor_ids, start, end_exclusive):
+    """Every month, every sensor; gates and data ambiguities are distinct."""
+    daily, monthly = [], []
+    for level, sid in sensor_ids.items():
+        rows = work.loc[work.sensorid.eq(sid)]
+        for day, part in rows.groupby(rows.localdatetime.dt.normalize()):
+            fit = monthly_day_fit(part)
+            record = dict(date=day, month=day.strftime('%Y-%m'), level=level, sensorid=sid,
+                          valid=fit is not None, doubtful_samples=int(part.doubt_reason.ne('').sum()))
+            if fit is not None:
+                record.update(fit)
+                record.update(admission_day_bounds(part, fit))
+            daily.append(record)
+    daily = pd.DataFrame(daily)
+    for month in pd.period_range(pd.Timestamp(start), pd.Timestamp(end_exclusive)-pd.Timedelta(nanoseconds=1), freq='M'):
+        for level, sid in sensor_ids.items():
+            d = daily.loc[daily.month.eq(str(month)) & daily.level.eq(level) & daily.valid].copy()
+            n = len(d)
+            record = dict(month=str(month), level=level, sensorid=sid, valid_days=n,
+                          median_concentration=d.concentration.median() if n else np.nan,
+                          median_raw_amplitude=d.amplitude.median() if n else np.nan)
+            record['minimum_valid_days'] = int(d.guaranteed.sum()) if n else 0
+            record['doubtful_valid_days'] = int(d.doubtful_samples.gt(0).sum()) if n else 0
+            reasons = []
+            if n < 10:
+                status = 'fail'
+                reasons.append('fewer_than_10_valid_days')
+                clo=chi=alo=ahi=np.nan
+            else:
+                d['guaranteed'] = d.guaranteed.astype(bool)
+                clo, chi = _monthly_median_bounds(d, 'c')
+                alo, ahi = _monthly_median_bounds(d, 'a')
+                if chi < 100 or clo > 2000: reasons.append('median_concentration_outside_100_2000')
+                if ahi < 8: reasons.append('median_raw_amplitude_below_8')
+                if reasons:
+                    status = 'fail'
+                elif record['minimum_valid_days'] >= 10 and clo >= 100 and chi <= 2000 and alo >= 8:
+                    status = 'pass'
+                    reasons.append('all_three_criteria_invariant_to_flagged_samples')
+                else:
+                    status = 'undetermined'
+                    reasons.append('unresolved_excursions_can_affect_monthly_gate')
+            record.update(status=status, reason=';'.join(reasons), concentration_lower=clo,
+                          concentration_upper=chi, amplitude_lower=alo, amplitude_upper=ahi)
+            monthly.append(record)
+    return pd.DataFrame(monthly), daily
+
+
+def final_admission_calendar(work, sensor_ids, monthly, start, end_exclusive, approved_exclusions):
+    """Keep all dates/reasons; admit H/A only after monthly and temporal gates."""
+    empty = pd.DataFrame(columns=['level', 'start', 'end'])
+    calendar = calculation_calendar(work, sensor_ids, start, end_exclusive, empty,
+                                    approved_exclusions, constants_require_decision=False)
+    calendar['month'] = calendar.date.dt.strftime('%Y-%m')
+    calendar['technical_category'] = calendar.category
+    calendar['technical_reason'] = calendar.reason
+    for i, row in calendar.iterrows():
+        statuses = monthly.loc[monthly.month.eq(row.month)].set_index('level')
+        status = 'fail' if statuses.status.eq('fail').any() else 'undetermined' if statuses.status.eq('undetermined').any() else 'pass'
+        calendar.loc[i, 'admission_status'] = status
+        notes = []
+        if status != 'pass':
+            notes = [f'{l}: {statuses.loc[l,"status"]}: {statuses.loc[l,"reason"]}'
+                     for l in sensor_ids if statuses.loc[l,'status'] != 'pass']
+        n_doubts = int(sum(row[f'{l}_doubtful_rows_required'] for l in sensor_ids))
+        calendar.loc[i, 'unresolved_samples_required'] = n_doubts
+        unresolved = row.technical_category == 'A' and not all(row[f'{l}_unambiguous_window'] for l in sensor_ids)
+        calendar.loc[i, 'unresolved_context'] = unresolved
+        if unresolved: notes.append('unresolved_excursion_in_required_12h_context')
+        if status == 'fail' or row.technical_category == 'B': calendar.loc[i, 'category'] = 'B'
+        elif status == 'undetermined' or unresolved: calendar.loc[i, 'category'] = 'C'
+        if row.technical_category != 'A': notes.append(row.technical_reason)
+        calendar.loc[i, 'reason'] = '; '.join(notes) or 'monthly_pass_and_complete_unambiguous_daily_context'
+    return calendar
+
+
 def load_historical_trajectories():
     """Read the fixed archive and accepted calendar, with original input hashes."""
     output = HERE / "output/ch02"
@@ -289,16 +524,24 @@ def trajectory_display_groups(table):
             for mask, label, marker, symbol in definitions]
 
 
-def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False):
+def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False, final=False):
     """Date-colored 3D trajectory with continuous fit-quality display, no selection."""
     from matplotlib.colors import Normalize
     from matplotlib.lines import Line2D
     from mpl_toolkits.mplot3d.art3d import Line3DCollection
     if kind not in ("H", "A"):
         raise ValueError("kind must be H or A")
+    if final:
+        table = table.loc[table.admission_status.eq("pass")].copy()
     if preliminary:
         table = table.loc[table.admission_status.isin(["confirmed", "unconfirmed"])].copy()
     selected = table.loc[table.calculation_status.eq("computed")].sort_values("date")
+    if selected.empty:
+        fig, ax = plt.subplots(figsize=(11, 9))
+        ax.axis("off")
+        ax.text(.5, .5, f"{kind}(d): нет допущенных суточных оценок.\nПричины сохранены в календаре.",
+                ha="center", va="center", transform=ax.transAxes)
+        return fig
     xyz = selected[[f"{kind}_{level}" for level in levels]].to_numpy(float)
     finite = np.isfinite(xyz).all(axis=1)
     dates = mdates.date2num(pd.to_datetime(selected.date))
@@ -306,7 +549,7 @@ def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False
     size = 12 + 42*np.nan_to_num(np.clip(quality, 0, 1), nan=0)
     norm = Normalize(mdates.date2num(pd.to_datetime(table.date).min()),
                      mdates.date2num(pd.to_datetime(table.date).max()))
-    if preliminary:
+    if preliminary or final:
         norm = Normalize(dates.min(), dates.max())
     fig = plt.figure(figsize=(11, 9))
     ax = fig.add_subplot(111, projection="3d", computed_zorder=False)
@@ -350,18 +593,18 @@ def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False
     ax.set_box_aspect((1, 1, 1))
     colorbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap="viridis"), ax=ax, shrink=.62, pad=.11)
     ticks = pd.to_datetime(["2017-10-01", "2018-07-01", "2019-04-01", "2020-01-01", "2020-08-31"])
-    if preliminary:
+    if preliminary or final:
         ticks = pd.date_range(pd.to_datetime(selected.date).min(), pd.to_datetime(selected.date).max(), periods=6)
     colorbar.set_ticks(mdates.date2num(ticks), labels=[date.strftime("%m.%Y") for date in ticks])
     colorbar.set_label("Дата, местное время базы")
-    if kind == "H":
+    if kind == "H" and sensitive.any():
         legend.append(Line2D([], [], marker="o", linestyle="none", color="#555555",
                                  markerfacecolor="none", markeredgewidth=.9, markersize=4,
                                  label="D3: чувствительная фаза 22.11.2017"))
     if legend:
         fig.legend(handles=legend, loc="upper left", bbox_to_anchor=(.045, .91), fontsize=9, frameon=False)
     period = "01.10.2017–31.08.2020"
-    if preliminary:
+    if preliminary or final:
         first, last = pd.to_datetime(selected.date).agg(["min", "max"])
         period = f"{first:%d.%m.%Y}–{last:%d.%m.%Y}"
     fig.suptitle(f"Траектория {kind}(d) · W_R4_C-4 · D1/D2/D3\n{period} · {finite.sum()} суточных точек", fontsize=15, y=.97)
@@ -373,10 +616,10 @@ def plot_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False
     return fig
 
 
-def show_trajectory(table, kind, *, preliminary=False):
+def show_trajectory(table, kind, *, preliminary=False, final=False):
     """Store a static PNG directly in notebook output, using the same display function."""
     from IPython.display import Image, display
-    fig = plot_trajectory(table, kind, preliminary=preliminary)
+    fig = plot_trajectory(table, kind, preliminary=preliminary, final=final)
     try:
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png", dpi=160)
@@ -398,22 +641,30 @@ def save_trajectories(table, diagnostics, directory=HERE / "output/ch02"):
 
 
 
-def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False):
+def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminary=False, final=False):
     """Plotly view of saved vectors; reuse the static plot's torus links."""
     import plotly.graph_objects as go
     if kind not in ("H", "A"):
         raise ValueError("kind must be H or A")
+    if final:
+        table = table.loc[table.admission_status.eq("pass")].copy()
     if preliminary:
         # Explicit audit refusals never enter the exploratory figures, even if fitted.
         table = table.loc[table.admission_status.isin(["confirmed", "unconfirmed"])].copy()
     selected = table.loc[table.calculation_status.eq("computed")].sort_values("date")
+    if selected.empty or not np.isfinite(selected[[f"{kind}_{l}" for l in levels]].to_numpy(float)).all(axis=1).any():
+        fig = go.Figure()
+        fig.update_layout(title=f"{kind}(d): нет определённых допущенных точек", annotations=[dict(
+            text="Причины отсутствия оценок сохранены в календаре. Нулевой амплитуде не назначается фаза.",
+            x=.5, y=.5, xref="paper", yref="paper", showarrow=False)])
+        return fig
     xyz = selected[[f"{kind}_{level}" for level in levels]].to_numpy(float)
     finite = np.isfinite(xyz).all(axis=1)
     selected, xyz = selected.loc[finite], xyz[finite]
     dates = mdates.date2num(pd.to_datetime(selected.date))
     low, high = mdates.date2num(pd.to_datetime(table.date).agg(["min", "max"]))
     ticks = pd.to_datetime(["2017-10-01", "2018-07-01", "2019-04-01", "2020-01-01", "2020-08-31"])
-    if preliminary:
+    if preliminary or final:
         if selected.empty:
             raise ValueError("Нет определённых координат для предварительного графика")
         low, high = dates.min(), dates.max()
@@ -482,27 +733,31 @@ def interactive_trajectory(table, kind, levels=("D1", "D2", "D3"), *, preliminar
     explanation = ("0 ≡ 24 ч: противоположные грани отождествлены; связи разрезаны на гранях. " if kind=="H" else "Амплитуда относительно постоянного уровня гармоники. ")
     explanation += "Пропуски не соединены.<br>Размер: min R² без порога; надёжность остальных фаз отдельно не установлена. Связи — ориентир порядка точек."
     title = f"{kind}(d) · W_R4_C-4 · 783 суток · 01.10.2017–31.08.2020"
-    if preliminary:
+    if preliminary or final:
         first, last = pd.to_datetime(selected.date).agg(["min", "max"])
         title = f"Траектория {kind}(d) · W_R4_C-4<br>{len(selected)} суток · {first:%d.%m.%Y}–{last:%d.%m.%Y}"
         missing = int((~finite).sum())
         explanation += f"<br>Неопределённые координаты: {missing} суток. Отказ аудита исключён. Месячный допуск не гарантирует надёжность фазы."
         explanation += "<br>Пустые ромбы — предварительные расчёты без месячного допуска; пустые квадраты — неподтверждённое окружение граничных суток. Методы отличаются от I.G."
+    if final:
+        explanation = ("0 ≡ 24 ч; противоположные грани отождествлены. " if kind == "H" else "Амплитуда в ppm. ")
+        explanation += "Только совместный месячный pass и полный однозначный контекст. Пропуски не соединены.<br>Размер точки: min R² без порога; надёжность фаз отдельно не установлена."
+        explanation += f"<br>Неопределённых H: {table.loc[table.calculation_status.eq('computed'), [f'H_{l}' for l in levels]].isna().any(axis=1).sum()} суток."
     fig.update_layout(title=title,
         template="plotly_white",scene=dict(**axes,aspectmode="cube",dragmode="orbit"),
         margin=dict(l=20,r=20,t=130 if preliminary else 100,b=120 if preliminary else 90),legend=dict(x=0,y=1.12 if preliminary else 1.06),
         annotations=[dict(text=explanation,x=.5,y=-.09,xref="paper",yref="paper",showarrow=False)],
         uirevision=f"chapter02-{kind}")
-    if preliminary:
+    if preliminary or final:
         fig.update_layout(title=dict(x=.03, y=.98, yanchor="top", font=dict(size=14)),
             legend=dict(orientation="h", x=0, y=1.02, yanchor="bottom", font=dict(size=11)),
             margin=dict(l=10, r=10, t=170, b=120), scene_camera=dict(eye=dict(x=1.7, y=1.7, z=1.7)))
     return fig
 
 
-def save_preliminary_interactive(table, kind, path):
+def save_preliminary_interactive(table, kind, path, *, final=False):
     """Self-contained browser view with wrapping notes outside the 3D canvas."""
-    fig = interactive_trajectory(table, kind, preliminary=True)
+    fig = interactive_trajectory(table, kind, preliminary=not final, final=final)
     notes = fig.layout.annotations[0].text
     fig.layout.annotations = ()
     fig.update_layout(margin=dict(b=10), height=740)
