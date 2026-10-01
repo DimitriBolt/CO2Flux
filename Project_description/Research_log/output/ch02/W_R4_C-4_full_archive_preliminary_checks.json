@@ -1,0 +1,152 @@
+{
+  "created_at_utc": "2026-09-29T06:50:50.169613+00:00",
+  "summary": {
+    "archive_months": 157,
+    "archive_days": 4764,
+    "first_record": "2013-09-11 12:30:00",
+    "last_record": "2026-09-26 20:45:01",
+    "calculated_days": 2039,
+    "plotted_days": 2036,
+    "calculated_by_monthly_admission": {
+      "unconfirmed": 1244,
+      "confirmed": 792,
+      "not_admitted_audit": 3
+    },
+    "failed_A_days": 0,
+    "skipped_B_C_days": 2725,
+    "first_plotted_day": "2013-09-21",
+    "last_plotted_day": "2020-12-31",
+    "added_to_previous_789": 1247,
+    "outside_previous_35_month_block": 1251,
+    "context_caveat_dates": [
+      "2013-09-30",
+      "2017-10-01",
+      "2020-08-31"
+    ],
+    "audit_excluded_dates": [
+      "2021-01-01",
+      "2021-01-02",
+      "2021-01-03"
+    ],
+    "phase_status_counts": {
+      "not_assessed": 6107,
+      "known_sensitive": 1
+    }
+  },
+  "comparisons": [
+    {
+      "source": "W_R4_C-4_2013-09-01_to_2013-10-01",
+      "days": 6,
+      "atol": 1e-07,
+      "rtol": 1e-07,
+      "max_H_A_R2_absolute_difference": 3.552713678800501e-15,
+      "max_fit_absolute_difference": 3.552713678800501e-15
+    },
+    {
+      "source": "W_R4_C-4_2017-10-01_to_2020-09-01",
+      "days": 783,
+      "atol": 1e-07,
+      "rtol": 1e-07,
+      "max_H_A_R2_absolute_difference": 1.4210854715202004e-14,
+      "max_fit_absolute_difference": 1.4210854715202004e-14
+    }
+  ],
+  "input_provenance": "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_provenance.json",
+  "input_provenance_sha256": "5a1532bee270128707020323cb483a4ac2f7cd3052b1a7220c25328a0e29dccd",
+  "calendar_sha256": "5dc4142e1d68a380dd5d6f5b2cdbca8685629989b555ab45a0d796ec5f4bc584",
+  "protected_sha256": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/README.md": "5812ea18bb3f0a0b2aed85dd5ce97cccd56dc0f7e3bc11db253f55dabc946ec5",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/PLAN.md": "503970220daa9f7af8eb4a2c84116c5e7caf1d229ee59f2237c49a9251aac8ed",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/02_monthly_changes.ipynb": "a1da744590d7eb5d66ef313981a87c7d02bc4c278916913a5676765d1d5bfe87",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/chapter01.py": "c63f784778d043439cb94781306982681ba9c81a930f261f5ed78199893d1a34",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2013-09-01_to_2013-10-01_trajectories.csv": "ba0a32a727aa4aa3356af45fca228654af597dd46244aba465b594e607dce4a2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2013-09-01_to_2013-10-01_calendar.csv": "f8e3c00b9fddfc452d27d1b766c9ef124d1852557766867c4a7285c37f6c9f85",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2013-09-01_to_2013-10-01_daily_fits.csv": "7f97ebf1d89cace5f778b6f66e8ac688480155217e7e4a87fa661e103d883a94",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2013-09-01_to_2013-10-01_provenance.json": "88135d6181c36f63cad5633598a5a620c1c75e938cf61f9385d0e587626ee1eb",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H_interactive.html": "14bd7f7093c4d053088c89c8dfa17ae98dfdababef801d24457c4a9ab3991b72",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_daily_fits.csv": "2b67ac10ec393c4fe29a67b35e3a9ad6634c13ec4893ab23c9ed516c8585da2e",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A_interactive.html": "2a542260c852eb7040e0e3dba08f5f27aa32e2da8ba5ab347d466852f2892a34",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar.csv": "3d143a925525ee4b6dfd3bbdeef0991265fc729d3c337b6757d3b0fc0225b150",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H.svg": "5b82a642cb28214c5c42562eecd7255c3ff70883ceb908aca8aeb703bdbac1d2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A.svg": "537686b0ca0753c8f1419003b8198f8ee7dfdf83767e8e70ac1c3a1bcd3293c2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar_monthly.csv": "6724c5a4e5cf02c015c03dc9c4b380a188e1d53241a08438f2351ff8c03753e1",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar_provenance.json": "9bbf5abfb6968fbd08582c294726bb2c28b5ffb21f136fd1d21505431a165a73",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A.png": "f72df0c3dcbfe8188a0619bbfe0a4700b8d8c4295a170b9c974c686b7f8171c8",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_trajectories.csv": "de271d74ec6c804bc30dc89e1407e6139bae62652b87c25fd8a71872cfc4bb74",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_trajectory_checks.json": "e607d31002983b224e4570d85f43a76e7fdee1b6bc9addeda0a9eadec1be6899",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H.png": "8fd04709e188d5cffeeef6fb37d9ede7516f4af7c1878e106a2c9af4107ccd8a",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_daily_fits.csv": "97fc9c19a1c144af738972d1c550a1d13f9949976daf3c445bd3be8a23dcb1c4",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_monthly.md": "05fc88f8d17cf853f2bc2dcacc5f98cf78cbdb58c6ec5b8bd2343029264c3e3f",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_provenance.json": "5a1532bee270128707020323cb483a4ac2f7cd3052b1a7220c25328a0e29dccd",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_admission.md": "f9b64250d3e87f11518f69445b19afd05bc8b12f338da201e6feae00721a1769",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_monthly.csv": "33237b34515f82051dba2e9ffee41d9fb3658833d21b9f30e973172c257cf834",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_full_archive_daily.csv": "5dc4142e1d68a380dd5d6f5b2cdbca8685629989b555ab45a0d796ec5f4bc584",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/plot_column_timeseries.py": "b15852b0501802042774c25b23c2d4d03d21a16bb24e5005a26375bea7762c06",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/diurnal_analysis.py": "f3890effbe4e6b4d4d1a6dea2ff57be9aae1e45d2463918b9e0edc1ed732b192"
+  },
+  "protected_files_byte_identical": true,
+  "implementation_sha256": {
+    "chapter02.py": "257e4a6c5aa57a55c9bdc9425d640190e195e207397ea595e4b303914aef85b0",
+    "prepare_chapter02.py": "29fc1860d957a7ea2f308e9203ff539869b8898869176a4692bbbf27357d1cc3"
+  },
+  "output_sha256": {
+    "W_R4_C-4_full_archive_preliminary_trajectories.csv": "a25e1cfb5fdc95c463b27917144449a8617e2c36bacdca91b01095b57c849e0d",
+    "W_R4_C-4_full_archive_preliminary_technical_fits.csv": "3041029d8f27c174e2d2d03208c5d9288ee3b64d6204355273bc990ff8195ce2",
+    "W_R4_C-4_full_archive_preliminary_monthly.csv": "cb57890d0a3c0faadc7f22d34064048503beaa03d77fb092c9e04ce8459dfcb3",
+    "W_R4_C-4_full_archive_preliminary_H_interactive.html": "f638c74d11770e62c65ecf58187330a61ccaebb2fb2bc62250ccfe97f9abda8a",
+    "W_R4_C-4_full_archive_preliminary_audit_excluded.csv": "37367a8e73585aa941b976f8c8972df38c5de129a53ce1e8671c71c0d907e857",
+    "W_R4_C-4_full_archive_preliminary_report.md": "95a61d259ab7e0beddbd3271a1e3f39ff27084e8899bbeb88e43f2519cf88692",
+    "W_R4_C-4_full_archive_preliminary_A_interactive.html": "162e7e3d9b4a71dead1d864bddc7a161f63ed38996f3ca714513bd50db6eb3f7"
+  },
+  "tests_passed": 35,
+  "all_six_october_tables_reproduced": true,
+  "plot_checks": {
+    "H": {
+      "unique_dated_points": 2036,
+      "coordinates_equal_csv": true,
+      "audit_refusals_absent": true,
+      "sensitive_overlays": 1
+    },
+    "A": {
+      "unique_dated_points": 2036,
+      "coordinates_equal_csv": true,
+      "audit_refusals_absent": true,
+      "sensitive_overlays": 0
+    }
+  },
+  "browser_checks": "Both WebGL plots displayed; H orbit and A zoom/hover inspected.",
+  "finalization_2026_09_29": {
+    "chapter_version": "2026-09-29",
+    "clean_kernel_execution": true,
+    "embedded_static_figures": 2,
+    "october_reference_tables": 6,
+    "existing_display_tests": 8,
+    "all_text_counts_verified": true,
+    "protected_data_files_unchanged": 104,
+    "plan_changes_limited_to_status": true,
+    "notebook_local_links_checked": 21,
+    "figures": {
+      "H": {
+        "points": 2036,
+        "groups": [
+          789,
+          3,
+          1244
+        ],
+        "static_and_interactive_coordinates_match": true
+      },
+      "A": {
+        "points": 2036,
+        "groups": [
+          789,
+          3,
+          1244
+        ],
+        "static_and_interactive_coordinates_match": true
+      }
+    },
+    "pdf_pages_rendered_and_checked": 6,
+    "chapter02_implementation_sha256": "6d665e7fd71f4b447bc41a62c648b787bd01e3cd94682da88582a4dea88ffa20",
+    "notebook_sha256": "f3c6d537c1e0e36930a0e8f11a494aec496a122e20a9342492b12091adb0245e"
+  }
+}

@@ -1,0 +1,19 @@
+month,series,metric,n_days,median
+October,D1,amplitude_ppm,22,24.179980435959656
+October,D1,r_squared,22,0.7515804044477856
+October,D2,amplitude_ppm,22,21.94677247699387
+October,D2,r_squared,22,0.8289729688041025
+October,D3,amplitude_ppm,22,11.681264591028295
+October,D3,r_squared,22,0.5828831933592975
+October,D1 → D2,lag_hours,22,4.373922940733429
+October,D2 → D3,lag_hours,22,3.7201689903006336
+October,D1 → D3,lag_hours,22,8.098635987960034
+November,D1,amplitude_ppm,10,23.293295425012246
+November,D1,r_squared,10,0.7084185400568956
+November,D2,amplitude_ppm,10,22.13554414127273
+November,D2,r_squared,10,0.8036884341482853
+November,D3,amplitude_ppm,10,9.04640938476535
+November,D3,r_squared,10,0.4352360230624248
+November,D1 → D2,lag_hours,10,3.368238350546693
+November,D2 → D3,lag_hours,10,2.1036973478258805
+November,D1 → D3,lag_hours,10,5.64904430754194

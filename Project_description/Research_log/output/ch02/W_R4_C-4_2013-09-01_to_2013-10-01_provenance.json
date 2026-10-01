@@ -1,0 +1,76 @@
+{
+  "column": "W_R4_C-4",
+  "sensor_ids": {
+    "D1": 994,
+    "D2": 1010,
+    "D3": 1026
+  },
+  "depth_cm": {
+    "D1": 5,
+    "D2": 20,
+    "D3": 35
+  },
+  "start_inclusive": "2013-09-01",
+  "end_exclusive": "2013-10-01",
+  "monthly_admission": "IG audit Table 2 pp.9-10: First=2013-09 for each selected sensor. The common first alive month is confirmed; no continuity inferred from First/Last/Run.",
+  "audit_path": "/home/dimitri/Documents/Bio2Projects/CO2/LEO_CO2_sensor_audit_2026-06-30.pdf",
+  "input_sha256": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/raw/2013.parquet": "d238d11a27c3c8332ec6eda26aa85c413b4b71e5bb0ac3cb2a6c4a2c8ecc04eb",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/constant_intervals.csv": "9fe9422abebf6428de487de7e212118963d839fcd8610022374f3cd9e44ec944",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/west_august_2026_screening/ig_inventory.csv": "c74d10a23ca3617eebfbffe75c2c6dcd69114507f1ad6ac5bcdb9e5a3df01bc0",
+    "/home/dimitri/Documents/Bio2Projects/CO2/LEO_CO2_sensor_audit_2026-06-30.pdf": "cf669565bdd817e6199e35bc78984c680973da01f6a7b851588a246be32a9560"
+  },
+  "implementation_sha256": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/chapter02.py": "e3ba289c940b5fa2e574bf5cb0dfd064e41e0d79b5e7cf3de90804337d9c36f6",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/plot_column_timeseries.py": "b15852b0501802042774c25b23c2d4d03d21a16bb24e5005a26375bea7762c06",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/diurnal_analysis.py": "f3890effbe4e6b4d4d1a6dea2ff57be9aae1e45d2463918b9e0edc1ed732b192"
+  },
+  "method": [
+    "chapter02.calculation_calendar",
+    "chapter02.calculate_trajectories"
+  ],
+  "approved_exclusions": [],
+  "category_counts": {
+    "B": 17,
+    "C": 7,
+    "A": 6
+  },
+  "computed_dates": [
+    "2013-09-21",
+    "2013-09-22",
+    "2013-09-23",
+    "2013-09-24",
+    "2013-09-28",
+    "2013-09-29"
+  ],
+  "checks": {
+    "old_block_files_unchanged": true,
+    "old_days_not_recomputed": true,
+    "only_A_computed": true,
+    "18_sensor_fits": true,
+    "finite_H_A_R2": true,
+    "H_in_0_24": true,
+    "amplitude_coefficient_identity_atol_rtol_1e-7": true,
+    "phase_coefficient_identity_atol_rtol_1e_7": true,
+    "csv_readback": true,
+    "existing_trajectory_tests_passed": 6
+  },
+  "protected_sha256": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/PLAN.md": "503970220daa9f7af8eb4a2c84116c5e7caf1d229ee59f2237c49a9251aac8ed",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/README.md": "5812ea18bb3f0a0b2aed85dd5ce97cccd56dc0f7e3bc11db253f55dabc946ec5",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/02_monthly_changes.ipynb": "a1da744590d7eb5d66ef313981a87c7d02bc4c278916913a5676765d1d5bfe87",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/chapter02.py": "e3ba289c940b5fa2e574bf5cb0dfd064e41e0d79b5e7cf3de90804337d9c36f6",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H_interactive.html": "14bd7f7093c4d053088c89c8dfa17ae98dfdababef801d24457c4a9ab3991b72",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_daily_fits.csv": "2b67ac10ec393c4fe29a67b35e3a9ad6634c13ec4893ab23c9ed516c8585da2e",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A_interactive.html": "2a542260c852eb7040e0e3dba08f5f27aa32e2da8ba5ab347d466852f2892a34",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar.csv": "3d143a925525ee4b6dfd3bbdeef0991265fc729d3c337b6757d3b0fc0225b150",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H.svg": "5b82a642cb28214c5c42562eecd7255c3ff70883ceb908aca8aeb703bdbac1d2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A.svg": "537686b0ca0753c8f1419003b8198f8ee7dfdf83767e8e70ac1c3a1bcd3293c2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar_monthly.csv": "6724c5a4e5cf02c015c03dc9c4b380a188e1d53241a08438f2351ff8c03753e1",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar_provenance.json": "9bbf5abfb6968fbd08582c294726bb2c28b5ffb21f136fd1d21505431a165a73",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_A.png": "f72df0c3dcbfe8188a0619bbfe0a4700b8d8c4295a170b9c974c686b7f8171c8",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_trajectories.csv": "de271d74ec6c804bc30dc89e1407e6139bae62652b87c25fd8a71872cfc4bb74",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_trajectory_checks.json": "e607d31002983b224e4570d85f43a76e7fdee1b6bc9addeda0a9eadec1be6899",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_H.png": "8fd04709e188d5cffeeef6fb37d9ede7516f4af7c1878e106a2c9af4107ccd8a"
+  }
+}

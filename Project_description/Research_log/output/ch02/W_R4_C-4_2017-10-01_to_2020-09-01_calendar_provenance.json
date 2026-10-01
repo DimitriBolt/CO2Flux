@@ -1,0 +1,71 @@
+{
+  "column": "W_R4_C-4",
+  "sensor_ids": {
+    "D1": 994,
+    "D2": 1010,
+    "D3": 1026
+  },
+  "start_inclusive": "2017-10-01 00:00:00",
+  "end_exclusive": "2020-09-01 00:00:00",
+  "raw_rows": 372171,
+  "input_hashes": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/raw/2017.parquet": "918c849484fbde6065d0d9c47434285904d4913a52653845e93b4149aa7837b1",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/raw/2018.parquet": "5c2296e4c410f6da50ede2bd25403e00b3f5ddc8ed5e7544386731ce22e36fb2",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/raw/2019.parquet": "3ccba467f407cd36828f847c10a9658df1226a529590fcc15a642760514369b1",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/raw/2020.parquet": "93a1ca4018447c084ef5726c27151f6dd95890577cdf6f5b683c06c5ae35d49f",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/constant_intervals.csv": "9fe9422abebf6428de487de7e212118963d839fcd8610022374f3cd9e44ec944",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/data/ch03/duplicate_times.csv": "1bcd8f47dd0d8f0552fa01f757982060e6e8ab488f6e1e3097374f0f83ce7247"
+  },
+  "implementation_hashes": {
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/Research_log/chapter02.py": "16bdab838da528c2ab0ebb2ca9acf490f4fa849d0c688611122b821314c83307",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/diurnal_analysis.py": "879017c04820e6429d766a86ff6b0c624aa0b42a9f49d3bd3961fa67bda5eb72",
+    "/home/dimitri/PycharmProjects/CO2Flux/Project_description/sensorDB/plot_column_timeseries.py": "b9ed643c6bfb5adf3f3b7c7e890f418a9d362746bf72bc66a4adb5fac05fa29b"
+  },
+  "method": "chapter02.calculation_calendar; original +/-12h window; daily context [d-1,d+2); 0<C<=3000; approved November intervals only; other diagnostic constants flagged without masking; B before C; no harmonic fitting",
+  "monthly_admission": "Historical 35-month block accepted from IG audit, not re-estimated. Category A is computational eligibility, not phase reliability.",
+  "approved_exclusions": [
+    {
+      "level": "D1",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D1",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    },
+    {
+      "level": "D2",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D2",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    },
+    {
+      "level": "D3",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D3",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    }
+  ],
+  "counts": {
+    "A": 783,
+    "B": 243,
+    "C": 40
+  },
+  "checks": {
+    "days_exhaustive_unique": true,
+    "categories_exclusive_exhaustive": true,
+    "october_coverage_reference": true,
+    "november_selection_coverage_duplicates_reference": true,
+    "harmonic_and_residual_calls_forbidden": true,
+    "protected_files_unchanged": true
+  }
+}

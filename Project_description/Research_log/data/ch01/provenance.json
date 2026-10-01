@@ -1,0 +1,58 @@
+{
+  "chapter": "01",
+  "report_version": "2026-09-24",
+  "data_export_date": "2026-09-23",
+  "data_snapshot_packaged_on": "2026-09-24",
+  "column": "W_R4_C-4",
+  "slope": "West",
+  "start_inclusive": "2017-10-01T00:00:00",
+  "end_exclusive": "2017-11-01T00:00:00",
+  "time_field": "LOCALDATETIME",
+  "time_interpretation": "Local times from Oracle; no timezone conversion applied",
+  "schema": "leo_west",
+  "variable_id": 9,
+  "sensors": {
+    "D1": {
+      "sensor_id": 994,
+      "sensor_code": "LEO-W_4_-4_1_GMM222"
+    },
+    "D2": {
+      "sensor_id": 1010,
+      "sensor_code": "LEO-W_4_-4_2_GMM222"
+    },
+    "D3": {
+      "sensor_id": 1026,
+      "sensor_code": "LEO-W_4_-4_3_GMM222"
+    }
+  },
+  "trend_window_hours": 24,
+  "gap_factor": 1.5,
+  "service_value_limit": -9999,
+  "harmonic_period_hours": 24,
+  "expected": {
+    "raw_rows_per_sensor": 8846,
+    "fitted_observations_per_sensor": 7662,
+    "complete_days": 22,
+    "common_intervals": 4
+  },
+  "original_output_directory": "Project_description/sensorDB/output",
+  "original_output_stem": "W_R4_C-4_2017-10-01_to_2017-11-01_exclusive",
+  "files_sha256": {
+    "measurements.csv": "aed67db38f608881bddf97d01b55c8bbc8e8d8d98ef9520a12ae6c75525463c3",
+    "reference_diurnal_summary.csv": "cc5df515f64ce68848e3ff02d945c458be8ee94ddff8aac67d85ced1cb5e0e29",
+    "reference_diurnal_lags.csv": "762d5124437593328a754bc7895fd4b5cf7cdffe44705a2e6b9001a27e1ca411",
+    "reference_diurnal_daily.csv": "ab2c38826c5915cb7973c900c3b8fb9484f112e32ae9fb962810f312cb580dbb",
+    "reference_diurnal_daily_lags.csv": "2c1476a916a3baf0cf5784b3de9d1280231c4248e7d01a952ff53559ddeaa647",
+    "reference_diurnal_day_coverage.csv": "a894b4a158bcbce0d4b581fb6cd7435798d0e9521a59abebeb04a97a36e7ead7",
+    "reference_diurnal_common_intervals.csv": "c9db74bbec517e98167066450c75b27479d6064abbeb96b22fa164fa2ceaa989"
+  },
+  "implementation_sha256": {
+    "plot_column_timeseries.py": "f8dd2ebb1857f3a53aacb2a1777ad396b65ad45770d13b7b02b0bcd4cf8eccfa",
+    "diurnal_analysis.py": "aa076fda5f69a7880f45a008c6b44204a3fc24cee01fa057ae8f2ebb36acef3c"
+  },
+  "notes": [
+    "Snapshot copied byte for byte; no Oracle query during report construction.",
+    "Depth labels D1/D2/D3 are ordinal; absolute depths in cm are not established in this chapter.",
+    "Git checkout had pre-existing uncommitted changes; file hashes identify the calculation modules."
+  ]
+}

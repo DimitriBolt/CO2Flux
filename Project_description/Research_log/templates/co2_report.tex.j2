@@ -1,0 +1,55 @@
+((* extends 'latex/index.tex.j2' *))
+
+((* block docclass *))
+\documentclass[11pt,a4paper]{article}
+((* endblock docclass *))
+
+((* block packages *))
+((( super() )))
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\newfontfamily\cyrillicfont{DejaVu Serif}
+\newfontfamily\cyrillicfontsf{DejaVu Sans}
+\newfontfamily\cyrillicfonttt{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{needspace}
+\usepackage{fancyhdr}
+((* endblock packages *))
+
+((* block margins *))
+\geometry{top=20mm,bottom=21mm,left=20mm,right=20mm,headheight=14pt}
+((* endblock margins *))
+
+((* block commands *))
+((( super() )))
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small CO2Flux / LEO / Глава ((( resources.report_chapter )))}
+\fancyhead[R]{\small ((( resources.report_date )))}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\let\originalsection\section
+\renewcommand{\section}{\Needspace{7\baselineskip}\originalsection}
+\let\originalsubsection\subsection
+\renewcommand{\subsection}{\Needspace{7\baselineskip}\originalsubsection}
+\let\originalsubsubsection\subsubsection
+\renewcommand{\subsubsection}{\Needspace{5\baselineskip}\originalsubsubsection}
+((* endblock commands *))
+
+((* block maketitle *))
+% The notebook opens with its own title and provenance.
+((* endblock maketitle *))
+
+((* block markdowncell scoped *))
+((* if cell.metadata.get('pdf_pagebreak_before', False) *))
+\clearpage
+((* endif *))
+((( super() )))
+((* endblock markdowncell *))

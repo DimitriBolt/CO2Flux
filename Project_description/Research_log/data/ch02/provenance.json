@@ -1,0 +1,61 @@
+{
+  "column": "W_R4_C-4",
+  "slope": "West",
+  "schema": "leo_west",
+  "variable_id": 9,
+  "sensors": {
+    "D1": {
+      "sensor_id": 994,
+      "sensor_code": "LEO-W_4_-4_1_GMM222"
+    },
+    "D2": {
+      "sensor_id": 1010,
+      "sensor_code": "LEO-W_4_-4_2_GMM222"
+    },
+    "D3": {
+      "sensor_id": 1026,
+      "sensor_code": "LEO-W_4_-4_3_GMM222"
+    }
+  },
+  "time_field": "LOCALDATETIME",
+  "time_interpretation": "Local times from Oracle; no timezone conversion applied",
+  "trend_window_hours": 24,
+  "gap_factor": 1.5,
+  "service_value_limit": -9999,
+  "chapter": "02",
+  "stage": "raw_data_and_record_audit_only",
+  "start_inclusive": "2017-11-01T00:00:00",
+  "end_exclusive": "2017-12-01T00:00:00",
+  "data_exported_at_utc": "2026-09-25T19:15:42.670062+00:00",
+  "packaged_at_utc": "2026-09-25T19:22:14.366436+00:00",
+  "diagnostics": {
+    "constant_run_minimum_hours": 1.0,
+    "short_step_maximum_seconds": 10,
+    "note": "Descriptive flags only; no rejection, deduplication or resampling."
+  },
+  "queries": {
+    "sensors": "SELECT sensorid, sensorcode\nFROM leo_west.sensors\nWHERE sensorcode IN (:code_d1, :code_d2, :code_d3)",
+    "measurements": "SELECT localdatetime, sensorid, datavalue\nFROM leo_west.datavalues\nWHERE localdatetime >= :start_datetime\n  AND localdatetime < :end_datetime\n  AND variableid = :variable_id\n  AND sensorid IN (:sensor_d1, :sensor_d2, :sensor_d3)\nORDER BY localdatetime, sensorid"
+  },
+  "notes": [
+    "Original timestamps and all values retained, including repeated records.",
+    "No trend, phase or lag estimates for November at this stage.",
+    "October snapshot and calculation are unchanged."
+  ],
+  "original_source_csv": "Project_description/sensorDB/output/W_R4_C-4_2017-11-01_to_2017-12-01_exclusive_raw.csv",
+  "implementation_sha256": {
+    "chapter02.py": "2d2523137d8d960c54a5e348decf29864bcbac98a088b985b61a22058a574031",
+    "prepare_chapter02.py": "6a5410ca215eec80c0517a3e0e39ae055c6a51d83af42abef8fa0202c31c9dff"
+  },
+  "plot_implementation_sha256": "f8dd2ebb1857f3a53aacb2a1777ad396b65ad45770d13b7b02b0bcd4cf8eccfa",
+  "files_sha256": {
+    "database_columns.csv": "6856f9d4230199e36d8de7481bbf79472a5f778a8b8afde85b37616f26626b66",
+    "database_duplicate_example.csv": "cde7ef65d1a6d496636a3b78eb66e2f35208ecdcc3fd0e55bc6ce368bd94e071",
+    "measurements.csv": "9d8e0bf047409f5e3e24a1b046706973eeb3dc3236141313a908d2b2856128e9",
+    "reference_constant_runs.csv": "5fca4057d63d4f09ffa7837b7c1a2b091bb0ad0b7d063691500d8e031467f392",
+    "reference_daily_counts.csv": "c0c87bb711d829579caeb0faa45d7d33f5dac97f7a1694b7ae2a518b1bf7040c",
+    "reference_duplicates.csv": "91f034ce81bcce8cb00f97243b8a904b658e3acd0c4fb73251c1cbb3ee2c8f85",
+    "reference_gaps.csv": "c3cd0cbed0584a02c05aeeeb15c00cb562acda19e13cecf84cab0bac7e7acfe1",
+    "reference_summary.csv": "073f92b69a68a16b0edcd9d81be032ad073df2632ee42debfab5a050027b67b5"
+  }
+}

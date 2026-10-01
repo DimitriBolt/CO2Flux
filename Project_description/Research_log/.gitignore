@@ -1,0 +1,7 @@
+.ipynb_checkpoints/
+__pycache__/
+tmp/
+
+# Immutable local database snapshots and per-measurement working logs; never publish.
+data/ch02/archive/*.parquet
+data/ch03/raw/

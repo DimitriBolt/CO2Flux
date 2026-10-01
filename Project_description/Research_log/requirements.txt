@@ -1,0 +1,16 @@
+# Python 3.11+. Only for saved-data notebooks and report export; Oracle is not needed.
+numpy>=1.26,<2.5
+pandas>=2.2,<3
+matplotlib>=3.8,<4
+nbformat>=5.10,<6
+nbclient>=0.10,<1
+nbconvert>=7.16,<8
+ipykernel>=6,<8
+
+# Optional interactive views of saved Chapter 2 results
+plotly>=6,<7
+
+# Full Chapter 2 snapshot / admission pipeline
+pyarrow>=18,<25
+oracledb>=2,<5
+python-dotenv>=1,<2

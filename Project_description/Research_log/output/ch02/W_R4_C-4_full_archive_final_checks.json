@@ -1,0 +1,203 @@
+{
+  "snapshot": {
+    "extraction_started_at_utc": "2026-10-01T03:01:40.655018+00:00",
+    "extraction_finished_at_utc": "2026-10-01T03:01:48.806000+00:00",
+    "database_inventory": {
+      "checked_at_utc": "2026-10-01T02:59:48.215262+00:00",
+      "query": "SELECT sensorid, COUNT(*) AS row_count, MIN(localdatetime) AS first_record, MAX(localdatetime) AS last_record FROM leo_west.datavalues WHERE variableid=9 AND sensorid IN (994,1010,1026) GROUP BY sensorid",
+      "bounds": [
+        {
+          "sensorid": 994,
+          "row_count": 871546,
+          "first_record": "2013-09-11 12:30:00",
+          "last_record": "2026-09-30 19:45:00"
+        },
+        {
+          "sensorid": 1026,
+          "row_count": 871546,
+          "first_record": "2013-09-11 12:30:00",
+          "last_record": "2026-09-30 19:45:00"
+        },
+        {
+          "sensorid": 1010,
+          "row_count": 871546,
+          "first_record": "2013-09-11 12:30:00",
+          "last_record": "2026-09-30 19:45:00"
+        }
+      ]
+    },
+    "rows": 2614638,
+    "first_record": "2013-09-11 12:30:00",
+    "last_record": "2026-09-30 19:45:00",
+    "sha256": "89e69150734e8ae18ce00ebb554e6cd0dfc605172d54af2febf71c1c086ab40a",
+    "file": "raw.parquet",
+    "refresh_start": "2026-09-26 00:00:00",
+    "source_query": "SELECT localdatetime, sensorid, variableid, datavalue\nFROM leo_west.datavalues WHERE variableid=9 AND sensorid IN (994,1010,1026)\nAND localdatetime >= :start_time AND localdatetime <= :end_time",
+    "parent_hashes": {
+      "data/ch03/raw/2010.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+      "data/ch03/raw/2011.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+      "data/ch03/raw/2012.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+      "data/ch03/raw/2013.parquet": "d238d11a27c3c8332ec6eda26aa85c413b4b71e5bb0ac3cb2a6c4a2c8ecc04eb",
+      "data/ch03/raw/2014.parquet": "777ff2585650ce19a8bc0ad79356c0d5bd067d65ac1f5f7dbd6a24bde3e671d9",
+      "data/ch03/raw/2015.parquet": "4077ed93403a94719572004622405e39ce84a74aec5ed93fd1fe374c46d1d47d",
+      "data/ch03/raw/2016.parquet": "2b851f7bd322434391ac53c29ff8a4d961a4c1f4f1712d028aee3a7f1fcb6788",
+      "data/ch03/raw/2017.parquet": "918c849484fbde6065d0d9c47434285904d4913a52653845e93b4149aa7837b1",
+      "data/ch03/raw/2018.parquet": "5c2296e4c410f6da50ede2bd25403e00b3f5ddc8ed5e7544386731ce22e36fb2",
+      "data/ch03/raw/2019.parquet": "3ccba467f407cd36828f847c10a9658df1226a529590fcc15a642760514369b1",
+      "data/ch03/raw/2020.parquet": "93a1ca4018447c084ef5726c27151f6dd95890577cdf6f5b683c06c5ae35d49f",
+      "data/ch03/raw/2021.parquet": "3c901814520750cc563cbd245169772ca1a5503b1a08e50b5861dac51b172064",
+      "data/ch03/raw/2022.parquet": "d80f6b4b481f8b897bfd610a00d1fd7fa57caf7b2cd6e78a1dd5ea10de1a3a0a",
+      "data/ch03/raw/2023.parquet": "0780c417e7522439bf0ed786eef4820a77b59c7a87ef763f08a91081d9375cef",
+      "data/ch03/raw/2024.parquet": "7ddf862bd3fb53b5153c951a239883c657402786278f1477a87282cfd7987894",
+      "data/ch03/raw/2025.parquet": "638ee9049f1c20357937eb8746b0724e67a402920d183cb480d9ed173a640686",
+      "data/ch03/raw/2026.parquet": "55e93adba052ddc3fcdfec95bc828fed14d13c3b050c294764106ca7fa22ac3f"
+    },
+    "sensor_ids": {
+      "D1": 994,
+      "D2": 1010,
+      "D3": 1026
+    },
+    "depth_cm": {
+      "D1": 5,
+      "D2": 20,
+      "D3": 35
+    },
+    "variable_id": 9,
+    "time_basis": "Oracle localdatetime, no timezone conversion; original rows retained"
+  },
+  "parameters": {
+    "service_limit": -9999,
+    "concentration_min_exclusive": 0,
+    "concentration_max": 3000,
+    "window_samples": 7,
+    "mad_scale": 1.4826,
+    "mad_multiplier": 6,
+    "cadence_ratio": 1.5,
+    "bins_hours": 6,
+    "minimum_per_bin": 2,
+    "minimum_days": 10,
+    "monthly_concentration_min": 100,
+    "monthly_concentration_max": 2000,
+    "monthly_amplitude_min": 8,
+    "period_hours": 24
+  },
+  "approved_exclusions": [
+    {
+      "level": "D1",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D1",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    },
+    {
+      "level": "D2",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D2",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    },
+    {
+      "level": "D3",
+      "start": "2017-11-12 06:10:04",
+      "end": "2017-11-14 23:55:08"
+    },
+    {
+      "level": "D3",
+      "start": "2017-11-26 06:25:05",
+      "end": "2017-11-26 08:25:03"
+    }
+  ],
+  "months": 157,
+  "calendar_days": 4768,
+  "sensor_month_statuses": {
+    "pass": 240,
+    "fail": 231
+  },
+  "joint_month_statuses": {
+    "fail": 114,
+    "pass": 43
+  },
+  "final_days": 25,
+  "first_final_day": "2014-03-12 00:00:00",
+  "last_final_day": "2020-05-09 00:00:00",
+  "failed_daily_calculations": 0,
+  "undefined_H_days": 2,
+  "flag_counts": {
+    "": 2604906,
+    "ambiguous_excursion": 7521
+  },
+  "exclusion_counts": {
+    "": 2058815,
+    "outside_0_3000": 539220,
+    "isolated_7_sample_MAD_spike": 8231,
+    "approved_individual_exclusion": 4353,
+    "conflicting_timestamp": 1094,
+    "service_code": 714
+  },
+  "exact_duplicate_extra": 1099,
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.7+dfsg1",
+    "plotly": "6.9.0",
+    "pyarrow": "24.0.0",
+    "oracledb": "3.4.2"
+  },
+  "python_version": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "numeric_csv_round_trip": "passed atol=rtol=1e-7",
+  "input_hashes": {
+    "raw.parquet": "89e69150734e8ae18ce00ebb554e6cd0dfc605172d54af2febf71c1c086ab40a",
+    "working_measurements.parquet": "a5122fdd9c42c8b402c49244f056ee12bd1d3d00f3631f3bc45c2a6eb0c937cf",
+    "measurement_decisions.parquet": "c1a40c03abbd454086be28f78e47be8478835388cd145b662a43a540f81600be"
+  },
+  "implementation_hashes": {
+    "Project_description/Research_log/chapter02.py": "dff4ff9c0d7db889c82acd91cf3161ebdcae249dc9e12f10c8c4716031391353",
+    "Project_description/Research_log/prepare_chapter02.py": "c421a40e8869fd6b0ff2cedca3811a275e099f493d8059d6dce2444cb8b72aa3",
+    "Project_description/sensorDB/diurnal_analysis.py": "f3890effbe4e6b4d4d1a6dea2ff57be9aae1e45d2463918b9e0edc1ed732b192",
+    "Project_description/sensorDB/plot_column_timeseries.py": "b15852b0501802042774c25b23c2d4d03d21a16bb24e5005a26375bea7762c06"
+  },
+  "output_sha256": {
+    "W_R4_C-4_full_archive_final_H_interactive.html": "4c043c6fc4fd6a395ca28d1c38c01ee9736a411d8c1f62a0d6a92500bf712ba9",
+    "W_R4_C-4_full_archive_final_sensor_months.csv": "61339330ff11c243b67ea44535135cb5525d6ef81b2874ef411b3cf478dc691f",
+    "W_R4_C-4_full_archive_final_daily_fits.csv": "1b9ea6a245920e4b87799096d2877498abc07bc65b72aed1e34db2ecf1b40683",
+    "W_R4_C-4_full_archive_final_H.png": "9f45c86189492dc505b3cea725d06283348fbc1c1a0b6f2303ec1e0b01173c74",
+    "W_R4_C-4_full_archive_final_trajectories.csv": "276230f24899f7e7f9547ee6cd31c35aea2d931dcf403250dcff9383c14455d5",
+    "W_R4_C-4_full_archive_final_A.png": "3af2e4250160b9beb62beae3ce45374db7ed7d4d65e6c58c2ab54bb777dfe18a",
+    "W_R4_C-4_full_archive_final_monthly.csv": "b6c0251075261151f5cd40c318130906348b5dad5e2fbfc836680182e47b262e",
+    "W_R4_C-4_full_archive_final_A_interactive.html": "e2e1238d7a1e321f95c41a556564d32f00293c26d2ed07a88f2e3711ff7db1ce",
+    "W_R4_C-4_full_archive_final_monthly_day_metrics.csv": "12f20185c2d348386a036541a1aea4121153371cf01c1051e65ebbd9e97f2cbb"
+  },
+  "verification": {
+    "test_count": 55,
+    "diurnal_tests": 24,
+    "chapter02_tests": 31,
+    "october_six_tables": "passed atol=rtol=1e-7",
+    "monthly_metrics_and_daily_fits": "passed",
+    "plotted_points": {
+      "H": 23,
+      "A": 25
+    },
+    "clean_kernel_notebook": "passed; two saved PNG outputs",
+    "chapter3_protected_files": 43,
+    "chapter3_byte_identical": true,
+    "chapter2_goal_definitions_completion_criteria_unchanged": true,
+    "audit_pdf_sha256": "cf669565bdd817e6199e35bc78984c680973da01f6a7b851588a246be32a9560",
+    "staged_source_tests": "55 passed in isolated checkout of the Git index",
+    "pdf_pages": 5,
+    "pdf_visual_review": "passed"
+  },
+  "report_files_sha256": {
+    "02_monthly_changes.ipynb": "659742b7f304d7734568691cd363f60b030e5617b1be53a385440cfbd584ae89",
+    "README.md": "0c3f7ee98bd421d4be744eeb9c4d50d35c3d0a218d8f5bd3ae006ac1a55bc75d",
+    "PLAN.md": "2fba9fea2971bbe3be9177a2aeb0617449102aad9c053c1569b34e70235dfc7a",
+    "details/02_data_checks.md": "526e57806b91cb8f06bc1b0b6b4a83b71e533c777079b4a54f0d3c206d72a40c",
+    "output/html/02_monthly_changes.html": "7557f5b3087740486ae4096b8e521c8f969f094db04511117afb40fb2c358190",
+    "output/pdf/02_monthly_changes_2026-10-01.pdf": "d1a555102dd7922fa88cedca76286befde0634ee28b0b56b92e0888b2ecd87c4"
+  }
+}

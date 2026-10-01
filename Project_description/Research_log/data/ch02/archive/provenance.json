@@ -1,0 +1,66 @@
+{
+  "extraction_started_at_utc": "2026-10-01T03:01:40.655018+00:00",
+  "extraction_finished_at_utc": "2026-10-01T03:01:48.806000+00:00",
+  "database_inventory": {
+    "checked_at_utc": "2026-10-01T02:59:48.215262+00:00",
+    "query": "SELECT sensorid, COUNT(*) AS row_count, MIN(localdatetime) AS first_record, MAX(localdatetime) AS last_record FROM leo_west.datavalues WHERE variableid=9 AND sensorid IN (994,1010,1026) GROUP BY sensorid",
+    "bounds": [
+      {
+        "sensorid": 994,
+        "row_count": 871546,
+        "first_record": "2013-09-11 12:30:00",
+        "last_record": "2026-09-30 19:45:00"
+      },
+      {
+        "sensorid": 1026,
+        "row_count": 871546,
+        "first_record": "2013-09-11 12:30:00",
+        "last_record": "2026-09-30 19:45:00"
+      },
+      {
+        "sensorid": 1010,
+        "row_count": 871546,
+        "first_record": "2013-09-11 12:30:00",
+        "last_record": "2026-09-30 19:45:00"
+      }
+    ]
+  },
+  "rows": 2614638,
+  "first_record": "2013-09-11 12:30:00",
+  "last_record": "2026-09-30 19:45:00",
+  "sha256": "89e69150734e8ae18ce00ebb554e6cd0dfc605172d54af2febf71c1c086ab40a",
+  "file": "raw.parquet",
+  "refresh_start": "2026-09-26 00:00:00",
+  "source_query": "SELECT localdatetime, sensorid, variableid, datavalue\nFROM leo_west.datavalues WHERE variableid=9 AND sensorid IN (994,1010,1026)\nAND localdatetime >= :start_time AND localdatetime <= :end_time",
+  "parent_hashes": {
+    "data/ch03/raw/2010.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+    "data/ch03/raw/2011.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+    "data/ch03/raw/2012.parquet": "4183d198ae339a8015c73a9f030af78c5a96b42a92e475d1be30f1d19c96f95d",
+    "data/ch03/raw/2013.parquet": "d238d11a27c3c8332ec6eda26aa85c413b4b71e5bb0ac3cb2a6c4a2c8ecc04eb",
+    "data/ch03/raw/2014.parquet": "777ff2585650ce19a8bc0ad79356c0d5bd067d65ac1f5f7dbd6a24bde3e671d9",
+    "data/ch03/raw/2015.parquet": "4077ed93403a94719572004622405e39ce84a74aec5ed93fd1fe374c46d1d47d",
+    "data/ch03/raw/2016.parquet": "2b851f7bd322434391ac53c29ff8a4d961a4c1f4f1712d028aee3a7f1fcb6788",
+    "data/ch03/raw/2017.parquet": "918c849484fbde6065d0d9c47434285904d4913a52653845e93b4149aa7837b1",
+    "data/ch03/raw/2018.parquet": "5c2296e4c410f6da50ede2bd25403e00b3f5ddc8ed5e7544386731ce22e36fb2",
+    "data/ch03/raw/2019.parquet": "3ccba467f407cd36828f847c10a9658df1226a529590fcc15a642760514369b1",
+    "data/ch03/raw/2020.parquet": "93a1ca4018447c084ef5726c27151f6dd95890577cdf6f5b683c06c5ae35d49f",
+    "data/ch03/raw/2021.parquet": "3c901814520750cc563cbd245169772ca1a5503b1a08e50b5861dac51b172064",
+    "data/ch03/raw/2022.parquet": "d80f6b4b481f8b897bfd610a00d1fd7fa57caf7b2cd6e78a1dd5ea10de1a3a0a",
+    "data/ch03/raw/2023.parquet": "0780c417e7522439bf0ed786eef4820a77b59c7a87ef763f08a91081d9375cef",
+    "data/ch03/raw/2024.parquet": "7ddf862bd3fb53b5153c951a239883c657402786278f1477a87282cfd7987894",
+    "data/ch03/raw/2025.parquet": "638ee9049f1c20357937eb8746b0724e67a402920d183cb480d9ed173a640686",
+    "data/ch03/raw/2026.parquet": "55e93adba052ddc3fcdfec95bc828fed14d13c3b050c294764106ca7fa22ac3f"
+  },
+  "sensor_ids": {
+    "D1": 994,
+    "D2": 1010,
+    "D3": 1026
+  },
+  "depth_cm": {
+    "D1": 5,
+    "D2": 20,
+    "D3": 35
+  },
+  "variable_id": 9,
+  "time_basis": "Oracle localdatetime, no timezone conversion; original rows retained"
+}

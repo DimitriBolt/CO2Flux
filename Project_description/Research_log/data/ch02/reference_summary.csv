@@ -1,0 +1,4 @@
+level,sensorid,rows,service_codes,duplicate_times,conflicting_times,exact_extra_rows,repeated_time_extra_rows,short_steps_le_10s,typical_step_seconds,gaps,long_constant_runs
+D1,994,10582,0,26,10,16,26,2262,299.0000000000,7,2
+D2,1010,10582,0,24,9,15,24,2262,299.0000000000,7,2
+D3,1026,10582,0,23,9,14,23,2262,299.0000000000,7,2

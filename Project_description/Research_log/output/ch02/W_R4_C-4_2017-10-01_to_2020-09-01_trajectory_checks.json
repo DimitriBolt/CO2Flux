@@ -1,0 +1,30 @@
+{
+  "computed_days": 783,
+  "skipped_B": 243,
+  "skipped_C": 40,
+  "fits": 2349,
+  "undefined_phases": 0,
+  "known_sensitive_phases": 1,
+  "unassessed_phases": 2348,
+  "october_daily_max_absolute_error": 4.999638036906617e-09,
+  "october_daily_atol": 1e-07,
+  "october_daily_rtol": 1e-07,
+  "amplitude_and_phase_formula_check": true,
+  "calendar_and_protected_inputs_unchanged": true,
+  "H_display_segments": 860,
+  "A_display_links": 713,
+  "tests": {
+    "existing_with_six_october_references": 24,
+    "selection_and_cyclic_display": 6
+  },
+  "source_hashes": {
+    "Project_description/Research_log/chapter02.py": "1e868a97a7c1fdc043d6d7c70fb4b15ec86a82795d5095765f1cdf1a7968c071",
+    "Project_description/sensorDB/diurnal_analysis.py": "f3890effbe4e6b4d4d1a6dea2ff57be9aae1e45d2463918b9e0edc1ed732b192",
+    "Project_description/sensorDB/plot_column_timeseries.py": "b15852b0501802042774c25b23c2d4d03d21a16bb24e5005a26375bea7762c06",
+    "Project_description/Research_log/output/ch02/W_R4_C-4_2017-10-01_to_2020-09-01_calendar.csv": "3d143a925525ee4b6dfd3bbdeef0991265fc729d3c337b6757d3b0fc0225b150"
+  },
+  "notebook_clean_kernel": true,
+  "notebook_figures": 2,
+  "historical_figures_preserved": true,
+  "html_exported": true
+}
