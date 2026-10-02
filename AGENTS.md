@@ -69,7 +69,7 @@ python3 scripts/update_co2_sheet.py
 
 ### `scripts/`
 
-- `update_co2_sheet.py` — Regenerate CO2 sheet in `variables_schema.xlsx` from Oracle inventory
+- `update_co2_sheet.py` — Refresh existing CO2 rows in `variables_schema.xlsx` using their explicit metadata
 
 ---
 
@@ -129,8 +129,10 @@ See `Sensors_Description/co2_vertical_profile_viewer_requirements.md` for full s
 - **LEO West:** `leo_west.datavalues` table
 
 **CO2 measurements:**
-- Variable ID 1 = CO2 concentration (ppm)
-- Search by sensor ID to locate specific depths and slopes
+- LEO West GMM222: `leo_west.datavalues`, `variableid = 9`, source units `ppm`.
+- LEO West LI-COR: `leo_west.datavalueslicor`, `variableid = 56`, source units `umol/mol`.
+- Identify a channel by Oracle table + sensorid + variableid; sensor IDs repeat across slopes.
+- Check the metadata of other sources separately; do not assume identical variable IDs.
 
 ---
 
@@ -158,7 +160,7 @@ Columns include:
 python3 scripts/update_co2_sheet.py
 ```
 
-This regenerates the CO2 sheet from Oracle inventory and validates data availability.
+This refreshes availability and query fields of existing CO2 rows in place. It preserves other rows and sheets; adding inventory sensors is a separate operation. Test changes only on temporary workbook copies with a fake Oracle source.
 
 ### Technical Reference
 
