@@ -229,7 +229,15 @@ def plot_static(static, report, out=OUT):
             ax.plot(sp['f'][mask],sp['amplitude'][mask],color=COLORS[i],lw=.85)
             ax.set_xlim(low,high); ax.set_ylim(bottom=0); ax.grid(alpha=.22)
             if low <= 1 <= high:
-                ax.axvline(1,color='#333333',ls='--',lw=.8)
+                # The daily reference stays on the axis and above the plot;
+                # it must not cover the spectral curve or affect data limits.
+                ax.plot(1,0,marker='v',markersize=4,color='#333333',linestyle='none',
+                        transform=ax.get_xaxis_transform(),clip_on=False,scalex=False,scaley=False)
+                ax.annotate('24 h',xy=(1,1.014),xycoords=ax.get_xaxis_transform(),
+                            xytext=(1+.05*(high-low),1.055),textcoords=ax.get_xaxis_transform(),
+                            ha='left',va='center',fontsize=8.5,color='#333333',
+                            arrowprops=dict(arrowstyle='->',lw=.8,color='#333333',shrinkA=2,shrinkB=0),
+                            annotation_clip=False)
             if j == 0:
                 ax.set_ylabel(f"Amplitude [{p['units']}]")
                 ax.legend([f"{LABELS[i]}   |   N={p['static_n']:,}"],loc='upper right',fontsize=10,framealpha=.93)
@@ -237,12 +245,12 @@ def plot_static(static, report, out=OUT):
                 ax.axvline(1/365.2425,color='#888888',ls=':',lw=.9)
             if i == 3:
                 ax.set_xlabel('Frequency [cycles/day]')
-    for ax,title in zip(axs[0],['Full display band · dashed line: 1 cycle/day','Low frequencies · dotted: annual reference','Daily-frequency neighborhood']):
+    for ax,title in zip(axs[0],['Full display band · 24 h reference','Low frequencies · dotted: annual reference','Daily-frequency neighborhood']):
         ax.set_title(title,fontsize=12,pad=12)
     fig.suptitle('LEO West (x=1, y=4) · Four-channel floating-mean GLS amplitudes',fontsize=19,x=.52,y=.974)
     fig.text(.52,.929,WARNING,ha='center',color='#9e2926',fontsize=13,weight='bold')
     fig.text(.52,.904,f"{report['common_start']} – {report['common_last']}  |  T={report['span_days']:.3f} days  |  Δf=1/T={report['frequency_step']:.6f} cycles/day",ha='center',fontsize=11)
-    fig.text(.065,.061,'A = √(a²+b²), C(t) = c + a cos(2πft) + b sin(2πft); original timestamps, equal weights, existing technical masks.',fontsize=10)
+    fig.text(.065,.061,r'$C(t)=c+\operatorname{Re}\{Z_f e^{2\pi ift}\},\quad Z_f=a-ib,\quad A(f)=|Z_f|$; independent GLS fit at each frequency; original timestamps, equal weights, existing masks.',fontsize=10)
     fig.text(.065,.039,'Air: 1 m horizontal offset; source umol/mol. Excel Z=0.25 m vs Oracle BOXZ=0.05 m unresolved. No unit conversion or time-zone correction.',fontsize=10)
     fig.text(.065,.018,'Gaps and review flags retained. 520 occupied common days ≠ continuous validated data. Only 1.43 annual cycles; annual periodicity is not established.',fontsize=10)
     fig.subplots_adjust(left=.065,right=.985,top=.858,bottom=.125,hspace=.29,wspace=.21)

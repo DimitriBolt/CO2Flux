@@ -28,9 +28,9 @@
   "visual_validation": "Final PDF raster, GIF sample frame and historical plot inspected.",
   "artifact_sha256": {
     "Project_description/Research_log/output/preliminary_spectra/1035_before_candidate.png": "4a9deecd245ed773509be5904be61ccfeb87b43d7fe041ecd45346c484968992",
-    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.pdf": "a56beb997bdec7118e7d286f95c9262589b1f48a5a1fd074ad9b9a4dd2805856",
-    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.png": "91906ef8248c76a33f6f28d87c05bb58470377bdf72f33c9610a149d317fabb1",
-    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.svg": "2f51489e86bbb3a14f8d4f0a673a30fcf6eb5246f010b3491f5bd3c8d789655d",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.pdf": "02858f99eb3bf745aea41232af403f86228167ad15a14086fcfef5e4ee2a7a7e",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.png": "28c41d2374c839df8e888368f8f66c92b678c203d92d4a1c8256917afd1d7503",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.svg": "c8351fb447334d48385899279702c5bfdd66fd1cd8d8b192f89afb7416c92837",
     "Project_description/Research_log/output/preliminary_spectra/gaps.csv": "72d02ed89876a67b52ccb570ad718294f8c3a25e0b0266e992082c9111847875",
     "Project_description/Research_log/output/preliminary_spectra/historical_diagnostic.json": "ae2cb2bac1733e4c017ce803ca169a6214f62b64b9cfeeed351d76b6837e21b4",
     "Project_description/Research_log/output/preliminary_spectra/historical_monthly_ranges.csv": "d0142ffae3509f047751f053d4e4416e017bdb5ec185c239a965260de7c4e24c",
@@ -42,6 +42,25 @@
     "Project_description/Research_log/output/preliminary_spectra/sliding_spectra.html": "069eceae4e2b6b5ffbcfbb1a63774eceea07bbd664f75cf4e7a09e34393e6d1d",
     "Project_description/Research_log/output/preliminary_spectra/sliding_spectra_30d_1d.gif": "06394265134639dbfe216d9b339528b5453f764ae4189965bfef156ebef9fd50",
     "Project_description/Research_log/output/preliminary_spectra/static_spectra.csv": "15387d691528cdbfebc8f4364da360254ab731a8eb74248b08e3a9cdaf963f46",
-    "Project_description/Research_log/00_preliminary_co2_spectra.ipynb": "f13cfc1faf11fad17bd54ec079b21509bfa90c56b5a8798d716791fe42affd0d"
+    "Project_description/Research_log/00_preliminary_co2_spectra.ipynb": "f55c72d558d96fabd4214f645d3f3f6a8bd9dadf9e25a029e720cb6dafa3ffc9"
+  },
+  "presentation_revision": {
+    "base_commit": "72022a652a62df50c9642e80f2fed168b0ed9f87",
+    "approved_changes": [
+      "24 h markers and arrows outside plotting areas",
+      "equivalent complex notation for the existing GLS model"
+    ],
+    "numerical_tests": "7 passed",
+    "clean_kernel_code_cells": 8,
+    "notebook_code_cells_unchanged": true,
+    "other_notebook_outputs_unchanged": true,
+    "all_12_spectral_curve_svg_paths_identical": true,
+    "source_archive_files_sha256_unchanged": 44306,
+    "readme_plan_unchanged": true,
+    "static_spectra_csv_sha256": "15387d691528cdbfebc8f4364da360254ab731a8eb74248b08e3a9cdaf963f46",
+    "passport_sha256": "9c21e083491fbc5077df8eabe15309f26e993443b3c11a9f313c9d52de6513fd",
+    "frequency_grid_and_amplitudes_byte_identical": true,
+    "all_other_publication_outputs_byte_identical": true,
+    "visual_check": "Revised PDF raster and final PNG inspected; 8 arrows above plots, x-axis markers, daily peaks unobscured; no label overlap."
   }
 }
