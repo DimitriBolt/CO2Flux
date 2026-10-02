@@ -1,0 +1,47 @@
+{
+  "source_commit": "48cc2c96bc47069f703136aca8c8f0acb5aedbef",
+  "numerical_tests": "7 passed",
+  "clean_kernel_executed_code_cells": 8,
+  "inputs_sha256_verified": 12,
+  "existing_details_append_only": true,
+  "pdf_page_inches": [
+    17,
+    11
+  ],
+  "png_pixels": [
+    5100,
+    3300
+  ],
+  "png_nominal_dpi": 300,
+  "pdf_raster_images": 0,
+  "default_gif_frames": 492,
+  "default_window_days": 30,
+  "default_step_days": 1,
+  "html_embedded_retained_counts": [
+    7589,
+    49784,
+    49770,
+    49715
+  ],
+  "html_local_links_checked": true,
+  "browser_visual_validation": "Not performed: local-file URL blocked by browser safety policy. No workaround attempted.",
+  "visual_validation": "Final PDF raster, GIF sample frame and historical plot inspected.",
+  "artifact_sha256": {
+    "Project_description/Research_log/output/preliminary_spectra/1035_before_candidate.png": "4a9deecd245ed773509be5904be61ccfeb87b43d7fe041ecd45346c484968992",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.pdf": "a56beb997bdec7118e7d286f95c9262589b1f48a5a1fd074ad9b9a4dd2805856",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.png": "91906ef8248c76a33f6f28d87c05bb58470377bdf72f33c9610a149d317fabb1",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.svg": "2f51489e86bbb3a14f8d4f0a673a30fcf6eb5246f010b3491f5bd3c8d789655d",
+    "Project_description/Research_log/output/preliminary_spectra/gaps.csv": "72d02ed89876a67b52ccb570ad718294f8c3a25e0b0266e992082c9111847875",
+    "Project_description/Research_log/output/preliminary_spectra/historical_diagnostic.json": "ae2cb2bac1733e4c017ce803ca169a6214f62b64b9cfeeed351d76b6837e21b4",
+    "Project_description/Research_log/output/preliminary_spectra/historical_monthly_ranges.csv": "d0142ffae3509f047751f053d4e4416e017bdb5ec185c239a965260de7c4e24c",
+    "Project_description/Research_log/output/preliminary_spectra/interactive_spectra.html": "9db95a3595aa70948d34d2eac24505c898f95621764eee97a70ce47ba7295ea4",
+    "Project_description/Research_log/output/preliminary_spectra/monthly_coverage.csv": "c43dd45bc473bcf4fec00399a9c22fff92423f8cf02729463e91b93b412c83e7",
+    "Project_description/Research_log/output/preliminary_spectra/passport.json": "9c21e083491fbc5077df8eabe15309f26e993443b3c11a9f313c9d52de6513fd",
+    "Project_description/Research_log/output/preliminary_spectra/sampling_window.png": "6c1e779e3af2ea0d62389d2c63ff58f9f930858e8c5b0f82d6b013b7aef6798b",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_30d_1d_coverage.csv": "7c0f285cbb9807673cffdec063d3d7d66fb4f8887210b7827a697ecf1db81718",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_spectra.html": "069eceae4e2b6b5ffbcfbb1a63774eceea07bbd664f75cf4e7a09e34393e6d1d",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_spectra_30d_1d.gif": "06394265134639dbfe216d9b339528b5453f764ae4189965bfef156ebef9fd50",
+    "Project_description/Research_log/output/preliminary_spectra/static_spectra.csv": "15387d691528cdbfebc8f4364da360254ab731a8eb74248b08e3a9cdaf963f46",
+    "Project_description/Research_log/00_preliminary_co2_spectra.ipynb": "f13cfc1faf11fad17bd54ec079b21509bfa90c56b5a8798d716791fe42affd0d"
+  }
+}

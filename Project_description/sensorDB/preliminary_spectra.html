@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEO West · Preliminary CO₂ spectra</title>
+<style>
+body{font:15px system-ui,sans-serif;color:#142331;background:#f6f8fa;margin:0;padding:24px;max-width:1400px;margin:auto}h1{font-size:25px;margin:0 0 8px}.warning{color:#a32226;font-weight:750;margin:12px 0}.controls{background:white;border:1px solid #d8e0e5;border-radius:8px;padding:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0}input[type=number]{width:76px;padding:5px}button,select{padding:7px;border:1px solid #a8b7c4;border-radius:4px;background:white;cursor:pointer}button:disabled{opacity:.5}.panel{background:white;border:1px solid #d8e0e5;border-radius:8px;padding:12px;margin:12px 0}.panel h2{font-size:17px;margin:0 0 4px}canvas{width:100%;height:205px;display:block}.info{font-size:13px;color:#47596b;min-height:36px}.muted{color:#526477;font-size:13px}#position{flex:1;min-width:200px}#status{min-height:24px;font-weight:600}details{margin-top:14px;line-height:1.6}a{color:#0065a0}.error{color:#a32226}
+</style>
+<h1>LEO West (x=1, y=4) · Four-channel GLS amplitudes</h1>
+<div class="warning">PRELIMINARY — QC AND TIME BASE UNRESOLVED</div>
+<div id="interval">Loading embedded observations…</div>
+<div class="controls" id="windowControls" hidden>
+<label>Window [days] <input id="window" type="number" min="1" max="521" value="30" step="1"></label>
+<label>Step [days] <input id="step" type="number" min="1" value="1" step="1"></label>
+<button id="rebuild">Rebuild real windows</button><button id="play">Play</button>
+<input id="position" aria-label="Window position" type="range" min="0" max="491" value="0" step="1">
+</div>
+<div class="controls">
+<label><input class="toggle" data-i="0" type="checkbox" checked> Air 1275</label>
+<label><input class="toggle" data-i="1" type="checkbox" checked> 5 cm / 996</label>
+<label><input class="toggle" data-i="2" type="checkbox" checked> 20 cm / 1012</label>
+<label><input class="toggle" data-i="3" type="checkbox" checked> 50 cm / 1035</label>
+<label>View <select id="solo"><option value="all">All channels</option><option value="0">Air only</option><option value="1">5 cm only</option><option value="2">20 cm only</option><option value="3">50 cm only</option></select></label>
+<label>Frequency min <input id="fmin" type="number" min="0" max="6" value="0" step="0.01"></label>
+<label>max <input id="fmax" type="number" min="0.001" max="6" value="6" step="0.01"></label>
+<button id="full">Full band</button><button id="low">Low frequencies</button><button id="daily">Daily neighborhood</button>
+</div>
+<div id="status" aria-live="polite"></div><div id="plots"></div>
+<details open><summary>Method, coverage and limits</summary>
+<p>A = √(a²+b²) in C(t)=c+a cos(2πft)+b sin(2πft): equal-weight floating-mean sinusoidal semi-amplitude, not normalized power. No interpolation, regularization, unit conversion, taper, trend removal or phase calculation. Each fit uses its own real timestamps after the existing technical exclusions; doubtful retained observations remain flagged.</p>
+<p>Frequency spacing is 1/T (static) or 1/window_days (sliding). The display uses f &lt; 6 cycles/day, half the 12/day slow modal air cadence; the exactly 6/day endpoint is excluded because nearly regular 2-hour segments cannot stably determine both sinusoidal coefficients; irregular observations have no single strict Nyquist frequency. A denser grid is not used. Dashed line: daily reference, not a preselected conclusion. Check the <a href="sampling_window.png">actual sampling window</a> for possible aliases.</p>
+<p>Sliding windows are half-open and recalculated from the embedded observations when selected or played; changing window/step rebuilds the entire date sequence and clears calculated spectra. A frequency needs ≥1 cycle within actual observed span, ≥4 distinct times and a nonsingular fit. Otherwise it is omitted with INSUFFICIENT DATA; these are numerical display rules, not new scientific admission criteria. Counts, occupied days / 2-hour bins, internal gaps and missing window edges are shown. Partial bins count as occupied; they are not simultaneous measurements. Large gaps alone have no newly invented exclusion threshold. Short windows cannot establish annual periodicity.</p>
+<p>The full 521-day candidate calendar has 520 occupied four-channel days in two runs (29 Apr–11 Aug 2025 and 13 Aug 2025–1 Oct 2026). It is not a continuous validated series. All LI-COR observations have unresolved numeric QC; source time zone / clock alignment are unconfirmed. Air horizontal offset: 1 m. Air Excel Z=0.25 m and Oracle BOXZ=0.05 m disagree. Source units stay separate.</p>
+<p>Source archive: 20261002T061358Z-264980. <a href="passport.json">Passport and input checksums</a> · <a href="monthly_coverage.csv">Monthly coverage</a> · <a href="gaps.csv">Actual gaps</a> · <a href="interactive_spectra.html">Static explorer</a> · <a href="sliding_spectra.html">Sliding windows</a>. Modern browser with DecompressionStream required; no network or database access.</p>
+</details>
+<script id="payload" type="application/octet-stream">__PAYLOAD__</script>
+<script>
+'use strict';
+const MODE='__MODE__';
+const $=id=>document.getElementById(id);
+let data, current, worker, sequence=[], cache=new Map(), generation=0, request=0, playing=false, busy=false, activeWidth=30;
+const visible=[true,true,true,true];
+const date=d=>new Date(Date.UTC(2025,3,29)+d*86400000).toISOString().replace('T',' ').slice(0,19);
+function workerBody(){
+  let series;
+  onmessage=e=>{
+    const p=e.data;
+    if(p.init){series=p.init;return;}
+    const freq=Array.from({length:Math.ceil(6*p.width)-1},(_,k)=>(k+1)/p.width);
+    const result=series.map(s=>{
+      const t=[],y=[],q=[];
+      for(let j=0;j<s.t.length;j++)if(s.t[j]>=p.lo&&s.t[j]<p.lo+p.width){t.push(s.t[j]);y.push(s.y[j]);q.push(s.q[j]);}
+      const n=t.length,span=n?t[n-1]-t[0]:0;
+      let maxGap=0;
+      for(let j=1;j<n;j++)maxGap=Math.max(maxGap,(t[j]-t[j-1])*24);
+      const stats={n,days:new Set(t.map(Math.floor)).size,bins:new Set(t.map(v=>Math.floor(v*12))).size,
+        review:q.reduce((a,b)=>a+b,0),gap:n>1?maxGap:null,startEdge:n?(t[0]-p.lo)*24:p.width*24,
+        endEdge:n?(p.lo+p.width-t[n-1])*24:p.width*24,span};
+      const amplitude=new Array(freq.length).fill(null);
+      if(n>=4&&span>0){
+        const mean=y.reduce((a,b)=>a+b,0)/n,yy=y.map(v=>v-mean),tt=t.map(v=>v-t[0]);
+        for(let k=0;k<freq.length;k++){
+          if(freq[k]*span<1-1e-12)continue;
+          let c=0,sn=0,cc=0,ss=0,cs=0,yc=0,ys=0;
+          for(let j=0;j<n;j++){
+            const a=2*Math.PI*freq[k]*tt[j],co=Math.cos(a),si=Math.sin(a);
+            c+=co;sn+=si;cc+=co*co;ss+=si*si;cs+=co*si;yc+=yy[j]*co;ys+=yy[j]*si;
+          }
+          cc-=c*c/n;ss-=sn*sn/n;cs-=c*sn/n;
+          const det=cc*ss-cs*cs;
+          if(det>1e-12*(cc+ss)**2)amplitude[k]=Math.hypot((yc*ss-ys*cs)/det,(ys*cc-yc*cs)/det);
+        }
+      }
+      return {f:freq,amplitude,stats};
+    });
+    postMessage({request:p.request,index:p.index,result});
+  };
+}
+function draw(){
+  if(!current)return;
+  const low=Number($('fmin').value),high=Number($('fmax').value);
+  if(!(low>=0&&high>low&&high<=6)){$('status').textContent='Frequency limits must satisfy 0 ≤ min < max ≤ 6.';return;}
+  current.forEach((sp,i)=>{
+    const panel=$('panel'+i);panel.hidden=!visible[i];if(!visible[i])return;
+    const canvas=$('canvas'+i),w=canvas.clientWidth,h=205,ratio=window.devicePixelRatio||1;
+    canvas.width=w*ratio;canvas.height=h*ratio;
+    const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);
+    const left=76,right=w-18,top=12,bottom=165;
+    const pts=sp.f.map((f,j)=>[f,sp.amplitude[j]]).filter(v=>v[0]>=low&&v[0]<=high);
+    const valid=pts.filter(v=>v[1]!==null&&Number.isFinite(v[1]));
+    const ymax=valid.length?Math.max(1e-8,...valid.map(v=>v[1]))*1.12:1;
+    const xx=f=>left+(f-low)/(high-low)*(right-left),yy=a=>bottom-a/ymax*(bottom-top);
+    ctx.font='12px system-ui';ctx.fillStyle='#435466';
+    for(let k=0;k<=4;k++){
+      const a=ymax*k/4,y=yy(a);ctx.strokeStyle='#e1e6ea';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();
+      ctx.textAlign='right';ctx.fillText(a.toPrecision(3),left-8,y+4);
+    }
+    for(let k=0;k<=6;k++){
+      const f=low+(high-low)*k/6;ctx.textAlign='center';ctx.fillText(f.toFixed(high-low<.5?3:1),xx(f),bottom+20);
+    }
+    ctx.fillText('Frequency [cycles/day]',(left+right)/2,h-3);
+    ctx.save();ctx.translate(14,(top+bottom)/2);ctx.rotate(-Math.PI/2);ctx.fillText('Amplitude ['+data.series[i].units+']',0,0);ctx.restore();
+    if(low<=1&&high>=1){ctx.strokeStyle='#606060';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(xx(1),top);ctx.lineTo(xx(1),bottom);ctx.stroke();ctx.setLineDash([]);}
+    ctx.strokeStyle=data.colors[i];ctx.lineWidth=1.25;ctx.beginPath();let pen=false;
+    for(const [f,a] of pts){if(a===null||!Number.isFinite(a)){pen=false;continue;}if(pen)ctx.lineTo(xx(f),yy(a));else ctx.moveTo(xx(f),yy(a));pen=true;}ctx.stroke();
+    let text='';
+    if(MODE==='sliding'){
+      const s=sp.stats;
+      text=`N=${s.n.toLocaleString()} · review flags=${s.review} · occupied days=${s.days}/${activeWidth} · occupied 2h bins=${s.bins}/${activeWidth*12} · max internal gap=${s.gap===null?'n/a':s.gap.toFixed(2)+' h'} · missing edges=${s.startEdge.toFixed(2)} / ${s.endEdge.toFixed(2)} h`;
+    }else{
+      const p=data.passport.channels[i];text=`N=${p.static_n.toLocaleString()} · review flags=${p.static_doubtful} · candidate-calendar days=${p.days}/521 · max calendar internal gap=${p.max_gap_h.toFixed(2)} h · median step=${p.median_step_s.toFixed(0)} s`;
+    }
+    if(!valid.length){ctx.fillStyle='#a32226';ctx.textAlign='center';ctx.fillText('INSUFFICIENT DATA',(left+right)/2,75);text+=' · No computable frequency in this view: <4 times, <1 observed cycle, singular fit, or no grid point in selected band.';}
+    else if(MODE==='sliding'&&pts.some(v=>v[1]===null))text+=' · INSUFFICIENT DATA at omitted frequencies (<1 observed cycle or singular fit).';
+    $('info'+i).textContent=text;
+  });
+}
+function stop(){playing=false;$('play').textContent='Play';}
+function choose(){
+  const index=Number($('position').value),lo=sequence[index];
+  request++;
+  $('interval').textContent=`Window ${index+1}/${sequence.length}: ${date(lo)} ≤ t < ${date(lo+activeWidth)} · Δf=${(1/activeWidth).toPrecision(5)} cycles/day`;
+  if(cache.has(index)){busy=false;current=cache.get(index);draw();schedule();return;}
+  busy=true;current=null;
+  $('status').textContent='Computing from real timestamps…';
+  document.querySelectorAll('canvas').forEach(c=>c.getContext('2d').clearRect(0,0,c.width,c.height));
+  worker.postMessage({request,index,lo,width:activeWidth});
+}
+function schedule(){
+  $('status').textContent=`${cache.size}/${sequence.length} windows computed on selection/play. Changing parameters rebuilds dates and recalculates spectra.`;
+  if(playing){const token=generation;setTimeout(()=>{if(playing&&!busy&&token===generation){if(Number($('position').value)<sequence.length-1){$('position').value=Number($('position').value)+1;choose();}else stop();}},180);}
+}
+function rebuild(){
+  const width=Number($('window').value),step=Number($('step').value);
+  if(!Number.isInteger(width)||!Number.isInteger(step)||width<1||width>data.days||step<1){$('status').textContent='Use integer window 1–521 days and step ≥1 day.';return;}
+  stop();generation++;cache.clear();busy=false;
+  activeWidth=width;
+  if(worker)worker.terminate();
+  const url=URL.createObjectURL(new Blob(['('+workerBody.toString()+')()'],{type:'application/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);
+  worker.postMessage({init:data.series});
+  worker.onmessage=e=>{const p=e.data;cache.set(p.index,p.result);if(p.request!==request)return;busy=false;current=p.result;draw();schedule();};
+  worker.onerror=e=>{busy=false;stop();$('status').textContent='Calculation failed: '+e.message;};
+  sequence=[];for(let lo=0;lo+width<=data.days;lo+=step)sequence.push(lo);
+  $('position').max=sequence.length-1;$('position').value=0;choose();
+}
+async function init(){
+  const bytes=Uint8Array.from(atob($('payload').textContent.trim()),c=>c.charCodeAt(0));
+  const text=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();data=JSON.parse(text);
+  $('plots').innerHTML=data.labels.map((label,i)=>`<section class="panel" id="panel${i}"><h2>${label}</h2><div class="info" id="info${i}"></div><canvas id="canvas${i}" aria-label="Amplitude spectrum ${label}"></canvas></section>`).join('');
+  document.querySelectorAll('.toggle').forEach(el=>el.onchange=()=>{visible[Number(el.dataset.i)]=el.checked;draw();});
+  $('solo').onchange=()=>{document.querySelectorAll('.toggle').forEach((el,i)=>{el.checked=$('solo').value==='all'||Number($('solo').value)===i;visible[i]=el.checked;});draw();};
+  ['fmin','fmax'].forEach(id=>$(id).onchange=draw);
+  const band=(a,b)=>{$('fmin').value=a;$('fmax').value=b;draw();};
+  $('full').onclick=()=>band(0,6);$('low').onclick=()=>band(0,.18);$('daily').onclick=()=>band(.85,1.15);
+  window.onresize=draw;
+  if(MODE==='sliding'){
+    $('windowControls').hidden=false;$('windowControls').style.display='flex';
+    $('rebuild').onclick=rebuild;$('position').oninput=()=>{stop();choose();};
+    $('play').onclick=()=>{if(playing)stop();else{playing=true;$('play').textContent='Pause';if(!busy)schedule();}};rebuild();
+  }else{
+    $('windowControls').style.display='none';current=data.static;
+    $('interval').textContent=`Common envelope: ${data.passport.common_start} – ${data.passport.common_last} · T=${data.passport.span_days.toFixed(3)} days · Δf=${data.passport.frequency_step.toPrecision(5)} cycles/day`;
+    $('status').textContent='520 occupied common days, separated by a missing air day. Candidate peaks only; no annual claim.';draw();
+  }
+}
+init().catch(e=>{$('status').textContent='Unable to open embedded data: '+e.message;$('status').className='error';});
+</script></html>

@@ -1,0 +1,26 @@
+{
+  "interval_start": "2023-07-08 00:00:00",
+  "interval_end_exclusive": "2025-04-29 00:00:00",
+  "raw_rows": 73097,
+  "raw_above_3000": 73084,
+  "positive_min": 6977.333638,
+  "positive_max": 7033.895013,
+  "positive_median": 7004.787103,
+  "positive_q05": 6993.955803,
+  "positive_q95": 7015.5723827,
+  "scenarios": [
+    {
+      "scenario": "existing masks",
+      "common_days": 520,
+      "first": "2025-04-29",
+      "last": "2026-10-01"
+    },
+    {
+      "scenario": "restore only >3000 at 1035; unreviewed counterfactual",
+      "common_days": 773,
+      "first": "2023-07-08",
+      "last": "2026-10-01"
+    }
+  ],
+  "warning": "No threshold changed. Restored points are not scientifically admitted and have not passed downstream QC."
+}
