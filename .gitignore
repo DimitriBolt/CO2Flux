@@ -12,3 +12,6 @@ venv/
 .env.*
 !.env.example
 !.emv.example
+
+# Versioned full LEO West raw archives and diagnostic working files.
+Project_description/sensorDB/Row_data/LEO_West_full/

@@ -13,6 +13,19 @@ This project focuses on analyzing **CO2 vertical profile data** and measuring CO
 
 ## Quick Start
 
+### Full LEO West CO2 refresh
+
+По команде Dimitri Bolt «Обнови все 53 канала» выполнять `make co2-refresh`.
+Не начинать заново разработку программы выгрузки. Команда продолжает
+незавершённую полную выгрузку, а после завершённой создаёт новую версию
+и повторно скачивает всю доступную историю 48 GMM222 и 5 LI-COR.
+Для автономного запуска использовать устойчивую сессию tmux;
+`make co2-status` показывает локальный прогресс без Oracle.
+Инструкция: `Project_description/sensorDB/Row_data/README.md`.
+Не удалять старые версии и не включать исходные архивы/секреты в Git.
+Диагностика альтернативных вертикалей не разрешает автоматически выбирать
+вертикаль, изменять критерии очистки или переходить к этапу 0.3.
+
 **Python requirements:**
 - Python 3.11+ (project uses `tomllib`)
 - Virtual environment via `python -m venv venv`
