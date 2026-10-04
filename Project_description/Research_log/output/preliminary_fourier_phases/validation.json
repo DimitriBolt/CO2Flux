@@ -1,0 +1,152 @@
+{
+  "source_sha": "886733c80caea324d4154553e1b9e35ab387bef9",
+  "stage": "0.4",
+  "tests_passed": true,
+  "test_log": "test_A_zero_phase (test_preliminary_fourier_phases.FourierPhaseTests.test_A_zero_phase) ... ok\ntest_B_positive_four_hour_lag (test_preliminary_fourier_phases.FourierPhaseTests.test_B_positive_four_hour_lag) ... ok\ntest_C_reverse_negative_lag (test_preliminary_fourier_phases.FourierPhaseTests.test_C_reverse_negative_lag) ... ok\ntest_D_wrap_boundary (test_preliminary_fourier_phases.FourierPhaseTests.test_D_wrap_boundary) ... ok\ntest_E_common_missing_bins (test_preliminary_fourier_phases.FourierPhaseTests.test_E_common_missing_bins) ... ok\ntest_F_fft_cross_check_full_grid (test_preliminary_fourier_phases.FourierPhaseTests.test_F_fft_cross_check_full_grid) ... ok\ntest_common_bins_means_counts_flags_and_no_fill (test_preliminary_fourier_phases.FourierPhaseTests.test_common_bins_means_counts_flags_and_no_fill) ... ok\ntest_javascript_recalculates_all_windows_like_python (test_preliminary_fourier_phases.FourierPhaseTests.test_javascript_recalculates_all_windows_like_python) ... ok\ntest_shared_origin_shift_and_constant_offsets (test_preliminary_fourier_phases.FourierPhaseTests.test_shared_origin_shift_and_constant_offsets) ... ok\ntest_undefined_empty_singleton_constant (test_preliminary_fourier_phases.FourierPhaseTests.test_undefined_empty_singleton_constant) ... ok\ntest_validation_table_has_all_six_required_checks (test_preliminary_fourier_phases.FourierPhaseTests.test_validation_table_has_all_six_required_checks) ... ok\ntest_window_parameters_and_common_timestamps (test_preliminary_fourier_phases.FourierPhaseTests.test_window_parameters_and_common_timestamps) ... ok\ntest_wrap_plot_break_preserves_endpoints_and_gaps (test_preliminary_fourier_phases.FourierPhaseTests.test_wrap_plot_break_preserves_endpoints_and_gaps) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 2.337s\n\nOK\n",
+  "synthetic": [
+    {
+      "test": "A",
+      "expected_deg": 0,
+      "actual_deg": 0.0,
+      "error_deg": 0.0
+    },
+    {
+      "test": "B",
+      "expected_deg": 60,
+      "actual_deg": 60.00000000000014,
+      "error_deg": 1.4210854715202004e-13
+    },
+    {
+      "test": "C",
+      "expected_deg": -60,
+      "actual_deg": -60.000000000000156,
+      "error_deg": -1.5631940186722204e-13
+    },
+    {
+      "test": "D",
+      "expected_deg": -150,
+      "actual_deg": -150.00000000000023,
+      "error_deg": -2.2737367544323206e-13
+    },
+    {
+      "test": "E_whole_days",
+      "expected_deg": 60,
+      "actual_deg": 60.00000000000024,
+      "error_deg": 2.4158453015843406e-13,
+      "retained_bins": 324,
+      "removed_indices": [
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155
+      ]
+    },
+    {
+      "test": "E_irregular",
+      "expected_deg": 60,
+      "actual_deg": 60.248119282866405,
+      "error_deg": 0.24811928286640494,
+      "retained_bins": 349,
+      "removed_indices": [
+        7,
+        8,
+        9,
+        27,
+        48,
+        121,
+        122,
+        203,
+        278,
+        301,
+        339
+      ]
+    },
+    {
+      "test": "F",
+      "max_complex_error": 1.942097114741681e-15,
+      "note": "FFT mode 30; center-origin correction exp(-2πi f0 t_first)"
+    }
+  ],
+  "browser_python_cross_check": [
+    {
+      "window_days": 30,
+      "step_days": 1,
+      "windows": 492,
+      "maximum_phase_difference_deg": 7.673861546209082e-13
+    },
+    {
+      "window_days": 60,
+      "step_days": 7,
+      "windows": 66,
+      "maximum_phase_difference_deg": 2.984279490192421e-13
+    }
+  ],
+  "input_hashes_unchanged": true,
+  "total_windows": 492,
+  "all_three_phases_computable": 492,
+  "windows_with_review_flags": 492,
+  "insufficient_windows": 0,
+  "scientifically_reliable_windows": null,
+  "scientific_reliability": "NOT ESTABLISHED; no admission criterion introduced",
+  "common_bins": 6184,
+  "possible_calendar_bins": 6252,
+  "coverage_percent_range": [
+    88.05555555555556,
+    100.0
+  ],
+  "complete_bins_range": [
+    317,
+    360
+  ],
+  "longest_gap_hours": 42,
+  "center_range": [
+    "2025-05-14 00:00:00",
+    "2026-09-17 00:00:00"
+  ],
+  "pdf_inches": [
+    17.0,
+    11.0
+  ],
+  "png_pixels": [
+    5100,
+    3300
+  ],
+  "python_versions": {
+    "python": "3.14.4",
+    "numpy": "2.3.5",
+    "pandas": "2.3.3"
+  },
+  "visual_inspection": "See verified delivery record in details/02_data_checks.md"
+}

@@ -1,0 +1,148 @@
+{
+  "source_sha": "886733c80caea324d4154553e1b9e35ab387bef9",
+  "stage": "0.4",
+  "priority": "temporal phase evolution",
+  "archive": "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980",
+  "input_hashes": {
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/manifest.json": "2346fbb77db20ad2396d38d2b7d3577cca808ed2d6701d2a9ebc41c07949056c",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/summary.json": "c50c3d399e3db29a2754d569765ceed9440ee8100038495a092780e72dbd2737",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/channels.csv": "262ac50e08573b1165962b12741b9214006f027a8e578b943a3a27038f789a35",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/vertical_candidates.csv": "7833b8d271b8cda4e2a8fa3f9e124cd5f8e4ada0ba1d06ef81136d6fb46f1c2b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1275_working.parquet": "ed4241af6f545be6118775f3d28db864d8e160d494e7a162d37b83d432ea069b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1275_source_decisions.parquet": "ed4241af6f545be6118775f3d28db864d8e160d494e7a162d37b83d432ea069b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/996_working.parquet": "b134ff8be5d8384ee5eaac4791dbc3af8e00213519c3654c961c181395a0d31a",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/996_source_decisions.parquet": "859cbd11778506c80d949e4ef367bbe29e7cd058cde5cdfd43993dd5148340ed",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1012_working.parquet": "f577c544211a850a5d87c7dbf1b608fa7bdaaf5909763f8dec41e5641f0c6774",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1012_source_decisions.parquet": "c3b15f00bd47d3b6a588dff68129d116248df324b0e494f20de493017419eaf0",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1035_working.parquet": "8f184aae98d957678d863ff72eca9ef88b1ed15f13bfb452e6b3f061f1c5a461",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1035_source_decisions.parquet": "dd0e56513dd70374905032b5a2f7b7334cfe07e4c326152a19b14e037378d9e4"
+  },
+  "calendar_start": "2025-04-29 00:00:00",
+  "calendar_end_exclusive": "2026-10-02 00:00:00",
+  "time_origin": "2025-04-29 00:00:00",
+  "bin_width_hours": 2,
+  "bin_center_offset_hours": 1,
+  "f0_cycles_per_day": 1.0,
+  "channels": [
+    {
+      "row": 205,
+      "table": "LEO_WEST.DATAVALUESLICOR",
+      "sensorid": 1275,
+      "variableid": 56,
+      "sensorcode": "LEO-W_4_0_1_LI-7000",
+      "kind": "LI-COR",
+      "x": 0.0,
+      "y": 4.0,
+      "z": 0.25,
+      "units": "umol/mol",
+      "oracle_location": {
+        "localx": "0",
+        "localy": "4",
+        "localz": "1.75",
+        "boxx": "0",
+        "boxy": "4",
+        "boxz": "0.05",
+        "dlevel": "1"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": "Excel air height .25m not established by Oracle BOXZ"
+    },
+    {
+      "row": 106,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 996,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_1_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.05,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.75",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.05",
+        "dlevel": "1"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 107,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1012,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_2_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.2,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.6",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.2",
+        "dlevel": "2"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 108,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1035,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_4_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.5,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.3",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.5",
+        "dlevel": "4"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    }
+  ],
+  "source": "source_decisions.parquet; existing technically_retained mask",
+  "review_reasons": {
+    "1275": {
+      "LI_COR_range_and_artifact_rules_unconfirmed": 7589
+    },
+    "996": {
+      "": 49596,
+      "ambiguous_excursion": 188
+    },
+    "1012": {
+      "": 49577,
+      "ambiguous_excursion": 193
+    },
+    "1035": {
+      "": 49509,
+      "ambiguous_excursion": 206
+    }
+  },
+  "limitations": [
+    "LI-COR QC unresolved",
+    "subsurface review flags retained",
+    "LOCALDATETIME timezone and instrument alignment unresolved",
+    "air height mapping unresolved",
+    "no scientific coverage/amplitude threshold",
+    "missing bins may bias direct Fourier phase",
+    "near-zero coefficient phase can be unstable",
+    "overlapping windows are dependent"
+  ]
+}
