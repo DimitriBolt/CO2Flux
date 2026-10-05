@@ -206,7 +206,7 @@ def print_figure(phases, coverage, out=OUT):
     locator = mdates.AutoDateLocator(minticks=6, maxticks=10)
     axes[-1].xaxis.set_major_locator(locator)
     axes[-1].xaxis.set_major_formatter(mdates.DateFormatter('%d.%m.%Y'))
-    axes[-1].set_xlabel('Календарная дата центра окна (исходная шкала LOCALDATETIME)', fontsize=11)
+    axes[-1].set_xlabel('Календарная дата центра окна', fontsize=11)
     cmin, cmax = coverage.complete_bins.min(), coverage.complete_bins.max()
     pctmin, pctmax = coverage.coverage_percent.min(), coverage.coverage_percent.max()
     fig.text(.095, .080, f'{len(phases)} окон · общих ячеек {cmin}–{cmax} из {coverage.possible_bins.iloc[0]} · покрытие {pctmin:.1f}–{pctmax:.1f}% · максимальный пробел {coverage.longest_gap_hours.max()} ч', fontsize=11)
@@ -332,8 +332,7 @@ def generate(out=OUT, window_days=30, step_days=1):
                     source='source_decisions.parquet; existing technically_retained mask',
                     review_reasons={str(s): raw[s].loc[raw[s].technically_retained & raw[s].localdatetime.ge(START) & raw[s].localdatetime.lt(END), 'doubt_reason'].value_counts().to_dict() for s in IDS},
                     limitations=['LI-COR QC unresolved', 'subsurface review flags retained',
-                                 'LOCALDATETIME timezone and instrument alignment unresolved',
-                                 'air height mapping unresolved', 'no scientific coverage/amplitude threshold',
+'no scientific coverage/amplitude threshold',
                                  'missing bins may bias direct Fourier phase',
                                  'near-zero coefficient phase can be unstable',
                                  'overlapping windows are dependent'])
