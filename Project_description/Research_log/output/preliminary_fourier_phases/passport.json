@@ -22,7 +22,7 @@
   "time_origin": "2025-04-29 00:00:00",
   "bin_width_hours": 2,
   "bin_center_offset_hours": 1,
-  "f0_cycles_per_day": 1.0,
+  "f0_cycles_per_day": 1,
   "channels": [
     {
       "row": 205,
@@ -31,8 +31,8 @@
       "variableid": 56,
       "sensorcode": "LEO-W_4_0_1_LI-7000",
       "kind": "LI-COR",
-      "x": 0.0,
-      "y": 4.0,
+      "x": 0,
+      "y": 4,
       "z": 0.25,
       "units": "umol/mol",
       "oracle_location": {
@@ -54,8 +54,8 @@
       "variableid": 9,
       "sensorcode": "LEO-W_4_1_1_GMM222",
       "kind": "GMM222",
-      "x": 1.0,
-      "y": 4.0,
+      "x": 1,
+      "y": 4,
       "z": -0.05,
       "units": "ppm",
       "oracle_location": {
@@ -77,8 +77,8 @@
       "variableid": 9,
       "sensorcode": "LEO-W_4_1_2_GMM222",
       "kind": "GMM222",
-      "x": 1.0,
-      "y": 4.0,
+      "x": 1,
+      "y": 4,
       "z": -0.2,
       "units": "ppm",
       "oracle_location": {
@@ -100,8 +100,8 @@
       "variableid": 9,
       "sensorcode": "LEO-W_4_1_4_GMM222",
       "kind": "GMM222",
-      "x": 1.0,
-      "y": 4.0,
+      "x": 1,
+      "y": 4,
       "z": -0.5,
       "units": "ppm",
       "oracle_location": {
@@ -119,9 +119,6 @@
   ],
   "source": "source_decisions.parquet; existing technically_retained mask",
   "review_reasons": {
-    "1275": {
-      "LI_COR_range_and_artifact_rules_unconfirmed": 7589
-    },
     "996": {
       "": 49596,
       "ambiguous_excursion": 188
@@ -133,13 +130,14 @@
     "1035": {
       "": 49509,
       "ambiguous_excursion": 206
+    },
+    "1275": {
+      "LI_COR_range_and_artifact_rules_unconfirmed": 7589
     }
   },
   "limitations": [
     "LI-COR QC unresolved",
     "subsurface review flags retained",
-    "LOCALDATETIME timezone and instrument alignment unresolved",
-    "air height mapping unresolved",
     "no scientific coverage/amplitude threshold",
     "missing bins may bias direct Fourier phase",
     "near-zero coefficient phase can be unstable",
