@@ -136,8 +136,7 @@ def compute_windows(grid, window_days=30, step_days=1):
             info[f'used_observations_{sid}'] = int(used[f'n_{sid}'].sum())
             info[f'review_bins_{sid}'] = int(used[f'review_{sid}'].sum())
         row = {name: info[name] for name in ('window', 'start', 'end_exclusive', 'center')}
-        row.update(f0_cycles_per_day=F0, **{p+'_rad': np.nan for p in PAIRS},
-                   **{p+'_deg': np.nan for p in PAIRS})
+        row.update(f0_cycles_per_day=F0, **{p+'_rad': np.nan for p in PAIRS})
         reason = ''
         try:
             coefficients = direct_fourier(used.t_days.to_numpy(), used[[f'mean_{s}' for s in IDS]].to_numpy())
@@ -146,7 +145,7 @@ def compute_windows(grid, window_days=30, step_days=1):
                 row[f'F_abs_{sid}'] = abs(coefficients[j])
             for j, pair in enumerate(PAIRS):
                 angle = phase_difference(coefficients[j], coefficients[j+1])
-                row[pair+'_rad'], row[pair+'_deg'] = angle, angle * 180 / np.pi
+                row[pair+'_rad'] = angle
                 row[pair+'_reason'] = '' if np.isfinite(angle) else 'Нулевой Fourier-коэффициент; аргумент не определён'
             if not all(np.isfinite(row[p+'_rad']) for p in PAIRS):
                 reason = 'INSUFFICIENT DATA: нулевой коэффициент хотя бы одного канала; часть фаз не определена'
@@ -167,7 +166,7 @@ def broken_line(times, values):
     x, y = [], []
     previous = np.nan
     for time, value in zip(times, values):
-        if np.isfinite(previous) and np.isfinite(value) and abs(value-previous) > 180:
+        if np.isfinite(previous) and np.isfinite(value) and abs(value-previous) > np.pi:
             x.append(time)
             y.append(np.nan)
         x.append(time)
@@ -184,7 +183,7 @@ def print_figure(phases, coverage, out=OUT):
     fig.text(.095, .880, f'Окно {int(coverage.window_days.iloc[0])} суток / шаг {int(coverage.step_days.iloc[0])} сутки · общая сетка 2 ч · центры окон', fontsize=13)
     colors = ['#b56418', '#b56418', '#b56418']
     for ax, pair, label, color in zip(axes, PAIRS, LABELS, colors):
-        values = phases[pair+'_deg'].to_numpy()
+        values = phases[pair+'_rad'].to_numpy()
         tx, vy = broken_line(phases.center, values)
         ax.plot(tx, vy, color='#aaa49c', lw=.7)
         review = coverage.doubtful_bins.to_numpy() > 0
@@ -193,12 +192,13 @@ def print_figure(phases, coverage, out=OUT):
             ax.scatter(phases.center[~review], values[~review], c='#186c7b', s=9, label='Без флагов; надёжность не установлена')
         absent = ~np.isfinite(values)
         if absent.any():
-            ax.scatter(phases.center[absent], np.full(absent.sum(), -172), marker='x', color='#b32025', s=25, label='Недостаточно данных')
-        ax.set_ylim(-180, 180)
-        ax.set_yticks([-180, -90, 0, 90, 180])
+            ax.scatter(phases.center[absent], np.full(absent.sum(), -np.pi*.95), marker='x', color='#b32025', s=25, label='Недостаточно данных')
+        ax.set_ylim(-np.pi, np.pi)
+        ax.set_yticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi],
+                      labels=['−π', '−π/2', '0', 'π/2', 'π'])
         ax.axhline(0, color='#757575', lw=.5)
         ax.grid(alpha=.20)
-        ax.set_ylabel('Разность фаз, °', fontsize=11)
+        ax.set_ylabel('Разность фаз Δφ', fontsize=11)
         ax.set_title(label, loc='left', fontsize=14, fontweight='bold', pad=6)
         ax.spines[['top', 'right']].set_visible(False)
     handles, labels = axes[0].get_legend_handles_labels()
@@ -211,7 +211,7 @@ def print_figure(phases, coverage, out=OUT):
     pctmin, pctmax = coverage.coverage_percent.min(), coverage.coverage_percent.max()
     fig.text(.095, .080, f'{len(phases)} окон · общих ячеек {cmin}–{cmax} из {coverage.possible_bins.iloc[0]} · покрытие {pctmin:.1f}–{pctmax:.1f}% · максимальный пробел {coverage.longest_gap_hours.max()} ч', fontsize=11)
     fig.text(.095, .052, 'ПРЕДВАРИТЕЛЬНО: контроль LI-COR не завершён. Оранжевые точки требуют проверки.', color='#91490a', fontsize=11)
-    fig.text(.095, .026, 'Ветвь [−180°, 180°); линии разорваны при переходе через границу. Положительный знак: второй сигнал запаздывает в синтетической синусоиде.', fontsize=10)
+    fig.text(.095, .026, 'Ветвь [−π, π); линии разорваны при переходе через границу. Положительный знак: второй сигнал запаздывает в синтетической синусоиде.', fontsize=10)
     for extension in ('pdf', 'svg', 'png'):
         fig.savefig(out/f'phase_evolution_17x11.{extension}', dpi=300)
     plt.close(fig)
@@ -246,18 +246,18 @@ def validation_examples():
     u, v = np.cos(2*np.pi*t), np.cos(2*np.pi*(t-4/24))
     def delta(ti, a, b):
         f = direct_fourier(ti, np.column_stack([a, b]))
-        return float(phase_difference(*f)*180/np.pi)
+        return float(phase_difference(*f))
     records = []
-    for name, a, b, expected in [('A',u,u,0), ('B',u,v,60), ('C',v,u,-60),
-                               ('D',u,np.cos(2*np.pi*(t-14/24)),-150)]:
+    for name, a, b, expected in [('A',u,u,0), ('B',u,v,np.pi/3), ('C',v,u,-np.pi/3),
+                               ('D',u,np.cos(2*np.pi*(t-14/24)),-5*np.pi/6)]:
         actual = delta(t,a,b)
-        records.append(dict(test=name,expected_deg=expected,actual_deg=actual,error_deg=actual-expected))
+        records.append(dict(test=name,expected_rad=expected,actual_rad=actual,error_rad=actual-expected))
     whole_days = ~((t>=10)&(t<13))
     irregular = np.ones(360, dtype=bool)
     irregular[np.array([7,8,9,27,48,121,122,203,278,301,339])] = False
     for name, mask in [('E_whole_days',whole_days), ('E_irregular',irregular)]:
         actual = delta(t[mask],u[mask],v[mask])
-        records.append(dict(test=name,expected_deg=60,actual_deg=actual,error_deg=actual-60,
+        records.append(dict(test=name,expected_rad=np.pi/3,actual_rad=actual,error_rad=actual-np.pi/3,
                             retained_bins=int(mask.sum()), removed_indices=np.flatnonzero(~mask).tolist()))
     f = direct_fourier(t, np.column_stack([u,v]))
     fft = np.fft.fft(np.column_stack([u,v])-np.mean(np.column_stack([u,v]),axis=0),axis=0)[30]/len(t)
@@ -308,13 +308,13 @@ def browser_cross_check(grid):
                             input=json.dumps(html_payload(grid,{}),allow_nan=False),text=True))
         phases, coverage = compute_windows(grid,width,step)
         js_phase = np.array([r['phase'] for r in actual],float)
-        py_phase = phases[[p+'_deg' for p in PAIRS]].to_numpy()
-        np.testing.assert_allclose(js_phase,py_phase,atol=1e-9,rtol=0,equal_nan=True)
+        py_phase = phases[[p+'_rad' for p in PAIRS]].to_numpy()
+        np.testing.assert_allclose(js_phase,py_phase,atol=1e-9*np.pi/180,rtol=0,equal_nan=True)
         assert [r['n'] for r in actual] == coverage.complete_bins.tolist()
         assert [r['doubtful'] for r in actual] == coverage.doubtful_bins.tolist()
         assert [r['longestGapHours'] for r in actual] == coverage.longest_gap_hours.tolist()
         records.append(dict(window_days=width,step_days=step,windows=len(actual),
-                            maximum_phase_difference_deg=float(np.nanmax(np.abs(js_phase-py_phase)))))
+                            maximum_phase_difference_rad=float(np.nanmax(np.abs(js_phase-py_phase)))))
     return records
 
 
@@ -354,7 +354,7 @@ def generate(out=OUT, window_days=30, step_days=1):
     pdf_inches = [float(box.width)/72, float(box.height)/72]
     png_size = list(Image.open(out/'phase_evolution_17x11.png').size)
     assert pdf_inches == [17,11] and png_size == [5100,3300]
-    valid = phases[[p+'_deg' for p in PAIRS]].notna().all(axis=1)
+    valid = phases[[p+'_rad' for p in PAIRS]].notna().all(axis=1)
     validation = dict(source_sha=SOURCE_SHA, stage='0.4', tests_passed=True, test_log=test_log,
         synthetic=validation_examples(), browser_python_cross_check=browser_checks, input_hashes_unchanged=unchanged,
         total_windows=len(phases), all_three_phases_computable=int(valid.sum()),

@@ -18,15 +18,15 @@ input[type=number]{width:130px;padding:9px;border:1px solid #8a9da3;border-radiu
 <div class="controls"><label>Длина окна, суток<input id="width" type="number" min="1" max="521" step="1" value="30"></label><label>Шаг, суток<input id="step" type="number" min="1" step="1" value="1"></label><button id="calculate">Пересчитать</button></div>
 <p class="muted">Целое число суток. Изменение параметров заново вычисляет Fourier-коэффициенты из встроенных средних общих 2-часовых ячеек. Пропуски сохраняются; подключения к сети не требуется.</p>
 <p id="error" role="alert"></p><p id="summary" aria-live="polite"></p>
-<section id="time-section" class="card"><div id="timeplot"></div><p class="muted">Точки стоят в центрах окон. Оранжевый: есть флаги проверки; синий: без флагов, надёжность не оценена; красный ×: фаза не определена. Линии разорваны через границу [−180°, 180°) и отсутствующие значения.</p></section>
+<section id="time-section" class="card"><div id="timeplot"></div><p class="muted">Точки стоят в центрах окон. Оранжевый: есть флаги проверки; синий: без флагов, надёжность не оценена; красный ×: фаза не определена. Линии разорваны через границу [−π, π) и отсутствующие значения.</p></section>
 <section class="card"><h2>Паспорт окна</h2><label>Выберите окно<input id="window" type="range" min="0" max="491" value="0"></label><div id="window-info"></div></section>
 <section class="card" id="trajectory-section"><h2>Три циклические координаты — радианы</h2><div id="trajectory"></div><p>Пространство фаз: <b>T³ = S¹ × S¹ × S¹</b>. Каждая координата в радианах на ветви [−π, π). Противоположные грани куба отождествляются. Здесь показаны только точки, кодированные датой; линий через границы нет. Все точки требуют проверки.</p></section>
 <details class="card"><summary>Формулы и ограничения</summary>
 <p>В каждой полуоткрытой ячейке [s, s + 2 ч) используется среднее наблюдений канала, не исключённых на этапе технической проверки данных. В Fourier-сумму входят только общие ячейки I<sub>W</sub> с четырьмя значениями, с одинаковым набором центров для всех каналов.</p>
 <p>x′<sub>jk</sub> = x<sub>jk</sub> − x̄<sub>j,W</sub>, где x̄<sub>j,W</sub> — среднее по общим ячейкам окна, N — их число.</p>
 <p>F<sub>j</sub> = (1/N) ∑<sub>k∈I<sub>W</sub></sub> x′<sub>jk</sub> e<sup>−iω₀t<sub>k</sub></sup>, &nbsp; ω₀ = 2πf₀ = 2π рад/сутки.</p>
-<p>Здесь f₀ = 1 цикл/сутки, ω₀ — угловая частота. Δφᵤ→ᵥ = wrap(Arg(Fᵤ conj(Fᵥ))); wrap(φ) = (φ + π) mod (2π) − π. Для временных графиков используются градусы; для 3D — радианы: φ<sub>rad</sub> = φ<sub>deg</sub>π/180.</p>
-<p>t — реальные центры ячеек в сутках от 29.04.2025 00:00:00. Временная привязка базы подтверждена. Для идеальной синусоиды задержка второго сигнала на 4 ч даёт +60°, обратный порядок −60°.</p>
+<p>Здесь f₀ = 1 цикл/сутки, ω₀ — угловая частота. Δφᵤ→ᵥ = wrap(Arg(Fᵤ conj(Fᵥ))); wrap(φ) = (φ + π) mod (2π) − π. Временные графики и 3D используют одни и те же фазы в радианах: Δφ ∈ [−π, π).</p>
+<p>t — реальные центры ячеек в сутках от 29.04.2025 00:00:00. Временная привязка базы подтверждена. Для идеальной синусоиды задержка второго сигнала на 4 ч даёт +π/3, обратный порядок −π/3.</p>
 <p>Это прямой комплексный Fourier-коэффициент, не GLS и не обычный FFT неполной сетки. Пропуски могут смещать фазу; при малом модуле коэффициента она неустойчива. Порог покрытия или амплитуды не вводился. Перекрывающиеся окна зависимы.</p>
 <p>Менее двух общих ячеек или нулевой коэффициент дают явную неопределённость. Возможность вычислить фазу не доказывает надёжность. «Максимальный пробел» — самый длинный ряд отсутствующих общих ячеек, включая края окна.</p>
 <p id="source" class="muted"></p></details>
@@ -36,7 +36,7 @@ const data=__DATA__;
 const $=id=>document.getElementById(id), labels=['Воздух → 5 см','5 → 20 см','20 → 50 см'];
 let rows=[];
 function hover(r){return [r.n,r.possible,r.coverage.toFixed(2),r.doubtful,r.longestGapHours,r.status,r.start,r.end];}
-const hoverTemplate='Центр: %{x}<br>Фаза: %{y:.3f}°<br>Общие ячейки: %{customdata[0]} / %{customdata[1]}<br>Покрытие: %{customdata[2]}%<br>Ячейки с флагами: %{customdata[3]}<br>Максимальный пробел: %{customdata[4]} ч<br>%{customdata[5]}<br>Окно [%{customdata[6]}, %{customdata[7]})<extra></extra>';
+const hoverTemplate='Центр: %{x}<br>Фаза: %{y:.3f} рад<br>Общие ячейки: %{customdata[0]} / %{customdata[1]}<br>Покрытие: %{customdata[2]}%<br>Ячейки с флагами: %{customdata[3]}<br>Максимальный пробел: %{customdata[4]} ч<br>%{customdata[5]}<br>Окно [%{customdata[6]}, %{customdata[7]})<extra></extra>';
 function drawTime(){
  const traces=[],layout={height:800,margin:{l:85,r:30,t:50,b:65},paper_bgcolor:'white',plot_bgcolor:'white',showlegend:false,hovermode:'closest',annotations:[]};
  for(let j=0;j<3;j++){
@@ -47,10 +47,10 @@ function drawTime(){
      ['Без флагов',r=>r.phase[j]!==null&&r.doubtful===0,'#186c7b','circle'],
      ['Недостаточно данных',r=>r.phase[j]===null,'#b32025','x']]){
       const chosen=rows.filter(predicate);
-      traces.push({x:chosen.map(r=>r.center),y:chosen.map(r=>r.phase[j]===null?-173:r.phase[j]),customdata:chosen.map(hover),name,type:'scatter',mode:'markers',marker:{color,symbol,size:4},hovertemplate:symbol==='x'?'Центр: %{x}<br>%{customdata[5]}<extra></extra>':hoverTemplate,...refs});
+      traces.push({x:chosen.map(r=>r.center),y:chosen.map(r=>r.phase[j]===null?-Math.PI*.95:r.phase[j]),customdata:chosen.map(hover),name,type:'scatter',mode:'markers',marker:{color,symbol,size:4},hovertemplate:symbol==='x'?'Центр: %{x}<br>%{customdata[5]}<extra></extra>':hoverTemplate,...refs});
    }
    layout['xaxis'+axis]={type:'date',anchor:'y'+axis,matches:j?'x':undefined,showticklabels:j===2,tickformat:'%d.%m.%Y',title:j===2?{text:'Календарная дата центра окна'}:undefined};
-   layout['yaxis'+axis]={domain:[[.72,1],[.36,.64],[0,.28]][j],range:[-180,180],tickvals:[-180,-90,0,90,180],title:{text:'Разность фаз, °'},zerolinecolor:'#8a949a',gridcolor:'#e6ebed'};
+   layout['yaxis'+axis]={domain:[[.72,1],[.36,.64],[0,.28]][j],range:[-Math.PI,Math.PI],tickvals:[-Math.PI,-Math.PI/2,0,Math.PI/2,Math.PI],ticktext:['−π','−π/2','0','π/2','π'],title:{text:'Разность фаз Δφ'},zerolinecolor:'#8a949a',gridcolor:'#e6ebed'};
    layout.annotations.push({xref:'paper',yref:'paper',x:0,y:[1.045,.685,.325][j],text:'<b>'+labels[j]+'</b>',showarrow:false,xanchor:'left',font:{size:16}});
  }
  Plotly.react('timeplot',traces,layout,{responsive:true,displaylogo:false,displayModeBar:false});
@@ -59,7 +59,7 @@ function draw3d(){
  const valid=rows.filter(r=>r.phase.every(x=>x!==null));
  const ticks=valid.length?[0,Math.floor((valid.length-1)/2),valid.length-1]:[];
  const radianAxis=label=>({title:{text:label+', рад'},range:[-Math.PI,Math.PI],tickvals:[-Math.PI,-Math.PI/2,0,Math.PI/2,Math.PI],ticktext:['−π','−π/2','0','π/2','π']});
- Plotly.react('trajectory',[{type:'scatter3d',mode:'markers',x:valid.map(r=>r.phase[0]*Math.PI/180),y:valid.map(r=>r.phase[1]*Math.PI/180),z:valid.map(r=>r.phase[2]*Math.PI/180),
+ Plotly.react('trajectory',[{type:'scatter3d',mode:'markers',x:valid.map(r=>r.phase[0]),y:valid.map(r=>r.phase[1]),z:valid.map(r=>r.phase[2]),
    text:valid.map(r=>`${r.center}<br>${r.n}/${r.possible} ячеек · ${r.coverage.toFixed(2)}%<br>${r.status}`),hovertemplate:'%{text}<br>Воздух → 5: %{x:.3f} рад<br>5 → 20: %{y:.3f} рад<br>20 → 50: %{z:.3f} рад<extra></extra>',
    marker:{size:3,color:valid.map(r=>r.window),colorscale:'Viridis',colorbar:{title:{text:'Дата центра'},tickvals:ticks.map(i=>valid[i].window),ticktext:ticks.map(i=>valid[i].center.slice(0,10))}}}],
    {margin:{l:10,r:10,t:5,b:5},scene:{xaxis:radianAxis(labels[0]),yaxis:radianAxis(labels[1]),zaxis:radianAxis(labels[2]),aspectmode:'cube'}},{responsive:true,displaylogo:false,displayModeBar:false});
@@ -70,7 +70,7 @@ function windowInfo(){
  if(r.reason)table+=`<p style="color:#a51f25">${r.reason}</p>`;
  table+='<div class="table-scroll"><table><tr><th>Канал</th><th>Наблюдений в окне</th><th>В общих ячейках</th><th>Общих ячеек с флагом</th><th>|F|, исходные единицы</th></tr>';
  ['Воздух · 1275','5 см · 996','20 см · 1012','50 см · 1035'].forEach((label,j)=>table+=`<tr><td>${label}</td><td>${r.counts[j]}</td><td>${r.usedCounts[j]}</td><td>${r.qChannel[j]}</td><td>${r.F[j][0]===null?'не определён':Math.hypot(...r.F[j]).toPrecision(6)}</td></tr>`);
- table+='</table><table><tr><th>Пара</th><th>Разность фаз, °</th><th>Причина отсутствия</th></tr>';
+ table+='</table><table><tr><th>Пара</th><th>Разность фаз, рад</th><th>Причина отсутствия</th></tr>';
  labels.forEach((label,j)=>table+=`<tr><td>${label}</td><td>${r.phase[j]===null?'не определена':r.phase[j].toFixed(6)}</td><td>${r.pairReasons[j]}</td></tr>`);
  $('window-info').innerHTML=table+'</table></div><p class="muted">Научная надёжность не установлена; модули коэффициентов не служат критерием допуска.</p>';
 }

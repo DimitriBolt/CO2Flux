@@ -26,28 +26,28 @@ class FourierPhaseTests(unittest.TestCase):
 
     def delta(self, t, a, b):
         f = direct_fourier(t, np.column_stack([a,b]))
-        return phase_difference(*f)*180/np.pi
+        return phase_difference(*f)
 
     def test_A_zero_phase(self):
         self.assertAlmostEqual(self.delta(self.t,self.u,self.u),0,places=11)
 
     def test_B_positive_four_hour_lag(self):
-        self.assertAlmostEqual(self.delta(self.t,self.u,self.v),60,places=10)
+        self.assertAlmostEqual(self.delta(self.t,self.u,self.v),np.pi/3,delta=1e-10*np.pi/180)
 
     def test_C_reverse_negative_lag(self):
-        self.assertAlmostEqual(self.delta(self.t,self.v,self.u),-60,places=10)
+        self.assertAlmostEqual(self.delta(self.t,self.v,self.u),-np.pi/3,delta=1e-10*np.pi/180)
 
     def test_D_wrap_boundary(self):
         delayed = np.cos(2*np.pi*(self.t-14/24))
-        self.assertAlmostEqual(self.delta(self.t,self.u,delayed),-150,places=10)
+        self.assertAlmostEqual(self.delta(self.t,self.u,delayed),-5*np.pi/6,delta=1e-10*np.pi/180)
         self.assertEqual(wrap(np.pi),-np.pi)
         self.assertEqual(wrap(-np.pi),-np.pi)
-        self.assertAlmostEqual(wrap(181*np.pi/180)*180/np.pi,-179,places=11)
+        self.assertAlmostEqual(wrap(np.pi+np.pi/180),-np.pi+np.pi/180,delta=1e-11*np.pi/180)
 
     def test_E_common_missing_bins(self):
         # Entire days preserve quadrature balance, and recover the lag exactly.
         mask = ~((self.t>=10)&(self.t<13))
-        self.assertAlmostEqual(self.delta(self.t[mask],self.u[mask],self.v[mask]),60,places=10)
+        self.assertAlmostEqual(self.delta(self.t[mask],self.u[mask],self.v[mask]),np.pi/3,delta=1e-10*np.pi/180)
         # An independent, fixed asymmetric mask produces finite sampling bias.
         mask = np.ones(360,dtype=bool)
         mask[[7,8,9,27,48,121,122,203,278,301,339]] = False
@@ -56,13 +56,13 @@ class FourierPhaseTests(unittest.TestCase):
             mean = math.fsum(float(y) for y in values)/len(values)
             return sum((float(y)-mean)*cmath.exp(-2j*math.pi*float(time))
                        for time,y in zip(t,values))/len(values)
-        expected = math.degrees(cmath.phase(reference(u)*reference(v).conjugate()))
+        expected = cmath.phase(reference(u)*reference(v).conjugate())
         actual = self.delta(t,u,v)
-        self.assertAlmostEqual(actual,expected,places=10)
-        self.assertLess(abs(actual-60),1)  # test-specific bound; NEVER a data admission rule
-        self.assertGreater(abs(actual-60),.01)  # explicitly disprove exact gap invariance
+        self.assertAlmostEqual(actual,expected,delta=1e-10*np.pi/180)
+        self.assertLess(abs(actual-np.pi/3),np.pi/180)  # test-specific bound; NEVER a data admission rule
+        self.assertGreater(abs(actual-np.pi/3),np.pi/18000)  # explicitly disprove exact gap invariance
         compressed = self.delta((np.arange(len(u))+.5)/12,u,v)
-        self.assertGreater(abs(compressed-actual),.1)
+        self.assertGreater(abs(compressed-actual),np.pi/1800)
 
     def test_F_fft_cross_check_full_grid(self):
         x = np.column_stack([self.u,self.v])
@@ -142,11 +142,11 @@ class FourierPhaseTests(unittest.TestCase):
             actual=self.browser(payload,width,step)
             p,c=compute_windows(grid,width,step)
             self.assertEqual(len(actual),len(p))
-            np.testing.assert_allclose([r['phase'] for r in actual],p[[x+'_deg' for x in PAIRS]],atol=1e-9,rtol=0)
+            np.testing.assert_allclose([r['phase'] for r in actual],p[[x+'_rad' for x in PAIRS]],atol=1e-9*np.pi/180,rtol=0)
             self.assertEqual([r['n'] for r in actual],c.complete_bins.tolist())
             self.assertEqual([r['longestGapHours'] for r in actual],c.longest_gap_hours.tolist())
             self.assertEqual([r['doubtful'] for r in actual],c.doubtful_bins.tolist())
-        self.assertNotAlmostEqual(actual[0]['phase'][0],self.browser(payload,30,1)[0]['phase'][0],places=2)
+        self.assertGreater(abs(actual[0]['phase'][0]-self.browser(payload,30,1)[0]['phase'][0]),.01*np.pi/180)
 
     def test_undefined_empty_singleton_constant(self):
         for count in [0,1]:
@@ -165,8 +165,8 @@ class FourierPhaseTests(unittest.TestCase):
         self.assertIn('нулевой коэффициент',result['reason'])
 
     def test_wrap_plot_break_preserves_endpoints_and_gaps(self):
-        x,y=broken_line([0,1,2,3,4],[179,-179,np.nan,120,121])
-        np.testing.assert_allclose(y,[179,np.nan,-179,np.nan,120,121],equal_nan=True)
+        x,y=broken_line([0,1,2,3,4],[np.pi-.01,-np.pi+.01,np.nan,2,2.1])
+        np.testing.assert_allclose(y,[np.pi-.01,np.nan,-np.pi+.01,np.nan,2,2.1],equal_nan=True)
         self.assertEqual(x,[0,1,1,2,3,4])
         self.assertEqual(longest_missing_run([False,False,True,False]),2)
 

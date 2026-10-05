@@ -40,7 +40,7 @@ function calculatePhases(data, windowDays=30, stepDays=1) {
         if(Math.hypot(ar,ai)===0 || Math.hypot(br,bi)===0) {
           reason='INSUFFICIENT DATA: нулевой коэффициент хотя бы одного канала; часть фаз не определена';
           pairReasons[j]='Нулевой Fourier-коэффициент; аргумент не определён';
-        } else phase[j]=wrapPhase(Math.atan2(ai*br-ar*bi,ar*br+ai*bi))*180/Math.PI;
+        } else phase[j]=wrapPhase(Math.atan2(ai*br-ar*bi,ar*br+ai*bi));
       }
     }
     if(n<2) pairReasons.fill(reason);
@@ -56,7 +56,7 @@ function phaseLine(rows,pair) {
   const x=[], y=[], custom=[]; let prev=null;
   for(const r of rows) {
     const value=r.phase[pair];
-    if(prev!==null && value!==null && Math.abs(value-prev)>180) {x.push(r.center); y.push(null); custom.push(null);}
+    if(prev!==null && value!==null && Math.abs(value-prev)>Math.PI) {x.push(r.center); y.push(null); custom.push(null);}
     x.push(r.center); y.push(value); custom.push(r); prev=value;
   }
   return {x,y,custom};
