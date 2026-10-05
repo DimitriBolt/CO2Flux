@@ -13,8 +13,8 @@ input[type=number]{width:130px;padding:9px;border:1px solid #8a9da3;border-radiu
 <header><div class="eyebrow">LEO WEST · ЭТАП 0.4 · ПРЕДВАРИТЕЛЬНЫЙ РЕЗУЛЬТАТ</div>
 <h1>Временная эволюция Fourier-разностей фаз CO₂</h1>
 <p>(x, y) = (1, 4) · воздух 1275 / 5 см 996 / 20 см 1012 / 50 см 1035</p>
-<p><b>Рабочая частота: 1 цикл/сутки (24 ч).</b> Принята Dimitri Bolt для срочной демонстрации I.G. Другие пики амплитудных спектров существуют, но здесь не исследуются.</p>
-<div class="warning">Все сохранённые измерения воздуха имеют review-флаг. Численные фазы предварительные; научная надёжность не установлена. Контроль LI-COR, сомнительные подземные наблюдения и согласованность временных шкал остаются нерешёнными.</div></header>
+<p><b>Рабочая частота: 1 цикл/сутки (24 ч).</b> Для срочной демонстрации I.G. я использую эту рабочую частоту. Другие пики амплитудных спектров существуют, но здесь не исследуются.</p>
+<div class="warning">Все сохранённые измерения воздуха имеют review-флаг. Численные фазы предварительные; научная надёжность не установлена. Контроль LI-COR и сомнительные подземные наблюдения остаются нерешёнными.</div></header>
 <div class="controls"><label>Длина окна, суток<input id="width" type="number" min="1" max="521" step="1" value="30"></label><label>Шаг, суток<input id="step" type="number" min="1" step="1" value="1"></label><button id="calculate">Пересчитать</button></div>
 <p class="muted">Целое число суток. Изменение параметров заново вычисляет Fourier-коэффициенты из встроенных средних общих 2-часовых ячеек. Пропуски сохраняются; подключения к сети не требуется.</p>
 <p id="error" role="alert"></p><p id="summary" aria-live="polite"></p>
@@ -24,7 +24,7 @@ input[type=number]{width:130px;padding:9px;border:1px solid #8a9da3;border-radiu
 <details class="card"><summary>Формулы и ограничения</summary>
 <p>В каждой полуоткрытой ячейке [s, s + 2 ч) используется среднее всех technically retained исходных наблюдений. В Fourier-сумму входят только ячейки с четырьмя значениями, с одинаковым набором центров для всех каналов.</p>
 <p><code>x′ⱼ = xⱼ − mean(xⱼ); Fⱼ = Σ x′ⱼ exp(−2π i t) / N; Δφᵤ→ᵥ = wrap(Arg(Fᵤ conj(Fᵥ))); wrap(φ) = (φ + π) mod (2π) − π.</code></p>
-<p>t — реальные центры ячеек в сутках от 29.04.2025 00:00:00 в исходной шкале LOCALDATETIME. Даты не преобразованы в подтверждённый часовой пояс. Для идеальной синусоиды задержка второго сигнала на 4 ч даёт +60°, обратный порядок −60°.</p>
+<p>t — реальные центры ячеек в сутках от 29.04.2025 00:00:00. Временная привязка базы подтверждена. Для идеальной синусоиды задержка второго сигнала на 4 ч даёт +60°, обратный порядок −60°.</p>
 <p>Это прямой комплексный Fourier-коэффициент, не GLS и не обычный FFT неполной сетки. Пропуски могут смещать фазу; при малом модуле коэффициента она неустойчива. Порог покрытия или амплитуды не вводился. Перекрывающиеся окна зависимы.</p>
 <p>Менее двух общих ячеек или нулевой коэффициент дают явную неопределённость. Возможность вычислить фазу не доказывает надёжность. «Максимальный пробел» — самый длинный ряд отсутствующих общих ячеек, включая края окна.</p>
 <p id="source" class="muted"></p></details>
@@ -47,7 +47,7 @@ function drawTime(){
       const chosen=rows.filter(predicate);
       traces.push({x:chosen.map(r=>r.center),y:chosen.map(r=>r.phase[j]===null?-173:r.phase[j]),customdata:chosen.map(hover),name,type:'scatter',mode:'markers',marker:{color,symbol,size:4},hovertemplate:symbol==='x'?'Центр: %{x}<br>%{customdata[5]}<extra></extra>':hoverTemplate,...refs});
    }
-   layout['xaxis'+axis]={type:'date',anchor:'y'+axis,matches:j?'x':undefined,showticklabels:j===2,tickformat:'%d.%m.%Y',title:j===2?{text:'Календарная дата центра окна (LOCALDATETIME)'}:undefined};
+   layout['xaxis'+axis]={type:'date',anchor:'y'+axis,matches:j?'x':undefined,showticklabels:j===2,tickformat:'%d.%m.%Y',title:j===2?{text:'Календарная дата центра окна'}:undefined};
    layout['yaxis'+axis]={domain:[[.72,1],[.36,.64],[0,.28]][j],range:[-180,180],tickvals:[-180,-90,0,90,180],title:{text:'Разность фаз, °'},zerolinecolor:'#8a949a',gridcolor:'#e6ebed'};
    layout.annotations.push({xref:'paper',yref:'paper',x:0,y:[1.045,.685,.325][j],text:'<b>'+labels[j]+'</b>',showarrow:false,xanchor:'left',font:{size:16}});
  }
