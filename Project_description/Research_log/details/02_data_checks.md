@@ -2464,6 +2464,8 @@ $$
 означают наличие флагов проверки. В 3D показан scatter с календарным
 градиентом, без соединения через границы. Пространство фаз —
 **T³ = S¹ × S¹ × S¹**; противоположные грани координатного куба склеены.
+Координаты 3D представлены в радианах на ветви [−π,π), с отметками
+−π, −π/2, 0, π/2, π; временные графики остаются в градусах.
 
 ### Синтетические тесты и проверка реализации
 
@@ -2516,8 +2518,7 @@ HTML и смена 30/1 → 60/7. Проверка интерфейса 1/1 вы
 - [PDF 17 × 11](../output/preliminary_fourier_phases/phase_evolution_17x11.pdf),
   [SVG](../output/preliminary_fourier_phases/phase_evolution_17x11.svg),
   [PNG](../output/preliminary_fourier_phases/phase_evolution_17x11.png).
-- [Интерактивные временные ряды](../output/preliminary_fourier_phases/phase_evolution.html),
-  [интерактивные 3D-точки](../output/preliminary_fourier_phases/phase_trajectory_3d.html),
+- [Единый интерактивный HTML: временные ряды, паспорт окна и 3D-тор](../output/preliminary_fourier_phases/phase_evolution.html),
   [статический 3D PNG](../output/preliminary_fourier_phases/phase_trajectory_3d.png).
 
 HTML автономен, содержит производные средние и flags выбранной четвёрки,
@@ -2533,7 +2534,7 @@ python Project_description/sensorDB/preliminary_fourier_phases.py
 для notebook — nbformat, nbclient, ipykernel; для проверки JavaScript — Node.js.
 Параметры Python: `--window-days`, `--step-days`, `--output`.
 
-**Оставшиеся ограничения:** QC LI-COR и подземные review flags; время и
+**Оставшиеся ограничения:** QC LI-COR и подземные review flags;
 высота воздуха; влияние неполной выборки и других составляющих на прямой
 Fourier-коэффициент; нестабильность малых коэффициентов; зависимость
 перекрывающихся окон. Предварительная демонстрация 0.4 получена, научный

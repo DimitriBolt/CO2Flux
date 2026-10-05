@@ -210,7 +210,7 @@ def print_figure(phases, coverage, out=OUT):
     cmin, cmax = coverage.complete_bins.min(), coverage.complete_bins.max()
     pctmin, pctmax = coverage.coverage_percent.min(), coverage.coverage_percent.max()
     fig.text(.095, .080, f'{len(phases)} окон · общих ячеек {cmin}–{cmax} из {coverage.possible_bins.iloc[0]} · покрытие {pctmin:.1f}–{pctmax:.1f}% · максимальный пробел {coverage.longest_gap_hours.max()} ч', fontsize=11)
-    fig.text(.095, .052, 'ПРЕДВАРИТЕЛЬНО: контроль LI-COR и временные шкалы не подтверждены. Оранжевые точки требуют проверки.', color='#91490a', fontsize=11)
+    fig.text(.095, .052, 'ПРЕДВАРИТЕЛЬНО: контроль LI-COR не завершён. Оранжевые точки требуют проверки.', color='#91490a', fontsize=11)
     fig.text(.095, .026, 'Ветвь [−180°, 180°); линии разорваны при переходе через границу. Положительный знак: второй сигнал запаздывает в синтетической синусоиде.', fontsize=10)
     for extension in ('pdf', 'svg', 'png'):
         fig.savefig(out/f'phase_evolution_17x11.{extension}', dpi=300)
@@ -218,15 +218,18 @@ def print_figure(phases, coverage, out=OUT):
 
 
 def trajectory_figure(phases, out=OUT):
-    valid = phases[[p+'_deg' for p in PAIRS]].notna().all(axis=1)
+    valid = phases[[p+'_rad' for p in PAIRS]].notna().all(axis=1)
     points = phases.loc[valid]
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     t = mdates.date2num(points.center)
-    artist = ax.scatter(*(points[p+'_deg'] for p in PAIRS), c=t, cmap='viridis', s=12)
+    artist = ax.scatter(*(points[p+'_rad'] for p in PAIRS), c=t, cmap='viridis', s=12)
     for setter, label in zip((ax.set_xlabel, ax.set_ylabel, ax.set_zlabel), LABELS):
-        setter(label + ', °', labelpad=10)
-    ax.set(xlim=(-180, 180), ylim=(-180, 180), zlim=(-180, 180))
+        setter(label + ', рад', labelpad=10)
+    ax.set(xlim=(-np.pi, np.pi), ylim=(-np.pi, np.pi), zlim=(-np.pi, np.pi))
+    for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+        axis.set_ticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi])
+        axis.set_ticklabels(['−π', '−π/2', '0', 'π/2', 'π'])
     bar = fig.colorbar(artist, ax=ax, shrink=.55, pad=.14)
     ticks = np.linspace(t.min(), t.max(), 4)
     bar.set_ticks(ticks, labels=[mdates.num2date(d).strftime('%d.%m.%Y') for d in ticks])
@@ -281,8 +284,7 @@ def write_html(grid, passport, out=OUT):
     engine = Path(__file__).with_suffix('.js').read_text()
     common = template.replace('__PLOTLY__', get_plotlyjs()).replace('__ENGINE__', engine)
     common = common.replace('__DATA__', json.dumps(html_payload(grid,passport), ensure_ascii=False, allow_nan=False).replace('</','<\\/'))
-    for name, mode in [('phase_evolution.html','time'), ('phase_trajectory_3d.html','3d')]:
-        (out/name).write_text(common.replace('__MODE__',mode))
+    (out/'phase_evolution.html').write_text(common)
 
 
 def run_tests():

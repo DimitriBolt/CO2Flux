@@ -59,6 +59,9 @@ Canonical workflow:
 
 - `Project_description/sensorDB/ideal_vertical_period_workflow.md`
 
+`Sensors_Description/config.toml` is a local per-machine config intentionally
+not tracked by Git; its coordinates and settings remain specific to this machine.
+
 This document is the canonical memory for:
 
 - resolving the target vertical from `Sensors_Description/config.toml`

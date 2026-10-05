@@ -42,6 +42,9 @@ Important correction for `4-sensor mode`:
 
 ## Input definition
 
+`Sensors_Description/config.toml` is a local per-machine config intentionally
+not tracked by Git. Keep the local coordinates and settings for the current machine.
+
 By default, repeated ideal-period tasks should read the target vertical from
 `Sensors_Description/config.toml`:
 
