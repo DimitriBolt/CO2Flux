@@ -1,5 +1,5 @@
 % Unified CO2Flux report. Compile from Project_description/Research_log
-% Source commit: 5ae77e372852f9fdf441de7542e0520ff98bc88b
+% Source commit: 67aa98954162d0437bfcc30d7d7b14c4d531f10f
 % latexmk -pdf -interaction=nonstopmode -halt-on-error Research_Report.tex
 \documentclass[11pt,letterpaper]{article}
 \usepackage[T1]{fontenc}
@@ -12,20 +12,81 @@
 \newcommand{\wrap}{\operatorname{wrap}}
 \title{CO2Flux: Relative Spectral Phases of Subsurface CO$_2$ at Biosphere 2 LEO\\
 \large A Unified Report of Documented Results and Open Validation}
-\author{Dimitri Bolt\\Prepared for Professor Ildar R. Gabitov}
-\date{18 October 2026 (Arizona)\\
-\small Source: CO2Flux, main, commit \texttt{5ae77e372852f9fdf441de7542e0520ff98bc88b}}
+\author{Dimitri Bolt\\{\small Academic Advisor: Professor Ildar R. Gabitov}}
+\date{19 October 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
 The current approved task is to display and evaluate the temporal evolution of three adjacent relative Fourier phases for a selected West-slope four-channel CO$_2$ profile, from atmospheric air to 5, 20 and 50 cm depth. Existing preliminary generalized Lomb--Scargle amplitude spectra and a separate direct-Fourier pilot are reported without conflating their estimators. The saved direct-Fourier analysis produces three finite phase coordinates in 492 overlapping 30-day windows stepped by one day at one cycle per day. All 492 windows contain unresolved sensor-review flags; their scientific reliability is not established. An isolated 5-to-20 cm phase change from 17 to 18 December 2025 is diagnosed algebraically but not physically attributed. Earlier studies of the times of maxima of fitted daily harmonics remain historical and do not answer the new spectral-phase question. Neither the final irrigation calendar nor I.~R.~Gabitov's Stage 0.5 methodological approval has been recorded as complete.
 \end{abstract}
 \tableofcontents
+
+\clearpage
+\section*{Research roadmap and source correspondence}
+\addcontentsline{toc}{section}{Research roadmap and source correspondence}
+\label{sec:roadmap}
+The identifiers below follow the existing
+\href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/README.md}{research README}
+and the
+\href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md}{approved PLAN}.
+They identify research stages, not the numbered sections of this report.
+In particular, \textbf{0.5/Q1} is a completed diagnostic of one phase change,
+\emph{not} completion of Stage 0.5. Existing numbered historical
+notebooks concern the previous methodology, not the future spectral chapters.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\begin{tabular}{@{}p{1.25cm}p{4.15cm}p{3.35cm}p{5.1cm}@{}}
+\toprule
+Stage & Object and status & Report section & Canonical source\\
+\midrule
+0.1 & Irrigation calendar; incomplete
+& \hyperref[sec:limits]{Limitations}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#preparation}{PLAN: 0.1}\\
+0.2 & Data and quality control; science-level admission unresolved
+& \hyperref[sec:data]{Data and QC}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/details/02_data_checks.md}{Data checks}\\
+0.3 & Preliminary amplitude spectra; calculated, not a final frequency choice
+& \hyperref[sec:gls]{Amplitude spectra}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_co2_spectra.ipynb}{Spectra notebook}\\
+0.4 & Relative Fourier phases; 492 computed windows, reliability unestablished
+& \hyperref[sec:fourier]{Direct Fourier}; \hyperref[sec:phase-results]{phase series}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_fourier_phases.ipynb}{Phase notebook, sections 1--9}\\
+0.5/Q1 & One phase jump analyzed; does not close Stage 0.5
+& \hyperref[sec:jump]{Single-jump result}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_fourier_phases.ipynb#one-phase-jump}{Phase notebook, section 10}\\
+0.5 & Presentation to I.G. and explicit approval; pending
+& \hyperref[sec:next]{Next approved steps}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#preparation}{PLAN: 0.5 and stopping criteria}\\
+1--3 & Future spectral-phase chapters; not yet begun
+& \hyperref[sec:next]{Next approved steps}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#later}{PLAN: later stages}\\
+4 & Buchstaber method; methodological preparation only
+& \hyperref[sec:buchstaber]{Buchstaber}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/04_buchstaber.ipynb}{Buchstaber notebook}\\
+5--6 & Spatial links and physical mechanisms; future work
+& \hyperref[sec:next]{Next approved steps}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#later}{PLAN: later stages}\\
+Historic 1--3 & Absolute-harmonic maximum times/amplitudes; distinct earlier work
+& \hyperref[sec:historical]{Historical analyses}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/01_october_2017.ipynb}{Notebook 01},
+\href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/02_monthly_changes.ipynb}{02},
+\href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/03_long_term_evolution.ipynb}{03}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\endgroup
+\clearpage
 \newpage
 \section{Introduction and research status}
+\label{sec:intro}
 The long-term objective is to assess whether changes in CO$_2$ accompanying the transformation of crushed basalt into soil allow transport, chemical interactions and biological sources or sinks to be distinguished. The immediate approved observable is instead precisely defined: three relative spectral phases between consecutive levels. Absolute times of fitted diurnal maxima are not interchangeable with these quantities. The current canonical README and PLAN place the project at preparatory Stage 0, before the new Chapter 1 \cite{readme,plan}. This report assembles existing results, not new scientific computations or an alternative research plan.
 
 \section{LEO experimental setup}
+\label{sec:setup}
 The selected pilot vertical on LEO West is at $(x,y)=(1,4)$ m. Four channels are used: air, 5, 20 and 50 cm. The air LI-COR instrument is at $(0,4)$ m, horizontally 1 m from the basalt profile. Its nominal height $+0.25$ m comes from Excel metadata and is not independently established by the Oracle BOXZ field. The assumption $C_0(t)=C_{\rm air}(t)$ is adopted for the present analysis and must not be mistaken for experimental proof of an exact surface boundary condition \cite{phase,passport}.
 \begin{center}
 \begin{tabular}{llll}
@@ -42,6 +103,7 @@ Air & 1275 & LI-COR & $\mu$mol/mol\\
 The historical West-slope profile W\_R4\_C-4 is different: sensors 994/1010/1026 at 5/20/35 cm. Its results are not pooled with this four-channel 5/20/50 cm pilot.
 
 \section{Data and quality control}
+\label{sec:data}
 \subsection{Input and temporal coverage}
 The versioned archive is \texttt{20261002T061358Z-264980}. The pilot calendar is the half-open interval $[2025\text{-}04\text{-}29,2026\text{-}10\text{-}02)$, containing 521 days; 520 have some four-channel daily overlap. The raw atmospheric record has 7,589 measurements; each selected subsurface sensor has 50,009 raw measurements, with 49,784, 49,770 and 49,715 technically retained measurements, respectively. Median native intervals are about two hours for air and 15 minutes for the basalt channels. The database time base is taken as confirmed: no additional time shift is imposed \cite{spectra,passport}.
 
@@ -62,6 +124,7 @@ All four estimates use these same actually observed bin centers, without interpo
 
 \section{Fourier methodology}
 \subsection{Stage 0.3: amplitude spectra}
+\label{sec:gls}
 The saved amplitude spectra use a floating-intercept, equal-weight generalized Lomb--Scargle sinusoidal least-squares model at each candidate frequency:
 \begin{equation}
 C_j(t)\simeq c_j(f)+a_j(f)\cos(2\pi ft)+b_j(f)\sin(2\pi ft)
@@ -80,6 +143,7 @@ $A_j$ is a fitted sinusoidal semi-amplitude in the source unit, not spectral pow
 \end{landscape}
 
 \subsection{Stage 0.4: direct complex coefficients and relative phases}
+\label{sec:fourier}
 Set $t_{\rm ref}=$29 April 2025 00:00. For each common two-hour center $t_k=s_k+1$ hour, express $t_k-t_{\rm ref}$ in days. The working frequency is $f_0=1$ cycle/day, window length 30 days, and step one day. For channel $j$ use
 \begin{align}
 \bar x_{j,W}&=\frac1N\sum_{k\in I_W}x_{jk},\\
@@ -106,7 +170,9 @@ The existing \texttt{Project\_description/sensorDB/preliminary\_fourier\_phases.
 The saved synthetic checks recover zero for identical signals, $+\pi/3$ for a four-hour delay of the second sinusoid, $-\pi/3$ when channels are reversed and $-5\pi/6$ for a 14-hour delay wrapped from $7\pi/6$. The selected irregular common-bin mask gives $1.0515280496203037$ rad rather than $\pi/3$, an error of $0.004330498423706031$ rad in that synthetic case. On a complete synthetic grid, the maximum complex difference from a correctly phase-corrected \texttt{numpy.fft.fft} result was $1.9421\times10^{-15}$. The original validation recorded 13 passing tests; the later Q1 diagnostic recorded 19 passing tests in total. These test results verify arithmetic and sign conventions, not physical sensor reliability \cite{phase,validation,jump}.
 
 \section{Preliminary results}
+\label{sec:prelim}
 \subsection{Three temporal series}
+\label{sec:phase-results}
 The saved stage 0.4 run reports 492 sliding 30-day windows, with all three relative phases numerically defined in every window. Their centers run from 14 May 2025 to 17 September 2026. Every window retains unresolved review flags, and a scientific reliability classification has \emph{not} been established. A count of zero scientifically certified windows here indicates lack of certification by this procedure, not evidence that every window is invalid.
 
 The three angular coordinates define a candidate point in $\mathbb T^3=S^1\times S^1\times S^1$. The cube $[-\pi,\pi)^3$ is only one coordinate display with opposite faces identified; a plotted branch jump or Euclidean cube distance is not automatically intrinsic motion on the torus.
@@ -126,6 +192,7 @@ The three angular coordinates define a candidate point in $\mathbb T^3=S^1\times
 \end{figure}
 
 \subsection{One 5-to-20 cm discontinuity examined for Stage 0.5/Q1}
+\label{sec:jump}
 The latest available diagnostic selects a single adjacent pair by maximal absolute difference on the original $[-\pi,\pi)$ phase branch, with earlier occurrence breaking ties. The centers are 17 and 18 December 2025, corresponding to 30-day windows from 2 December through 1 January and from 3 December through 2 January, respectively. Neighboring windows overlap for 29 days and must not be treated as independent events. For the complex product $Q=F_5\overline{F_{20}}$, distinguish
 \begin{equation}
 d_Q=\wrap(\Arg Q_2)-\wrap(\Arg Q_1),\qquad
@@ -148,9 +215,11 @@ The saved phases are $1.3815969902$ and $1.9625409175$ rad, so $d_Q=\delta_Q=+0.
 \end{figure}
 
 \section{Historical analyses, not spectral-phase evidence}
+\label{sec:historical}
 The earlier Chapter 1 fitted a fixed diurnal harmonic. Earlier Chapter 2 studied the different West vertical W\_R4\_C-4 from 11 September 2013 through 30 September 2026, over 157 months and 2,614,638 archived raw measurements. Its final historical processing retained 43 jointly admitted months, 23 vectors of absolute daily maximum times $H(d)$ and 25 daily-amplitude vectors $A(d)$. These are not four-channel spectral-window admissions. Earlier Chapter 3 found no established reproducible long-term evolution under its original absolute-maximum-time and amplitude procedure. The historical input and its limitations are retained but are not recalculated or interpreted as either confirming or refuting the new relative spectral-phase problem \cite{readme,historical}.
 
 \section{Mathematical validation and physical interpretation}
+\label{sec:validation}
 A Fourier phase is defined only for nonzero complex coefficients; when a modulus approaches zero, the argument becomes sensitive to perturbations. A discrete branch crossing must be distinguished from an intrinsic circular increment by equation~\eqref{eq:jump}. Missing samples and changing source quality can affect direct Fourier coefficients. The successful synthetic and Python/browser cross-checks certify implementation properties, not error bars or a physical causal model.
 
 A reduced diffusion--reaction reference equation might be written
@@ -161,6 +230,7 @@ A reduced diffusion--reaction reference equation might be written
 but it has not been fitted or uniquely identified in this pilot. Moisture, storage, boundary forcing, thermal variations, physical sensor quality, and source/sink terms remain possible confounders. Phase alone is not a diffusion coefficient and cannot identify biological versus geochemical origin \cite{plan,maier}.
 
 \section{Buchstaber framework: approved methodological preparation only}
+\label{sec:buchstaber}
 The separate existing Chapter 4 notebook states that application to LEO has not begun. For an admissible uniform scalar series $(f_1,\ldots,f_N)$, the proposed unfolding consists of
 \begin{equation}
 X_k=(f_k,\ldots,f_{k+n-1})^\mathsf{T}\in\mathbb R^n,\quad
@@ -174,14 +244,16 @@ E_q=\min_{\dim L=q}\frac1P\sum_k\|(I-\Pi_L)(X_k-\bar X)\|_2^2
 This standard mathematical identity is not a measured LEO result. In particular the Grassmannian $G(n,q)$ is not the phase torus $\mathbb T^3$. Synthetic tests, validated data and a separately approved protocol are prerequisites for application to LEO \cite{buchnotebook,buch1994,buch2025}.
 
 \section{Limitations and open questions}
+\label{sec:limits}
 The scientific admission of LI-COR and basalt signals is unfinished. No confirmed threshold for phase stability or amplitude has been selected. Overlapping windows are dependent; direct Fourier coefficients may be affected by missingness and spectral leakage. The adopted daily frequency is provisional; investigation of phase as a function of frequency is not currently authorized. Complete actual West-slope irrigation events (including SCADA logs, timing, intensity and location) remain outstanding. The public Arevalo et al. data provide only partial 2015--2019 precipitation coverage and cannot replace the complete operational history. None of the preliminary curves identifies a chemical, biological, or transport mechanism \cite{plan}.
 
 \section{Next approved steps}
+\label{sec:next}
 The existing PLAN requires documented spectral-specific quality and coverage, the actual irrigation calendar or an explicit decision about its missing portion, presentation of the four amplitude spectra and three temporal phase curves with formulas and tests, and explicit feedback from I.~R.~Gabitov on frequency, time window, step and experimental interval. Until those completion conditions hold, the new spectral Chapter 1 cannot begin. The single Q1 discontinuity diagnostic does not authorize wider jump analysis or mechanism inference. The separately allowed Buchstaber preparation remains subject to its own input and approval conditions \cite{plan}.
 
 \section*{Sources, figures and reproducibility}
 \addcontentsline{toc}{section}{Sources, figures and reproducibility}
-This report consolidates the source repository at commit \texttt{5ae77e372852f9fdf441de7542e0520ff98bc88b}, 18 October 2026 Arizona. The existing figures used here, without regeneration, are:
+This report consolidates the source repository at commit \texttt{67aa98954162d0437bfcc30d7d7b14c4d531f10f}, 19 October 2026. The existing figures used here, without regeneration, are:
 \begin{itemize}
 \item \texttt{output/preliminary\_spectra/four\_channel\_spectra\_17x11.pdf};
 \item \texttt{output/preliminary\_fourier\_phases/phase\_evolution\_17x11.pdf};
