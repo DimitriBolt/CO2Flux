@@ -1,6 +1,7 @@
 """Stage 0.4: direct Fourier phase differences at 1/day; immutable local inputs.
 
 Run this file, or run 00_preliminary_fourier_phases.ipynb from a clean kernel.
+The notebook also diagnoses one saved 5->20 cm phase jump (Stage 0.5 / Q1).
 No Oracle, interpolation, compressed-calendar FFT, or scientific admission rule.
 """
 from __future__ import annotations
@@ -294,6 +295,218 @@ def run_tests():
     if result.returncode:
         raise RuntimeError(result.stdout + result.stderr)
     return result.stdout + result.stderr
+
+
+def load_saved_results(out=OUT):
+    """Read the published 30/1 results without regenerating Stage 0.4 artifacts."""
+    out = Path(out)
+    dates = ['start', 'end_exclusive', 'center']
+    grid = pd.read_csv(out/'common_2h_bins.csv', index_col='bin_start',
+                       parse_dates=['bin_start', 'bin_center'], float_precision='round_trip')
+    phases = pd.read_csv(out/'phase_timeseries.csv', parse_dates=dates, float_precision='round_trip')
+    coverage = pd.read_csv(out/'window_coverage.csv', parse_dates=dates, float_precision='round_trip')
+    return grid, phases, coverage, json.loads((out/'validation.json').read_text())
+
+
+def select_phase_jump(phases):
+    """Largest |raw phase difference| for 5->20 on adjacent daily centers.
+
+    Earliest pair wins an exact tie. This is an example-selection rule, not
+    a quality threshold; only this pair is subsequently diagnosed.
+    """
+    if not phases.center.is_monotonic_increasing or phases.center.duplicated().any():
+        raise ValueError('Expected unique chronological window centers')
+    delta = phases['5_to_20_rad'].diff().to_numpy()
+    adjacent = phases.center.diff().eq(pd.Timedelta(days=1)).to_numpy()
+    eligible = adjacent & np.isfinite(delta)
+    if not eligible.any():
+        raise ValueError('No finite adjacent daily phase pair')
+    right = int(np.argmax(np.where(eligible, np.abs(delta), -np.inf)))
+    return right - 1, right
+
+
+def complex_step(z_before, z_after):
+    """Discrete endpoint diagnostics; infer no path between windows.
+
+    Numerical zero only; no near-zero or scientific admission threshold.
+    The circular increment uses the SAME phase_difference convention.
+    """
+    defined = (np.isfinite(z_before) and np.isfinite(z_after)
+               and abs(z_before) > 0 and abs(z_after) > 0)
+    before = wrap(np.angle(z_before)) if np.isfinite(z_before) and abs(z_before) > 0 else np.nan
+    after = wrap(np.angle(z_after)) if np.isfinite(z_after) and abs(z_after) > 0 else np.nan
+    raw = after - before
+    circular = phase_difference(z_after, z_before) if defined else np.nan
+    turns = int(np.rint((raw-circular)/(2*np.pi))) if defined else None
+    return dict(abs_before=float(abs(z_before)), abs_after=float(abs(z_after)),
+                modulus_ratio=float(abs(z_after)/abs(z_before)) if abs(z_before) > 0 else np.nan,
+                relative_complex_change=float(abs(z_after-z_before)/abs(z_before)) if abs(z_before) > 0 else np.nan,
+                arg_before_rad=float(before), arg_after_rad=float(after),
+                raw_increment_rad=float(raw), circular_increment_rad=float(circular),
+                branch_turns=turns, phase_defined=bool(defined))
+
+
+def phase_jump_tables(phases, coverage, neighbors=3):
+    """One selected pair plus local context, using saved complex coefficients."""
+    if not isinstance(neighbors, int) or neighbors < 0:
+        raise ValueError('neighbors must be a nonnegative integer')
+    keys = ['window', 'start', 'end_exclusive', 'center']
+    pd.testing.assert_frame_equal(phases[keys], coverage[keys])
+    if not (phases.f0_cycles_per_day.eq(1).all() and coverage.window_days.eq(30).all()
+            and coverage.step_days.eq(1).all()):
+        raise ValueError('This diagnostic requires the unchanged 1/day, 30/1 protocol')
+    left, right = select_phase_jump(phases)
+    columns = keys + [f'F_{part}_{sid}' for sid in (996, 1012) for part in ('real', 'imag', 'abs')]
+    columns += ['5_to_20_rad', 'status', 'scientific_reliability']
+    local = phases.iloc[max(0, left-neighbors):right+neighbors+1][columns].copy()
+    for sid in (996, 1012):
+        z = local[f'F_real_{sid}'] + 1j*local[f'F_imag_{sid}']
+        np.testing.assert_allclose(np.abs(z), local[f'F_abs_{sid}'], rtol=1e-13, atol=1e-13)
+    upper = local.F_real_996.to_numpy() + 1j*local.F_imag_996.to_numpy()
+    lower = local.F_real_1012.to_numpy() + 1j*local.F_imag_1012.to_numpy()
+    q = upper * np.conj(lower)
+    local['Q_real'], local['Q_imag'], local['Q_abs'] = q.real, q.imag, np.abs(q)
+    local['Q_arg_rad'] = [phase_difference(u, v) for u, v in zip(upper, lower)]
+    np.testing.assert_allclose(local.Q_arg_rad, local['5_to_20_rad'], rtol=0, atol=2e-14)
+    local['selected_endpoint'] = local.window.isin(phases.iloc[[left, right]].window)
+    quality = coverage.loc[local.index].copy()
+    records = []
+    for name, z in [('F5', upper), ('F20', lower), ('Q', q)]:
+        a, b = z[local.selected_endpoint.to_numpy()]
+        records.append(dict(coefficient=name, **complex_step(a, b)))
+    return local.reset_index(drop=True), quality.reset_index(drop=True), pd.DataFrame(records)
+
+
+def phase_jump_figures(local, quality, out):
+    """Static reusable figures. Points only: no interpolated coefficient path."""
+    selected = local.loc[local.selected_endpoint]
+    month = local.center.iloc[0].strftime('%B %Y')
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), layout='constrained')
+    series = [('5_to_20_rad', 'Relative phase: 5 → 20 cm', 'Phase (rad)'),
+              ('F_abs_996', '|F₅|', 'ppm'), ('F_abs_1012', '|F₂₀|', 'ppm'),
+              ('Q_abs', '|Q| = |F₅| |F₂₀|', 'ppm²')]
+    for ax, (column, title, unit) in zip(axes.flat, series):
+        ax.scatter(local.center, local[column], color='#537782', s=35)
+        for (_, row), color, marker in zip(selected.iterrows(), ('#b44b13', '#8c238b'), ('s', 'D')):
+            ax.scatter(row.center, row[column], c=color, marker=marker, s=65, zorder=3,
+                       label=row.center.strftime('%d %b'))
+        ax.set(title=title, ylabel=unit, xlabel=f'Window center ({month})')
+        ax.xaxis.set_major_locator(mdates.DayLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d'))
+        ax.grid(alpha=.2)
+        ax.set_ylim(bottom=0)
+    axes[0, 0].set_ylim(-np.pi, np.pi)
+    axes[0, 0].set_yticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi],
+                         labels=['−π', '−π/2', '0', 'π/2', 'π'])
+    axes[0, 0].legend(loc='lower left', frameon=False)
+    nmin, nmax = quality.complete_bins.min(), quality.complete_bins.max()
+    fig.suptitle('One discrete phase jump · 1 cycle/day · 30-day windows · 1-day step\n'
+                 f'{len(local)} windows: {nmin}–{nmax}/{quality.possible_bins.iloc[0]} common bins; '
+                 'review flags retained', fontsize=14)
+    for extension in ('png', 'svg'):
+        fig.savefig(out/f'phase_jump_local.{extension}', dpi=180, bbox_inches='tight', pad_inches=.15)
+    plt.close(fig)
+
+    fig, axes = plt.subplots(1, 3, figsize=(14, 5), layout='constrained')
+    for ax, real, imag, title, unit in zip(axes,
+            ('F_real_996', 'F_real_1012', 'Q_real'),
+            ('F_imag_996', 'F_imag_1012', 'Q_imag'),
+            ('F₅', 'F₂₀', 'Q = F₅ conjugate(F₂₀)'), ('ppm', 'ppm', 'ppm²')):
+        ax.axhline(0, color='#cccccc', lw=.7)
+        ax.axvline(0, color='#cccccc', lw=.7)
+        ax.scatter(0, 0, marker='+', color='black', s=80)
+        ax.scatter(local[real], local[imag], c='#7e878a', s=25)
+        for (_, row), color, marker in zip(selected.iterrows(), ('#b44b13', '#8c238b'), ('s', 'D')):
+            ax.scatter(row[real], row[imag], c=color, marker=marker, s=70, zorder=3)
+            ax.annotate(row.center.strftime('%d'), (row[real], row[imag]), xytext=(5, 3),
+                        textcoords='offset points', fontsize=9)
+        ax.set(title=title, xlabel=f'Re ({unit})', ylabel=f'Im ({unit})', aspect='equal')
+        # Square panels retain equal geometric scale and keep the origin visible.
+        xmin, xmax = min(0, local[real].min()), max(0, local[real].max())
+        ymin, ymax = min(0, local[imag].min()), max(0, local[imag].max())
+        span = max(xmax-xmin, ymax-ymin) * 1.35
+        ax.set_xlim((xmin+xmax-span)/2, (xmin+xmax+span)/2)
+        ax.set_ylim((ymin+ymax-span)/2, (ymin+ymax+span)/2)
+        ax.grid(alpha=.15)
+    axes[2].plot([axes[2].get_xlim()[0], 0], [0, 0], color='#b44b13',
+                 ls='--', label='Arg branch boundary')
+    axes[2].legend(loc='upper left', fontsize=9, frameon=False)
+    a, b = selected.center.dt.strftime('%d %b %Y')
+    fig.suptitle(f'Complex coefficients · square: {a}; diamond: {b}\n'
+                 f'{len(local)-2} neighboring windows in grey; discrete points, no path between windows inferred.', fontsize=13)
+    for extension in ('png', 'svg'):
+        fig.savefig(out/f'phase_jump_complex.{extension}', dpi=180, bbox_inches='tight', pad_inches=.15)
+    plt.close(fig)
+    for name in ('phase_jump_local.svg', 'phase_jump_complex.svg'):
+        path = out/name
+        path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
+
+
+def generate_phase_jump(source=OUT):
+    """Verify Stage 0.4; export only one Q1 diagnostic into its own subfolder."""
+    source = Path(source)
+    previous = {p.name: digest(p) for p in source.iterdir() if p.is_file()}
+    grid, phases, coverage, _ = load_saved_results(source)
+    passport = json.loads((source/'passport.json').read_text())
+    _, raw, _, hashes = read_inputs()
+    if hashes != passport['input_hashes']:
+        raise ValueError('The Stage 0.4 input snapshot changed')
+    rebuilt_grid = aggregate_bins(raw)
+    rebuilt_phases, rebuilt_coverage = compute_windows(rebuilt_grid, 30, 1)
+    differences = {}
+    for name, saved, rebuilt in [('grid', grid, rebuilt_grid), ('phases', phases, rebuilt_phases),
+                                  ('coverage', coverage, rebuilt_coverage)]:
+        # CSV loses frequency metadata and integer/float distinctions, not values.
+        pd.testing.assert_frame_equal(saved.fillna(''), rebuilt.fillna(''),
+                                      check_dtype=False, check_freq=False, check_exact=False,
+                                      rtol=1e-12, atol=1e-12)
+        numeric = saved.select_dtypes(include='number').columns.intersection(
+            rebuilt.select_dtypes(include='number').columns)
+        differences[name] = float(np.nanmax(np.abs(saved[numeric].to_numpy()-rebuilt[numeric].to_numpy())))
+    local, quality, steps = phase_jump_tables(phases, coverage)
+    test_log = run_tests()
+    out = source/'jump_diagnostic'
+    out.mkdir(exist_ok=True)
+    for name, frame in [('windows', local), ('coverage', quality), ('step', steps)]:
+        frame.to_csv(out/f'phase_jump_{name}.csv', index=False, float_format='%.17g')
+    phase_jump_figures(local, quality, out)
+    if not all(digest(source/name) == h for name, h in previous.items()):
+        raise RuntimeError('A pre-existing Stage 0.4 artifact changed')
+    if not all(digest(ROOT/name) == h for name, h in hashes.items()):
+        raise RuntimeError('An input changed during the diagnostic')
+    captions = {
+        'phase_jump_local': 'One selected 5–20 cm phase jump at window centers 17 and 18 December 2025, '
+            'with three neighboring windows on either side. The original phase branch is [−π, π). '
+            'Moduli use the unchanged 1/N normalization at 1 cycle/day. All windows have 360/360 '
+            'common two-hour bins and review flags; scientific reliability is not established.',
+        'phase_jump_complex': 'Saved complex Fourier coefficients F5, F20 and Q = F5 conjugate(F20). '
+            'The labeled square and diamond mark window centers 17 and 18 December 2025; '
+            'the other six windows are shown in grey. The origin and the negative-real-axis branch boundary for Q are shown. '
+            'Points are discrete estimates, not an interpolated trajectory. No sampled coefficient '
+            'is zero; an intervening zero cannot be established or excluded by these endpoints.'}
+    report = dict(stage='0.5 / Q1: one diagnostic only',
+        baseline_commit='9059ae9306c1fbebaa821ca746c93f057f2e402a',
+        implementation_sha256=digest(Path(__file__)),
+        selection='Largest absolute raw 5_to_20_rad difference between finite daily-adjacent centers; earliest exact tie.',
+        selected_windows=local.loc[local.selected_endpoint, 'window'].tolist(), neighbors_each_side=3,
+        f0_cycles_per_day=1, window_days=30, step_days=1,
+        baseline_artifact_sha256=previous, input_sha256=hashes,
+        baseline_artifacts_unchanged=True, input_hashes_unchanged=True,
+        stage04_recomputed_max_abs_difference=differences, tests_passed=True, test_log=test_log,
+        mathematical_checks=dict(
+            raw_phase_increment_rad=float(np.diff(local.loc[local.selected_endpoint, '5_to_20_rad'])[0]),
+            circular_phase_increment_rad=float(steps.loc[steps.coefficient.eq('Q'), 'circular_increment_rad'].iloc[0]),
+            decomposition_residual_rad=float(wrap(steps.iloc[0].circular_increment_rad
+                                                  - steps.iloc[1].circular_increment_rad
+                                                  - steps.iloc[2].circular_increment_rad))),
+        captions=captions,
+        limitations=['No new near-zero or quality threshold', 'No interpolation or intervening zero inference',
+                     'Full bin coverage does not remove review flags', 'Overlapping windows are dependent',
+                     'No physical event or mechanism established'])
+    report['artifact_sha256'] = {p.name: digest(p) for p in out.iterdir()
+                                  if p.is_file() and p.name != 'phase_jump_validation.json'}
+    (out/'phase_jump_validation.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
+    return local, quality, steps, report
 
 
 def browser_cross_check(grid):

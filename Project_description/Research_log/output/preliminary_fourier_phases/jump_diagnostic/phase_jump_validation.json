@@ -1,0 +1,74 @@
+{
+  "stage": "0.5 / Q1: one diagnostic only",
+  "baseline_commit": "9059ae9306c1fbebaa821ca746c93f057f2e402a",
+  "implementation_sha256": "c9ec433910059586bb79921629f68536e1b697585d1a9da984de06239004ee43",
+  "selection": "Largest absolute raw 5_to_20_rad difference between finite daily-adjacent centers; earliest exact tie.",
+  "selected_windows": [
+    217,
+    218
+  ],
+  "neighbors_each_side": 3,
+  "f0_cycles_per_day": 1,
+  "window_days": 30,
+  "step_days": 1,
+  "baseline_artifact_sha256": {
+    "phase_evolution.html": "5b6a022d6152396fb692d96dd597ca2e8051c14f1272db9d2d53e477986d7640",
+    "phase_trajectory_3d.png": "15d6738f1d0b84277c9c556a5995252af31174d42951363b5c0051533e52e7de",
+    "phase_evolution_17x11.pdf": "dd6032832a24f06b4339d26fe8f0c088be2a55b09f1153cd8f5b2e3d5bb1eff8",
+    "phase_evolution_17x11.svg": "7301dfc78b25f2589a1116fe8ddf292846c7b1a2ee87ac5491059e2fb9f68810",
+    "window_coverage.csv": "6f8862a01267aa9096ef2cdeb7b392d854a7d55bdfe3d41b0be7528631f1f5f0",
+    "common_2h_bins.csv": "b993c07ca9904e7b649891be164909832b41af3501a599ec984aa12f054a6b55",
+    "phase_timeseries.csv": "df0c74fbe6d7d4504796cdabe5a873c9344a9344b63cf3076bc3e6c31d879902",
+    "phase_evolution_17x11.png": "40eea9f68ba2f6854277c0927532170cd7e18ba3bbabe92aa0e5f48278a730f3",
+    "validation.json": "7905bfcd702c19e1ba398fc148b9d5d5b7d172e3a72ad9c9c0e892ed57558aec",
+    "passport.json": "f45827b6a477f8c3e11e842660fe2e7cb73083bf0e812d0eb435c1b4356f4886"
+  },
+  "input_sha256": {
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/manifest.json": "2346fbb77db20ad2396d38d2b7d3577cca808ed2d6701d2a9ebc41c07949056c",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/summary.json": "c50c3d399e3db29a2754d569765ceed9440ee8100038495a092780e72dbd2737",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/channels.csv": "262ac50e08573b1165962b12741b9214006f027a8e578b943a3a27038f789a35",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/vertical_candidates.csv": "7833b8d271b8cda4e2a8fa3f9e124cd5f8e4ada0ba1d06ef81136d6fb46f1c2b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1275_working.parquet": "ed4241af6f545be6118775f3d28db864d8e160d494e7a162d37b83d432ea069b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1275_source_decisions.parquet": "ed4241af6f545be6118775f3d28db864d8e160d494e7a162d37b83d432ea069b",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/996_working.parquet": "b134ff8be5d8384ee5eaac4791dbc3af8e00213519c3654c961c181395a0d31a",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/996_source_decisions.parquet": "859cbd11778506c80d949e4ef367bbe29e7cd058cde5cdfd43993dd5148340ed",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1012_working.parquet": "f577c544211a850a5d87c7dbf1b608fa7bdaaf5909763f8dec41e5641f0c6774",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1012_source_decisions.parquet": "c3b15f00bd47d3b6a588dff68129d116248df324b0e494f20de493017419eaf0",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1035_working.parquet": "8f184aae98d957678d863ff72eca9ef88b1ed15f13bfb452e6b3f061f1c5a461",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/diagnostics/sensors/1035_source_decisions.parquet": "dd0e56513dd70374905032b5a2f7b7334cfe07e4c326152a19b14e037378d9e4"
+  },
+  "baseline_artifacts_unchanged": true,
+  "input_hashes_unchanged": true,
+  "stage04_recomputed_max_abs_difference": {
+    "grid": 0.0,
+    "phases": 0.0,
+    "coverage": 0.0
+  },
+  "tests_passed": true,
+  "test_log": "test_A_zero_phase (test_preliminary_fourier_phases.FourierPhaseTests.test_A_zero_phase) ... ok\ntest_B_positive_four_hour_lag (test_preliminary_fourier_phases.FourierPhaseTests.test_B_positive_four_hour_lag) ... ok\ntest_C_reverse_negative_lag (test_preliminary_fourier_phases.FourierPhaseTests.test_C_reverse_negative_lag) ... ok\ntest_D_wrap_boundary (test_preliminary_fourier_phases.FourierPhaseTests.test_D_wrap_boundary) ... ok\ntest_E_common_missing_bins (test_preliminary_fourier_phases.FourierPhaseTests.test_E_common_missing_bins) ... ok\ntest_F_fft_cross_check_full_grid (test_preliminary_fourier_phases.FourierPhaseTests.test_F_fft_cross_check_full_grid) ... ok\ntest_common_bins_means_counts_flags_and_no_fill (test_preliminary_fourier_phases.FourierPhaseTests.test_common_bins_means_counts_flags_and_no_fill) ... ok\ntest_javascript_recalculates_all_windows_like_python (test_preliminary_fourier_phases.FourierPhaseTests.test_javascript_recalculates_all_windows_like_python) ... ok\ntest_jump_argument_change_and_conjugate_sign (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_argument_change_and_conjugate_sign) ... ok\ntest_jump_branch_crossing_without_small_modulus (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_branch_crossing_without_small_modulus) ... ok\ntest_jump_selection_ties_gaps_and_undefined_values (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_selection_ties_gaps_and_undefined_values) ... ok\ntest_jump_small_nonzero_coefficient_sensitivity (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_small_nonzero_coefficient_sensitivity) ... ok\ntest_jump_tables_preserve_inputs_and_align_coverage (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_tables_preserve_inputs_and_align_coverage) ... ok\ntest_jump_zero_and_nonfinite_endpoints_are_undefined (test_preliminary_fourier_phases.FourierPhaseTests.test_jump_zero_and_nonfinite_endpoints_are_undefined) ... ok\ntest_shared_origin_shift_and_constant_offsets (test_preliminary_fourier_phases.FourierPhaseTests.test_shared_origin_shift_and_constant_offsets) ... ok\ntest_undefined_empty_singleton_constant (test_preliminary_fourier_phases.FourierPhaseTests.test_undefined_empty_singleton_constant) ... ok\ntest_validation_table_has_all_six_required_checks (test_preliminary_fourier_phases.FourierPhaseTests.test_validation_table_has_all_six_required_checks) ... ok\ntest_window_parameters_and_common_timestamps (test_preliminary_fourier_phases.FourierPhaseTests.test_window_parameters_and_common_timestamps) ... ok\ntest_wrap_plot_break_preserves_endpoints_and_gaps (test_preliminary_fourier_phases.FourierPhaseTests.test_wrap_plot_break_preserves_endpoints_and_gaps) ... ok\n\n----------------------------------------------------------------------\nRan 19 tests in 2.492s\n\nOK\n",
+  "mathematical_checks": {
+    "raw_phase_increment_rad": 0.580943927289634,
+    "circular_phase_increment_rad": 0.580943927289634,
+    "decomposition_residual_rad": 4.440892098500626e-16
+  },
+  "captions": {
+    "phase_jump_local": "One selected 5–20 cm phase jump at window centers 17 and 18 December 2025, with three neighboring windows on either side. The original phase branch is [−π, π). Moduli use the unchanged 1/N normalization at 1 cycle/day. All windows have 360/360 common two-hour bins and review flags; scientific reliability is not established.",
+    "phase_jump_complex": "Saved complex Fourier coefficients F5, F20 and Q = F5 conjugate(F20). The labeled square and diamond mark window centers 17 and 18 December 2025; the other six windows are shown in grey. The origin and the negative-real-axis branch boundary for Q are shown. Points are discrete estimates, not an interpolated trajectory. No sampled coefficient is zero; an intervening zero cannot be established or excluded by these endpoints."
+  },
+  "limitations": [
+    "No new near-zero or quality threshold",
+    "No interpolation or intervening zero inference",
+    "Full bin coverage does not remove review flags",
+    "Overlapping windows are dependent",
+    "No physical event or mechanism established"
+  ],
+  "artifact_sha256": {
+    "phase_jump_complex.png": "9adfaa71d5f31e722894982383ddbca8c8ea657ccf07649e4c8348b9fdd3af89",
+    "phase_jump_coverage.csv": "12bd85305ed9d32b2e6653c73a92f00e4a093b5c485b79db3bc482f12183b7d2",
+    "phase_jump_windows.csv": "80f559af6cf869e87ab5cbdd182266e053afcd247edcca3525222dc0ed21445e",
+    "phase_jump_local.png": "24204bd18288337cfa111452a8c69a748c16d37f9d7a0c244e8eda1d6d0041e4",
+    "phase_jump_step.csv": "693ae6777a0daa126d8f35c02713f958ace8b1f722082c603a1b78b475036740",
+    "phase_jump_local.svg": "b4f10f5cec8a18085775c89d6b21b58be6249a31788e00d4940b697e43139a2b",
+    "phase_jump_complex.svg": "814db40a3215cf4a3e834715e1f940f867cd42e432623660a131758af39d8dfc"
+  }
+}

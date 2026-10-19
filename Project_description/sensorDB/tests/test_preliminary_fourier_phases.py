@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from preliminary_fourier_phases import (
     IDS, PAIRS, aggregate_bins, broken_line, compute_windows, direct_fourier,
     html_payload, longest_missing_run, phase_difference, validation_examples,
-    window_slices, wrap,
+    window_slices, wrap, complex_step, select_phase_jump, phase_jump_tables,
 )
 
 
@@ -174,6 +174,75 @@ class FourierPhaseTests(unittest.TestCase):
         table=validation_examples()
         self.assertEqual([r['test'] for r in table],['A','B','C','D','E_whole_days','E_irregular','F'])
         self.assertLess(table[-1]['max_complex_error'],2e-14)
+
+    def test_jump_branch_crossing_without_small_modulus(self):
+        result = complex_step(cmath.exp(1j*(math.pi-.01)), cmath.exp(1j*(-math.pi+.01)))
+        self.assertAlmostEqual(result['raw_increment_rad'], -2*math.pi+.02)
+        self.assertAlmostEqual(result['circular_increment_rad'], .02)
+        self.assertEqual(result['branch_turns'], -1)
+        self.assertAlmostEqual(result['abs_before'], 1)
+        self.assertAlmostEqual(result['abs_after'], 1)
+
+    def test_jump_argument_change_and_conjugate_sign(self):
+        u0, u1 = 2+3j, 1+2j
+        v0, v1 = 2+1j, 2+.01j  # small imaginary part is not a small modulus
+        du, dv, dq = [complex_step(a, b) for a,b in
+                      [(u0,u1), (v0,v1), (u0*v0.conjugate(),u1*v1.conjugate())]]
+        expected = cmath.phase(u1)-cmath.phase(u0)-cmath.phase(v1)+cmath.phase(v0)
+        self.assertAlmostEqual(dq['circular_increment_rad'], expected)
+        self.assertAlmostEqual(dq['circular_increment_rad'],
+                               du['circular_increment_rad']-dv['circular_increment_rad'])
+        self.assertEqual(dq['branch_turns'], 0)
+        self.assertGreater(dv['abs_after'], 2)
+
+    def test_jump_small_nonzero_coefficient_sensitivity(self):
+        # Same absolute perturbation at two scales: no real-data cutoff implied.
+        epsilon = 1e-8
+        small = complex_step(epsilon+0j, epsilon+1j*epsilon)
+        large = complex_step(1+0j, 1+1j*epsilon)
+        self.assertTrue(small['phase_defined'])
+        self.assertAlmostEqual(small['circular_increment_rad'], math.pi/4)
+        self.assertAlmostEqual(large['circular_increment_rad'], math.atan(epsilon))
+        self.assertAlmostEqual(small['relative_complex_change'], 1)
+        self.assertAlmostEqual(large['relative_complex_change'], epsilon)
+
+    def test_jump_zero_and_nonfinite_endpoints_are_undefined(self):
+        for a,b in [(0j,1j), (1j,0j), (complex(np.nan,0),1j)]:
+            result = complex_step(a,b)
+            self.assertFalse(result['phase_defined'])
+            self.assertTrue(np.isnan(result['circular_increment_rad']))
+            self.assertIsNone(result['branch_turns'])
+        # Opposite endpoints alone do not establish an intervening zero.
+        result = complex_step(1+0j, -1+0j)
+        self.assertTrue(result['phase_defined'])
+        self.assertAlmostEqual(result['circular_increment_rad'], -math.pi)
+
+    def test_jump_selection_ties_gaps_and_undefined_values(self):
+        table = pd.DataFrame(dict(center=pd.to_datetime([
+            '2025-01-01','2025-01-02','2025-01-03','2025-01-05','2025-01-06','2025-01-07']),
+            **{'5_to_20_rad':[0, .5, 0, 3, np.nan, -3]}))
+        self.assertEqual(select_phase_jump(table), (0,1))  # earliest exact tie; gap excluded
+        with self.assertRaises(ValueError): select_phase_jump(table.iloc[::-1])
+        with self.assertRaises(ValueError): select_phase_jump(table.iloc[[3,5]])
+
+    def test_jump_tables_preserve_inputs_and_align_coverage(self):
+        phases, coverage = compute_windows(self.synthetic_grid(), 30, 1)
+        original = phases.copy(deep=True)
+        local, quality, steps = phase_jump_tables(phases, coverage, neighbors=2)
+        pd.testing.assert_frame_equal(phases, original)
+        self.assertEqual(local.selected_endpoint.sum(), 2)
+        self.assertEqual(local.window.tolist(), quality.window.tolist())
+        for _,row in local.iterrows():
+            u = complex(row.F_real_996, row.F_imag_996)
+            v = complex(row.F_real_1012, row.F_imag_1012)
+            expected = u*v.conjugate()
+            self.assertAlmostEqual(row.Q_real, expected.real)
+            self.assertAlmostEqual(row.Q_imag, expected.imag)
+            self.assertAlmostEqual(row.Q_abs, abs(expected))
+            self.assertAlmostEqual(row.Q_arg_rad, cmath.phase(expected))
+        self.assertEqual(steps.coefficient.tolist(), ['F5','F20','Q'])
+        with self.assertRaises(AssertionError): phase_jump_tables(phases, coverage.iloc[::-1])
+        with self.assertRaises(ValueError): phase_jump_tables(phases, coverage.assign(window_days=60))
 
 
 if __name__=='__main__':
