@@ -1,0 +1,5 @@
+sensorid,level,raw_source_rows,unique_times,point_excluded_unique,point_excluded_source_rows,retained_unique,doubtful_removed,candidate_measurements,exact_duplicate_extra,remaining_plateau_review,full_history_raw_source_rows,occupied_bins_before_doubt_removal,occupied_bins_after_doubt_removal
+1275,C_air,7528,7528,7,7,7521,30,7491,0,93,12982,6148,6123
+996,C_5,49724,49724,225,225,49499,188,49311,0,0,871655,6216,6216
+1012,C_20,49724,49724,238,238,49486,193,49293,0,0,871655,6216,6216
+1035,C_50,49724,49724,251,251,49473,206,49267,0,0,871655,6216,6216

@@ -1,0 +1,13 @@
+sensorid,decision_field,reason,unique_times
+1275,exclusion_reason,isolated_7_sample_MAD_spike,7
+1275,doubt_reason,ambiguous_excursion,25
+1275,doubt_reason,zero_MAD_deviation,5
+996,exclusion_reason,isolated_7_sample_MAD_spike,209
+996,exclusion_reason,service_code,16
+996,doubt_reason,ambiguous_excursion,188
+1012,exclusion_reason,isolated_7_sample_MAD_spike,222
+1012,exclusion_reason,service_code,16
+1012,doubt_reason,ambiguous_excursion,193
+1035,exclusion_reason,isolated_7_sample_MAD_spike,235
+1035,exclusion_reason,service_code,16
+1035,doubt_reason,ambiguous_excursion,206

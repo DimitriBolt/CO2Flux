@@ -21,3 +21,6 @@ Project_description/sensorDB/Row_data/LEO_West_full/
 
 # Large reproducible per-measurement decisions for final stage 0.2 admission.
 Project_description/Research_log/data/stage02_final_admission/
+
+# Separate reproducible candidate input; original strict decisions stay intact.
+Project_description/Research_log/data/stage02_candidate_selection/
