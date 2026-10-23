@@ -40,6 +40,7 @@ $C_0=C_{\rm air}$. Абсолютные часы максимумов отдел
 
 ## Где читать результаты подготовительного этапа 0
 
+- **0.1 — Аудит фактических поливов, результат B:** [проверка SensorDB за 17 месяцев](details/00_irrigation_audit.md), [37 дат согласованного увлажнения](data/stage01_irrigation/wetting_dates.csv). Точные границы, поданная вода и полнота событий не установлены; этап открыт.
 - **0.2 — Закрытый допуск и выбранная вертикаль:** [паспорт принятого кандидата с порогом 2,5](output/stage02_candidate_selection/passport.json), [обоснование](details/02_data_checks.md); [строгий сравнительный паспорт с порогом 8](output/stage02_final_admission/passport.json) сохранён.
 - **0.3 — Предварительные амплитудные спектры:** [00_preliminary_co2_spectra.ipynb](00_preliminary_co2_spectra.ipynb).
 - **0.4 — Временная эволюция относительных Fourier-фаз:** [00_preliminary_fourier_phases.ipynb](00_preliminary_fourier_phases.ipynb), разделы 1–9.
