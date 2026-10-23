@@ -1,0 +1,81 @@
+{
+  "source_commit": "484a4fd01ca1e12b0702026076a3004509d9c283",
+  "tests_run": 43,
+  "tests_passed": true,
+  "test_log": "test_air_metadata_and_input_are_preserved (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_air_metadata_and_input_are_preserved) ... ok\ntest_default_preserves_legacy_schema_and_variableid (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_default_preserves_legacy_schema_and_variableid) ... ok\ntest_duplicate_grouping_keeps_metadata (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_duplicate_grouping_keeps_metadata) ... ok\ntest_metadata_does_not_change_any_numeric_decision (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_metadata_does_not_change_any_numeric_decision) ... ok\ntest_metadata_rejects_invalid_variableid_and_blank_labels (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_metadata_rejects_invalid_variableid_and_blank_labels) ... ok\ntest_metadata_requires_exact_levels_and_all_identity_fields (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_metadata_requires_exact_levels_and_all_identity_fields) ... ok\ntest_missing_wrong_mixed_or_undefined_source_variableid_is_rejected (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_missing_wrong_mixed_or_undefined_source_variableid_is_rejected) ... ok\ntest_two_channels_keep_distinct_variables_and_units (Project_description.sensorDB.tests.test_admission_metadata.AdmissionMetadataTests.test_two_channels_keep_distinct_variables_and_units) ... ok\ntest_band_and_service_boundaries (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_band_and_service_boundaries) ... ok\ntest_duplicate_decisions_preserve_source (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_duplicate_decisions_preserve_source) ... ok\ntest_enclosure_contains_actual_removal_subsets (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_enclosure_contains_actual_removal_subsets) ... ok\ntest_final_context_and_all_three_monthly_pass (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_final_context_and_all_three_monthly_pass) ... ok\ntest_final_plot_excludes_failed_and_undetermined_months (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_final_plot_excludes_failed_and_undetermined_months) ... ok\ntest_gap_or_cadence_boundary_is_not_crossed (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_gap_or_cadence_boundary_is_not_crossed) ... ok\ntest_individual_exclusion_not_extended_to_other_dates (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_individual_exclusion_not_extended_to_other_dates) ... ok\ntest_invalid_record_is_not_jumped (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_invalid_record_is_not_jumped) ... ok\ntest_monthly_amplitude_has_no_rolling_mean_subtraction (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_monthly_amplitude_has_no_rolling_mean_subtraction) ... ok\ntest_monthly_day_requires_bins_not_context_or_continuity (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_monthly_day_requires_bins_not_context_or_continuity) ... ok\ntest_monthly_raw_amplitude_and_equal_day_weight (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_monthly_raw_amplitude_and_equal_day_weight) ... ok\ntest_months_with_no_rows_and_boundary_days (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_months_with_no_rows_and_boundary_days) ... ok\ntest_no_admitted_days_has_explicit_empty_views (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_no_admitted_days_has_explicit_empty_views) ... ok\ntest_one_spike_across_cadences (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_one_spike_across_cadences) ... ok\ntest_small_r_squared_is_not_a_monthly_exclusion (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_small_r_squared_is_not_a_monthly_exclusion) ... ok\ntest_smooth_diurnal_maximum_not_removed (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_smooth_diurnal_maximum_not_removed) ... ok\ntest_thresholds_are_inclusive (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_thresholds_are_inclusive) ... ok\ntest_uncertainty_retained_only_when_gate_not_invariant (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_uncertainty_retained_only_when_gate_not_invariant) ... ok\ntest_unresolved_context_uses_exact_windows_including_midnight_support (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_unresolved_context_uses_exact_windows_including_midnight_support) ... ok\ntest_zero_mad_and_multiple_peak_values_are_retained (Project_description.sensorDB.tests.test_chapter02_admission.AdmissionTests.test_zero_mad_and_multiple_peak_values_are_retained) ... ok\ntest_exact_amplitude_eight_is_inclusive_without_a_tolerance (Project_description.sensorDB.tests.test_stage02_final_admission.ExactMonthlyBoundaryTests.test_exact_amplitude_eight_is_inclusive_without_a_tolerance) ... ok\ntest_exact_concentration_boundaries_are_inclusive_without_a_tolerance (Project_description.sensorDB.tests.test_stage02_final_admission.ExactMonthlyBoundaryTests.test_exact_concentration_boundaries_are_inclusive_without_a_tolerance) ... ok\ntest_nine_days_fail_and_exactly_ten_days_pass (Project_description.sensorDB.tests.test_stage02_final_admission.ExactMonthlyBoundaryTests.test_nine_days_fail_and_exactly_ten_days_pass) ... ok\ntest_joint_precedence_and_individual_reasons_are_preserved (Project_description.sensorDB.tests.test_stage02_final_admission.JointMonthlyAdmissionTests.test_joint_precedence_and_individual_reasons_are_preserved) ... ok\ntest_missing_duplicate_or_invalid_month_metadata_is_rejected (Project_description.sensorDB.tests.test_stage02_final_admission.JointMonthlyAdmissionTests.test_missing_duplicate_or_invalid_month_metadata_is_rejected) ... ok\ntest_calendar_month_without_contributing_cells_does_not_supply_data (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_calendar_month_without_contributing_cells_does_not_supply_data) ... ok\ntest_constant_plateau_diagnostic_does_not_become_an_exclusion_rule (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_constant_plateau_diagnostic_does_not_become_an_exclusion_rule) ... ok\ntest_fail_month_is_not_silently_removed_from_the_original_window (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_fail_month_is_not_silently_removed_from_the_original_window) ... ok\ntest_original_calendar_has_492_half_open_30_day_windows (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_original_calendar_has_492_half_open_30_day_windows) ... ok\ntest_short_calendar_and_invalid_window_parameters_are_rejected (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_short_calendar_and_invalid_window_parameters_are_rejected) ... ok\ntest_sparse_observation_coverage_does_not_introduce_a_new_cutoff (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_sparse_observation_coverage_does_not_introduce_a_new_cutoff) ... ok\ntest_technical_computability_uses_existing_two_cell_boundary (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_technical_computability_uses_existing_two_cell_boundary) ... ok\ntest_undetermined_month_is_not_pass_and_fail_takes_priority (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_undetermined_month_is_not_pass_and_fail_takes_priority) ... ok\ntest_unresolved_excursion_inside_common_cells_requires_a_decision (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_unresolved_excursion_inside_common_cells_requires_a_decision) ... ok\ntest_unresolved_flag_outside_common_cells_does_not_enter_the_result (Project_description.sensorDB.tests.test_stage02_final_admission.WindowAdmissionTests.test_unresolved_flag_outside_common_cells_does_not_enter_the_result) ... ok\n\n----------------------------------------------------------------------\nRan 43 tests in 7.568s\n\nOK\n",
+  "real_data_lineage": {
+    "1275": {
+      "source_rows": 12982,
+      "lineage_preserved": true,
+      "retained_values_unmodified": true,
+      "previous_masks_preserved": true
+    },
+    "996": {
+      "source_rows": 871655,
+      "lineage_preserved": true,
+      "retained_values_unmodified": true,
+      "previous_masks_preserved": true
+    },
+    "1012": {
+      "source_rows": 871655,
+      "lineage_preserved": true,
+      "retained_values_unmodified": true,
+      "previous_masks_preserved": true
+    },
+    "1035": {
+      "source_rows": 871655,
+      "lineage_preserved": true,
+      "retained_values_unmodified": true,
+      "previous_masks_preserved": true
+    }
+  },
+  "original_basalt_pointwise_decisions_identical": true,
+  "monthly_functions_ast_identical": true,
+  "cleaner_numeric_body_identical": true,
+  "archive_files_unchanged": 44306,
+  "protected_files_unchanged": 44344,
+  "protected_snapshot_sha256": "575781f1404e9289172b9ed5144fd66302a8ce996596759ad227362a0a3976d2",
+  "old_stage03_stage04_notebooks_and_outputs_unchanged": true,
+  "readme_plan_unchanged": true,
+  "details_append_only": true,
+  "no_new_fourier_coefficients_or_phases": true,
+  "no_oracle_access": true,
+  "no_zero_filled_concentrations_or_interpolation": true,
+  "monthly_calendar": [
+    "2013-09",
+    "2026-10"
+  ],
+  "joint_pass_months": 0,
+  "joint_pass_days": 0,
+  "joint_pass_bins": 0,
+  "original_calendar_windows": 492,
+  "technical_computable_windows": 492,
+  "ig_admitted_windows": 0,
+  "windows_requiring_new_author_decision": 0,
+  "source_units_preserved": true,
+  "data_passport_complete": true,
+  "phase_study_can_continue": false,
+  "stage0_not_automatically_closed": true,
+  "output_sha256": {
+    "Project_description/Research_log/output/stage02_final_admission/channel_days.csv": "f478149ba1716489917e0a564fc21c2bedc09e44244206572f050582f840974f",
+    "Project_description/Research_log/output/stage02_final_admission/channel_months.csv": "bfd4740943ee8e0e609995ecbece73e113a2acbd8e3dcb61103104c7495e64a3",
+    "Project_description/Research_log/output/stage02_final_admission/channel_summary.csv": "779857c7918aebf64afdab7391ffa5a08bb70df96678a7e510b7bdced70907d4",
+    "Project_description/Research_log/output/stage02_final_admission/joint_admitted_intervals.csv": "7579670b3f8c7448fa40146bc895160f1dad3dfdc6440017956a5bfbe99b7845",
+    "Project_description/Research_log/output/stage02_final_admission/joint_days.csv": "9cb6a7f0b5b364b2f7116b51b6cf459db407fa4cad6c01a80d41296e9b7c3ebf",
+    "Project_description/Research_log/output/stage02_final_admission/joint_months.csv": "94b20f5a85463251c8c4c690b727a3c8e7abdb7e148d0dab449b3eb6f38cb6ac",
+    "Project_description/Research_log/output/stage02_final_admission/measurement_reasons.csv": "35b6e70db9fe528a23f280a6126b4b3776c608f63153b2e49a34cc7dd65bbd53",
+    "Project_description/Research_log/output/stage02_final_admission/passport.json": "2a0ffdd7b56d6396d69065a2b4d800a432720fa35d87a3f15396dc9211ac4d2c",
+    "Project_description/Research_log/output/stage02_final_admission/window_admission_30d_1d.csv": "ef59abf93b344515dc79f2c3ec96d277969008dfc1c8cbd19167707a87509f01"
+  },
+  "large_local_decisions_sha256": {
+    "Project_description/Research_log/data/stage02_final_admission/1012_measurements.parquet": "8378655d26f9b783337a2a4f46c70e83bcc6c505b41aa77dd366c08a24f80c6a",
+    "Project_description/Research_log/data/stage02_final_admission/1012_source_decisions.parquet": "332e0617bb3682eab29b5cd96af76e3df43b5a7d9f961ec8f7535a967d8b8e82",
+    "Project_description/Research_log/data/stage02_final_admission/1035_measurements.parquet": "29e68aa5cddf6e7db85ce1b27df1f094ef02299a3441f01854d38f66ada2f3f6",
+    "Project_description/Research_log/data/stage02_final_admission/1035_source_decisions.parquet": "64487ed15a69134d43301e6b8f1e72200f2b41d02cc5250a99a054cfc7163e1a",
+    "Project_description/Research_log/data/stage02_final_admission/1275_measurements.parquet": "724c73ab80bff7bbf603b7ac73e1081a8f74c9e5fd53d484059ddb7e988a1236",
+    "Project_description/Research_log/data/stage02_final_admission/1275_source_decisions.parquet": "c5de22753cbfc159ecf7be48fbb0b7e36f9ed938a2a6d9c3d77a6921b9920876",
+    "Project_description/Research_log/data/stage02_final_admission/996_measurements.parquet": "51370ddfee5a97d16707ca12ba6276c6303dfc37d82e11ed069070bcc462152f",
+    "Project_description/Research_log/data/stage02_final_admission/996_source_decisions.parquet": "4d7e1b138446e9f11d6de20c064547ebc95e31220a28ee27192a082dcb0ddea2",
+    "Project_description/Research_log/data/stage02_final_admission/joint_2h_grid.parquet": "18d201963f683355282f3643328686fe58c7bfa5c3b8dafd97e4c311600722d4"
+  }
+}

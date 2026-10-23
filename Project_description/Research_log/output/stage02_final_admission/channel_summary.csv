@@ -1,0 +1,9 @@
+sensorid,period,raw_source_rows,unique_timestamps,exact_duplicate_extra,retained_source_rows,excluded_source_rows,retained_measurements,excluded_unique_times,doubtful_measurements,retained_in_pass_months,retained_in_fail_months,retained_in_undetermined_months,retained_in_nonpass_months,previous_retained_source_rows,previous_doubtful_source_rows
+1275,full_history,12982,12982,0,12857,125,12857,125,62,416,12441,0,12441,12933,12933
+1275,stage04_calendar,7589,7589,0,7582,7,7582,7,30,0,7582,0,7582,7589,7589
+996,full_history,871655,870889,390,844840,26815,844451,26438,3071,740619,103832,0,103832,844840,3071
+996,stage04_calendar,50009,50009,0,49784,225,49784,225,188,49691,93,0,93,49784,188
+1012,full_history,871655,870919,375,865280,6375,864906,6013,3048,509608,352939,2359,355298,865280,3048
+1012,stage04_calendar,50009,50009,0,49770,239,49770,239,193,49678,92,0,92,49770,193
+1035,full_history,871655,870972,344,776925,94730,776714,94258,2932,44447,732267,0,732267,776925,2932
+1035,stage04_calendar,50009,50009,0,49715,294,49715,294,206,0,49715,0,49715,49715,206

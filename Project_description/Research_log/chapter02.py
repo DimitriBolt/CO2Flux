@@ -4,6 +4,7 @@
 Основной запуск: prepare_chapter02.py --final [--refresh].
 """
 
+from collections.abc import Mapping
 from contextlib import redirect_stdout
 from dataclasses import dataclass
 import hashlib
@@ -232,7 +233,7 @@ ADMISSION_PARAMETERS = dict(service_limit=-9999, concentration_min_exclusive=0,
     monthly_amplitude_min=8, period_hours=24)
 
 
-def clean_admission_measurements(raw, sensor_ids, approved_exclusions):
+def clean_admission_measurements(raw, sensor_ids, approved_exclusions, *, channel_metadata=None):
     """Immutable input; unique timestamp work view with a reproducible decision log.
 
     Seven original consecutive timestamps, including invalid ones, form a window.
@@ -241,17 +242,44 @@ def clean_admission_measurements(raw, sensor_ids, approved_exclusions):
     cannot be silently jumped. Non-centred windows are never used at boundaries.
     Only the centre outside the MAD band with all six neighbours inside is
     unambiguous. Adjacent candidates are retained, never removed iteratively.
+
+    Optional per-level channel_metadata preserves source variableid, units, table
+    and sensorcode after validating every selected source variableid. Without it
+    the historical variableid=9 output and its schema are unchanged.
     """
+    if channel_metadata is not None:
+        if not isinstance(channel_metadata, Mapping) or set(channel_metadata) != set(sensor_ids):
+            raise ValueError("channel_metadata must contain exactly the selected levels")
+        if "variableid" not in raw:
+            raise ValueError("Source variableid is required with channel_metadata")
+        for level in sensor_ids:
+            metadata = channel_metadata[level]
+            if not isinstance(metadata, Mapping):
+                raise ValueError(f"Invalid channel metadata for {level}")
+            variableid = metadata.get("variableid")
+            if isinstance(variableid, (bool, np.bool_)) or not isinstance(variableid, (int, np.integer)):
+                raise ValueError(f"An integer variableid is required for {level}")
+            for field in ("units", "table", "sensorcode"):
+                if not isinstance(metadata.get(field), str) or not metadata[field].strip():
+                    raise ValueError(f"Nonempty {field} is required for {level}")
     parts = []
     for level, sid in sensor_ids.items():
         source = raw.loc[raw.sensorid.eq(sid)].copy()
+        if channel_metadata is not None:
+            metadata = channel_metadata[level]
+            if not source.variableid.eq(metadata['variableid']).fillna(False).all():
+                raise ValueError(f"Source variableid mismatch for {level} / sensorid {sid}")
         source['localdatetime'] = pd.to_datetime(source.localdatetime)
         if source.localdatetime.isna().any():
             raise ValueError('Undefined source timestamps')
         grouped = source.groupby('localdatetime', sort=True).datavalue
         work = grouped.agg(datavalue='first', source_rows='size').reset_index()
         conflict = grouped.nunique(dropna=False).gt(1).to_numpy()
-        work['sensorid'], work['variableid'], work['level'] = sid, 9, level
+        variableid = 9 if channel_metadata is None else metadata['variableid']
+        work['sensorid'], work['variableid'], work['level'] = sid, variableid, level
+        if channel_metadata is not None:
+            for field in ('units', 'table', 'sensorcode'):
+                work[field] = metadata[field]
         work['original_value'] = work.datavalue
         work['exact_duplicate_extra'] = np.where(conflict, 0, work.source_rows-1)
         reason = np.full(len(work), '', dtype=object)
