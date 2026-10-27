@@ -509,6 +509,364 @@ def generate_phase_jump(source=OUT):
     return local, quality, steps, report
 
 
+def load_saved_phase_jump(source=OUT):
+    """Read historical Q1 tables; do not recompute or rewrite Stage 0.4/Q1."""
+    out = Path(source)/'jump_diagnostic'
+    tables = [pd.read_csv(out/f'phase_jump_{name}.csv', float_precision='round_trip',
+                         parse_dates=['start', 'end_exclusive', 'center'] if name != 'step' else None)
+              for name in ('windows', 'coverage', 'step')]
+    return (*tables, json.loads((out/'phase_jump_validation.json').read_text()))
+
+
+GRID_START, GRID_END = pd.Timestamp('2025-05-01'), pd.Timestamp('2026-10-01')
+SUBSURFACE_IDS = (996, 1012, 1035)
+RESOLUTION_OUT = OUT/'grid_resolution'
+CANDIDATE_PASSPORT = ROOT/'Project_description/Research_log/output/stage02_candidate_selection/passport.json'
+
+
+def load_resolution_inputs():
+    """Verify the accepted 0.2 passport and read its frozen candidate points.
+
+    README/PLAN are historical reference hashes: verify their original Git
+    versions explicitly and record their later revisions. Data mismatches fail.
+    No cleaning, monthly fitting, old 0.4 masks or Oracle access is performed.
+    """
+    passport = json.loads(CANDIDATE_PASSPORT.read_text())
+    if (passport['selected_vertical'] != 'W_x1_y4'
+            or pd.Timestamp(passport['selected_start_inclusive']) != GRID_START
+            or pd.Timestamp(passport['selected_end_exclusive']) != GRID_END
+            or passport['selector'] != 'technically_retained & ~doubtful'):
+        raise ValueError('Unexpected accepted Stage 0.2 input')
+    expected = {str(CANDIDATE_PASSPORT.relative_to(ROOT)): digest(CANDIDATE_PASSPORT)}
+    for key in ('input_sha256', 'local_derived_sha256', 'implementation_sha256'):
+        expected.update(passport[key])
+    current, reference_updates = {}, {}
+    for rel, sha in expected.items():
+        actual = digest(ROOT/rel)  # missing files fail; no fallback snapshot
+        if actual != sha:
+            if rel not in ('Project_description/Research_log/README.md', 'Project_description/Research_log/PLAN.md'):
+                raise ValueError(f'Accepted input checksum mismatch: {rel}')
+            import hashlib
+            original = subprocess.check_output(['git', 'show', passport['source_commit']+':'+rel], cwd=ROOT)
+            if hashlib.sha256(original).hexdigest() != sha:
+                raise ValueError(f'Historical reference does not match its source commit: {rel}')
+            reference_updates[rel] = dict(passport_sha256=sha, current_sha256=actual,
+                                          historical_commit=passport['source_commit'])
+        current[rel] = actual
+    local = ROOT/'Project_description/Research_log/data/stage02_candidate_selection'
+    strict_local = ROOT/'Project_description/Research_log/data/stage02_final_admission'
+    from stage02_candidate_selection import candidate_points
+    frames, used_hashes, point_checks = {}, {}, []
+    for sid in IDS:
+        path = local/f'{sid}_candidate_measurements.parquet'
+        frame = pd.read_parquet(path)
+        if (frame.doubtful.any() or not frame.technically_retained.all()
+                or not frame.candidate_month_status.eq('pass').all()
+                or frame.localdatetime.duplicated().any()
+                or not frame.localdatetime.is_monotonic_increasing
+                or not np.isfinite(frame.datavalue).all()):
+            raise ValueError(f'Invalid accepted points: {sid}')
+        strict_path = strict_local/f'{sid}_measurements.parquet'
+        selected = candidate_points(pd.read_parquet(strict_path), GRID_START, GRID_END)
+        cols = ['localdatetime', 'datavalue', 'sensorid', 'variableid', 'table', 'sensorcode', 'plateau_review']
+        pd.testing.assert_frame_equal(frame[cols].reset_index(drop=True), selected[cols].reset_index(drop=True),
+                                      check_exact=True)
+        frames[sid] = frame
+        for p in (path, strict_path):
+            used_hashes[str(p.relative_to(ROOT))] = current[str(p.relative_to(ROOT))]
+        point_checks.append(dict(sensorid=sid, points=len(frame), exact_time_value_and_metadata_match=True,
+            fine_cells_with_multiple_points=int(frame.localdatetime.dt.floor('15min').duplicated().sum()),
+            plateau_review_points=int(frame.plateau_review.sum())))
+    return frames, passport, current, used_hashes, reference_updates, point_checks
+
+
+def resolution_grid(frames, bin_minutes, start=GRID_START, end=GRID_END):
+    """Calendar-cell means of the same accepted raw points, at either width.
+
+    Coarse means are not means of fine-cell means, nor restricted by fine-cell
+    commonality. Source timestamps stay in the input; Fourier times are real
+    calendar-cell centers, measured from the unchanged Stage 0.4 origin START.
+    """
+    if bin_minutes not in (15, 120):
+        raise ValueError('Only the authorized 15-minute and 2-hour grids are supported')
+    index = pd.date_range(start, end, freq=f'{bin_minutes}min', inclusive='left', name='bin_start')
+    grid = pd.DataFrame(index=index)
+    grid['bin_center'] = index + pd.Timedelta(minutes=bin_minutes/2)
+    grid['t_days'] = (grid.bin_center - START).dt.total_seconds()/86400
+    for sid, frame in frames.items():
+        points = frame.loc[frame.technically_retained & ~frame.doubtful
+                           & frame.localdatetime.ge(start) & frame.localdatetime.lt(end)]
+        if not np.isfinite(points.datavalue).all():
+            raise ValueError('Nonfinite accepted concentration')
+        groups = points.groupby(points.localdatetime.dt.floor(f'{bin_minutes}min'))
+        grid[f'mean_{sid}'] = groups.datavalue.mean().reindex(index)
+        grid[f'n_{sid}'] = groups.size().reindex(index, fill_value=0).astype(int)
+        grid[f'plateau_review_{sid}'] = groups.plateau_review.any().reindex(index, fill_value=False)
+    grid['complete_subsurface'] = grid[[f'mean_{s}' for s in SUBSURFACE_IDS]].notna().all(axis=1)
+    if 1275 in frames:
+        grid['complete_with_air'] = grid.complete_subsurface & grid.mean_1275.notna()
+    return grid
+
+
+def resolution_windows(grid, bin_minutes, support='subsurface', window_days=30, step_days=1):
+    """Two subsurface phases with actual common support; no quality cutoff."""
+    # Reuse the established integer-day window calendar (12 bins/day), then
+    # map its boundaries to the denser grid. The Fourier sum itself is shared.
+    if bin_minutes not in (15, 120) or (support == 'with_air' and bin_minutes != 120):
+        raise ValueError('No 15-minute atmospheric estimate is authorized')
+    factor = 120//bin_minutes
+    if len(grid) % factor:
+        raise ValueError('Incomplete calendar extent')
+    slices = [(lo*factor, hi*factor) for lo,hi in window_slices(len(grid)//factor, window_days, step_days)]
+    rows = []
+    for number, (lo,hi) in enumerate(slices):
+        window = grid.iloc[lo:hi]
+        common = window[f'complete_{support}'].to_numpy(bool)
+        used = window.loc[common]
+        start, end = window.index[0], window.index[-1]+pd.Timedelta(minutes=bin_minutes)
+        info = dict(window=number, start=start, end_exclusive=end, center=start+(end-start)/2,
+                    bin_minutes=bin_minutes, support=support, possible_bins=len(window),
+                    complete_bins=len(used), missing_bins=len(window)-len(used),
+                    coverage_fraction=len(used)/len(window),
+                    longest_gap_bins=longest_missing_run(common),
+                    longest_gap_hours=longest_missing_run(common)*bin_minutes/60,
+                    air_removed_bins=int(window.complete_subsurface.sum()-len(used)) if support == 'with_air' else 0)
+        coefficients = np.full(3, np.nan+1j*np.nan)
+        if len(used) >= 2:
+            coefficients = direct_fourier(used.t_days.to_numpy(), used[[f'mean_{s}' for s in SUBSURFACE_IDS]].to_numpy())
+        for j,sid in enumerate(SUBSURFACE_IDS):
+            info.update({f'F_real_{sid}': coefficients[j].real, f'F_imag_{sid}': coefficients[j].imag,
+                         f'F_abs_{sid}': abs(coefficients[j]),
+                         f'used_observations_{sid}': int(used[f'n_{sid}'].sum()),
+                         f'plateau_review_bins_{sid}': int(used[f'plateau_review_{sid}'].sum())})
+        if support == 'with_air':
+            info['plateau_review_bins_1275'] = int(used.plateau_review_1275.sum())
+        for j,pair in enumerate(PAIRS[1:]):
+            angle = phase_difference(coefficients[j], coefficients[j+1])
+            info[pair+'_rad'] = angle
+            info[pair+'_reason'] = ('fewer_than_two_common_cells' if len(used) < 2 else
+                                    'zero_or_nonfinite_coefficient' if not np.isfinite(angle) else '')
+        rows.append(info)
+    return pd.DataFrame(rows)
+
+
+def compare_resolution_windows(left, right, effect):
+    """Join exact calendar windows; undefined pairs remain explicit non-comparisons."""
+    keys = ['window', 'start', 'end_exclusive', 'center']
+    pd.testing.assert_frame_equal(left[keys], right[keys])
+    result = []
+    for j,pair in enumerate(PAIRS[1:]):
+        columns = keys+['complete_bins','possible_bins','missing_bins','coverage_fraction',
+                        'longest_gap_hours', pair+'_rad', pair+'_reason']
+        for sid in SUBSURFACE_IDS[j:j+2]:
+            columns += [f'F_abs_{sid}', f'used_observations_{sid}', f'plateau_review_bins_{sid}']
+        joined = left[columns].merge(right[columns], on=keys, suffixes=('_left','_right'), validate='one_to_one')
+        a, b = joined[pair+'_rad_left'].to_numpy(), joined[pair+'_rad_right'].to_numpy()
+        joined['comparable'] = np.isfinite(a) & np.isfinite(b)
+        joined['delta_rad'] = np.where(joined.comparable, wrap(np.angle(np.exp(1j*(a-b)))), np.nan)
+        joined['effect'], joined['pair'] = effect, pair
+        joined['left_variant'] = f'{left.bin_minutes.iloc[0]}min_{left.support.iloc[0]}'
+        joined['right_variant'] = f'{right.bin_minutes.iloc[0]}min_{right.support.iloc[0]}'
+        result.append(joined)
+    return pd.concat(result, ignore_index=True)
+
+
+def resolution_summary(comparison):
+    """Descriptive spread only; overlapping windows are not independent samples."""
+    rows = []
+    for (effect,pair), group in comparison.groupby(['effect','pair'], sort=False):
+        d = group.loc[group.comparable, 'delta_rad']
+        row = dict(effect=effect, pair=pair, total_windows=len(group), comparable_windows=len(d),
+                   undefined_windows=int((~group.comparable).sum()))
+        row.update({name: float(value) for name,value in dict(min_rad=d.min(), max_rad=d.max(),
+            median_rad=d.median(), q25_rad=d.quantile(.25), q75_rad=d.quantile(.75),
+            std_rad=d.std(ddof=0), median_abs_rad=d.abs().median(), q95_abs_rad=d.abs().quantile(.95),
+            max_abs_rad=d.abs().max()).items()})
+        if len(d):
+            row['max_abs_center'] = str(group.loc[d.abs().idxmax(), 'center'])
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def resolution_extrema(windows):
+    """List observed minimum modules and worst coverage, without classifying them.
+
+    Keep ties: a minimum is a descriptive rank, never an admission threshold.
+    Undefined phases are retained separately in the comparisons and counts.
+    """
+    rows = []
+    metrics = ['coverage_fraction', 'longest_gap_hours']+[f'F_abs_{s}' for s in SUBSURFACE_IDS]
+    for variant, group in windows.groupby('variant', sort=False):
+        for metric in metrics:
+            target = group[metric].max() if metric == 'longest_gap_hours' else group[metric].min()
+            if metric in ('coverage_fraction','longest_gap_hours') and group.missing_bins.eq(0).all():
+                continue  # no incomplete windows; the range table reports full coverage
+            for _,row in group.loc[group[metric].eq(target)].iterrows():
+                rows.append(dict(variant=variant, metric=metric, value=float(target), center=row.center,
+                    complete_bins=row.complete_bins, possible_bins=row.possible_bins,
+                    longest_gap_hours=row.longest_gap_hours,
+                    **{f'F_abs_{s}': row[f'F_abs_{s}'] for s in SUBSURFACE_IDS},
+                    **{p+'_rad': row[p+'_rad'] for p in PAIRS[1:]}))
+    return pd.DataFrame(rows)
+
+
+def resolution_quality_summary(windows):
+    """Coverage, gaps and undefined counts; no new quality categories."""
+    rows = []
+    for variant, group in windows.groupby('variant', sort=False):
+        rows.append(dict(variant=variant, windows=len(group),
+            common_bins_min=int(group.complete_bins.min()), common_bins_max=int(group.complete_bins.max()),
+            possible_bins=int(group.possible_bins.iloc[0]),
+            coverage_percent_min=float(100*group.coverage_fraction.min()),
+            coverage_percent_max=float(100*group.coverage_fraction.max()),
+            incomplete_windows=int(group.missing_bins.gt(0).sum()),
+            max_gap_hours=float(group.longest_gap_hours.max()),
+            **{p+'_undefined':int(group[p+'_rad'].isna().sum()) for p in PAIRS[1:]}))
+    return pd.DataFrame(rows)
+
+
+def resolution_figures(comparison, windows, out):
+    """Two separate effect figures, plus module/coverage context; radians only."""
+    colors = ['#186b9b', '#bd6217', '#8a3c82']
+    variant_colors = dict(zip(('15min_subsurface','120min_subsurface','120min_with_air'),colors))
+    variant_labels = {'15min_subsurface':'15 min · subsurface', '120min_subsurface':'2 h · subsurface',
+                      '120min_with_air':'2 h · + LI-COR mask'}
+    captions = {}
+    for effect, group in comparison.groupby('effect', sort=False):
+        fig, axes = plt.subplots(2, 2, figsize=(14, 8), sharex=True, layout='constrained')
+        for col,pair in enumerate(PAIRS[1:]):
+            data = group.loc[group.pair.eq(pair)]
+            for suffix in ('left','right'):
+                variant=data[suffix+'_variant'].iloc[0]
+                tx,vy = broken_line(data.center, data[pair+'_rad_'+suffix])
+                axes[0,col].plot(tx,vy, color=variant_colors[variant], lw=.9, label=variant_labels[variant])
+            axes[0,col].set(title=pair.replace('_to_', ' → ')+' cm', ylabel='Relative phase (rad)', ylim=(-np.pi,np.pi))
+            axes[0,col].set_yticks([-np.pi,-np.pi/2,0,np.pi/2,np.pi], labels=['−π','−π/2','0','π/2','π'])
+            axes[0,col].legend(fontsize=9, frameon=False)
+            tx,vy = broken_line(data.center, data.delta_rad)
+            axes[1,col].plot(tx,vy,color='#323b43',lw=.9)
+            axes[1,col].axhline(0,color='#888888',lw=.6)
+            axes[1,col].set(ylabel='Circular difference: left − right (rad)', xlabel='Window center')
+            for ax in axes[:,col]:
+                ax.grid(alpha=.2)
+                ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        caption = ('Subsurface 15-minute versus 2-hour estimates from the accepted Stage 0.2 observations.'
+                   if effect == 'aggregation' else
+                   'Additional LI-COR availability restriction on the same subsurface 2-hour means; no air phase estimated.')
+        fig.suptitle(caption+'\n1 cycle/day · 30-day windows · 1-day step; no sufficiency threshold', fontsize=13)
+        name='grid_'+effect
+        for extension in ('png','svg'):
+            fig.savefig(out/f'{name}.{extension}',dpi=180,bbox_inches='tight',pad_inches=.15)
+        plt.close(fig)
+        captions[name]=caption+' The lower row uses Arg(exp(i(left − right))) on [−π, π). Windows overlap.'
+    fig,axes=plt.subplots(4,1,figsize=(13,11),sharex=True,layout='constrained')
+    for (variant,data),color in zip(windows.groupby('variant',sort=False),colors):
+        axes[0].plot(data.center,100*data.coverage_fraction,color=color,lw=.9,label=variant_labels[variant])
+        for ax,sid in zip(axes[1:],SUBSURFACE_IDS):
+            ax.plot(data.center,data[f'F_abs_{sid}'],color=color,lw=.9)
+            minimum=data.loc[data[f'F_abs_{sid}'].eq(data[f'F_abs_{sid}'].min())]
+            ax.scatter(minimum.center, minimum[f'F_abs_{sid}'], color=color, s=25, zorder=3)
+            ax.set_ylabel({996:'|F₅| (ppm)',1012:'|F₂₀| (ppm)',1035:'|F₅₀| (ppm)'}[sid])
+            ax.set_ylim(bottom=0)
+    axes[0].set(ylabel='Common cells (%)',ylim=(0,102))
+    axes[0].legend(loc='lower left',ncol=3,frameon=False,fontsize=9)
+    for ax in axes:
+        ax.grid(alpha=.2)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+    axes[-1].set_xlabel('Window center')
+    fig.suptitle('Coverage and coefficient magnitudes · accepted Stage 0.2 input\nDots: observed module minima; no new quality cutoff',fontsize=14)
+    for extension in ('png','svg'):
+        fig.savefig(out/f'grid_context.{extension}',dpi=180,bbox_inches='tight',pad_inches=.15)
+    plt.close(fig)
+    captions['grid_context']='Actual common-cell coverage and |F| of the three subsurface channels for each variant; no new amplitude or coverage threshold.'
+    for path in out.glob('grid_*.svg'):
+        path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
+    return captions
+
+
+def generate_grid_resolution(out=RESOLUTION_OUT):
+    """The bounded 0.5 diagnostic only: no full Stage 0.3/0.4/Q1 calculation."""
+    out = Path(out)
+    frames, accepted, hashes, used_hashes, reference_updates, point_checks = load_resolution_inputs()
+    protected = {}
+    for folder in ('stage02_candidate_selection','stage02_final_admission','preliminary_spectra','preliminary_fourier_phases'):
+        for path in (OUT.parent/folder).rglob('*'):
+            if path.is_file() and not path.is_relative_to(out):
+                protected[str(path.relative_to(ROOT))]=digest(path)
+    fine = resolution_grid({s:frames[s] for s in SUBSURFACE_IDS},15)
+    coarse = resolution_grid(frames,120)
+    saved_grid_path=ROOT/'Project_description/Research_log/data/stage02_candidate_selection/calendar_2h_grid.parquet'
+    saved_grid=pd.read_parquet(saved_grid_path)
+    for sid in IDS:
+        np.testing.assert_array_equal(coarse[f'mean_{sid}'],saved_grid[f'C_{sid}'])
+        np.testing.assert_array_equal(coarse[f'n_{sid}'],saved_grid[f'n_{sid}'])
+    np.testing.assert_array_equal(coarse.complete_with_air,saved_grid.complete)
+    variants = {
+        '15min_subsurface': resolution_windows(fine,15),
+        '120min_subsurface': resolution_windows(coarse,120),
+        '120min_with_air': resolution_windows(coarse,120,'with_air')}
+    comparison=pd.concat([
+        compare_resolution_windows(variants['15min_subsurface'],variants['120min_subsurface'],'aggregation'),
+        compare_resolution_windows(variants['120min_subsurface'],variants['120min_with_air'],'air_support')],ignore_index=True)
+    windows=pd.concat([data.assign(variant=name) for name,data in variants.items()],ignore_index=True)
+    summary=resolution_summary(comparison)
+    extrema=resolution_extrema(windows)
+    quality=resolution_quality_summary(windows)
+    test_log=run_tests()
+    out.mkdir(parents=True,exist_ok=True)
+    for name,frame in [('windows',windows),('comparisons',comparison),('summary',summary),('extrema',extrema),('quality',quality)]:
+        frame.to_csv(out/f'grid_{name}.csv',index=False,float_format='%.17g')
+    # Save every calendar cell and missing run, not just windows selected for display.
+    gap_rows=[]
+    for variant,grid,mask,minutes in [('15min_subsurface',fine,'complete_subsurface',15),
+            ('120min_subsurface',coarse,'complete_subsurface',120),('120min_with_air',coarse,'complete_with_air',120)]:
+        missing=grid.index[~grid[mask]]
+        groups=(missing.to_series().diff()!=pd.Timedelta(minutes=minutes)).cumsum()
+        for _,part in missing.to_series().groupby(groups):
+            gap_rows.append(dict(variant=variant,start=part.iloc[0],
+                end_exclusive=part.iloc[-1]+pd.Timedelta(minutes=minutes),missing_bins=len(part),missing_hours=len(part)*minutes/60))
+    pd.DataFrame(gap_rows,columns=['variant','start','end_exclusive','missing_bins','missing_hours']).to_csv(out/'grid_gap_runs.csv',index=False)
+    fine.to_csv(out/'grid_15min.csv.gz',float_format='%.17g',compression={'method':'gzip','mtime':0})
+    coarse.to_csv(out/'grid_2h.csv.gz',float_format='%.17g',compression={'method':'gzip','mtime':0})
+    captions=resolution_figures(comparison,windows,out)
+    for rel,sha in {**hashes,**protected}.items():
+        if digest(ROOT/rel)!=sha:
+            raise ValueError(f'Protected input/result changed: {rel}')
+    used_hashes[str(CANDIDATE_PASSPORT.relative_to(ROOT))]=digest(CANDIDATE_PASSPORT)
+    used_hashes[str(saved_grid_path.relative_to(ROOT))]=digest(saved_grid_path)
+    passport=dict(stage='0.5: temporal-grid diagnostic', baseline_commit='0e33a2d951e572e57636452840da0a794c01e072',
+        accepted_passport=str(CANDIDATE_PASSPORT.relative_to(ROOT)),selector=accepted['selector'],
+        selected_vertical=accepted['selected_vertical'],metadata=accepted['metadata'],
+        start=str(GRID_START),end_exclusive=str(GRID_END),time_origin=str(START),
+        f0_cycles_per_day=F0,window_days=30,step_days=1,bin_minutes=[15,120],
+        bin_time='Calendar centers (+7min30s or +1h); input timestamps unchanged',
+        aggregation='Arithmetic mean of all accepted source observations in each cell; equal weight per common cell in Fourier sum',
+        normalization='1/N after subtraction of each channel mean over the same common cells',
+        phase='wrap(Arg(F_upper * conjugate(F_lower))) in [-pi,pi)',
+        differences={'aggregation':'wrap(Arg(exp(i*(phase_15min_subsurface-phase_120min_subsurface))))',
+                     'air_support':'wrap(Arg(exp(i*(phase_120min_subsurface-phase_120min_with_air))))'},
+        input_sha256=used_hashes,upstream_hashes_verified=len(hashes),reference_document_updates=reference_updates,
+        point_checks=point_checks,implementation_sha256=digest(Path(__file__)),captions=captions,
+        limitations=['Overlapping windows are dependent; descriptive spread is not measurement uncertainty',
+                     'No new small-module, coverage or sufficiency threshold; extrema are ranks only',
+                     '2h support can retain source observations whose 15min cell lacks another subsurface channel',
+                     'LI-COR only restricts 2h support here; no 15min air reconstruction or air phase',
+                     'No fast-transport or physical-mechanism inference; sufficiency requires I.R. Gabitov decision'])
+    (out/'grid_passport.json').write_text(json.dumps(passport,ensure_ascii=False,indent=2)+'\n')
+    validation=dict(tests_passed=True,test_log=test_log,accepted_2h_means_counts_support_exact=True,
+        upstream_checksums_verified=len(hashes),upstream_inputs_unchanged=True,
+        previous_results_unchanged=True,previous_result_sha256=protected,
+        windows_per_variant={k:len(v) for k,v in variants.items()},
+        common_calendar_cells={'15min_subsurface':int(fine.complete_subsurface.sum()),
+                              '120min_subsurface':int(coarse.complete_subsurface.sum()),
+                              '120min_with_air':int(coarse.complete_with_air.sum())},
+        artifact_sha256={p.name:digest(p) for p in out.iterdir() if p.is_file() and p.name!='grid_validation.json'})
+    (out/'grid_validation.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2)+'\n')
+    return windows,comparison,summary,extrema,validation
+
+
 def browser_cross_check(grid):
     """Numerical validation of the actual embedded data at two UI settings."""
     engine = Path(__file__).with_suffix('.js')
@@ -591,6 +949,10 @@ if __name__ == '__main__':
     parser.add_argument('--window-days', type=int, default=30)
     parser.add_argument('--step-days', type=int, default=1)
     parser.add_argument('--output', type=Path, default=OUT)
+    parser.add_argument('--grid-resolution', action='store_true', help='Run only the accepted-input 15min/2h diagnostic')
     args = parser.parse_args()
-    _, _, _, report = generate(args.output,args.window_days,args.step_days)
+    if args.grid_resolution:
+        _, _, _, _, report = generate_grid_resolution(RESOLUTION_OUT if args.output == OUT else args.output)
+    else:
+        _, _, _, report = generate(args.output,args.window_days,args.step_days)
     print(json.dumps({k:v for k,v in report.items() if k not in ('test_log','synthetic')},ensure_ascii=False,indent=2))

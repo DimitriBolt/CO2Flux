@@ -1,0 +1,4 @@
+variant,windows,common_bins_min,common_bins_max,possible_bins,coverage_percent_min,coverage_percent_max,incomplete_windows,max_gap_hours,5_to_20_undefined,20_to_50_undefined
+15min_subsurface,489,2776,2831,2880,96.388888888888886,98.298611111111114,489,1,0,0
+120min_subsurface,489,360,360,360,100,100,0,0,0,0
+120min_with_air,489,316,360,360,87.777777777777771,100,402,42,0,0

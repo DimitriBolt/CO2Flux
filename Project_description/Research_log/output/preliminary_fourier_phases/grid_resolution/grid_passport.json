@@ -1,0 +1,187 @@
+{
+  "stage": "0.5: temporal-grid diagnostic",
+  "baseline_commit": "0e33a2d951e572e57636452840da0a794c01e072",
+  "accepted_passport": "Project_description/Research_log/output/stage02_candidate_selection/passport.json",
+  "selector": "technically_retained & ~doubtful",
+  "selected_vertical": "W_x1_y4",
+  "metadata": [
+    {
+      "row": 205,
+      "table": "LEO_WEST.DATAVALUESLICOR",
+      "sensorid": 1275,
+      "variableid": 56,
+      "sensorcode": "LEO-W_4_0_1_LI-7000",
+      "kind": "LI-COR",
+      "x": 0.0,
+      "y": 4.0,
+      "z": 0.25,
+      "units": "umol/mol",
+      "oracle_location": {
+        "localx": "0",
+        "localy": "4",
+        "localz": "1.75",
+        "boxx": "0",
+        "boxy": "4",
+        "boxz": "0.05",
+        "dlevel": "1"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": "Excel air height .25m not established by Oracle BOXZ"
+    },
+    {
+      "row": 106,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 996,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_1_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.05,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.75",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.05",
+        "dlevel": "1"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 107,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1012,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_2_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.2,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.6",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.2",
+        "dlevel": "2"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 108,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1035,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_4_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.5,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.3",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.5",
+        "dlevel": "4"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    }
+  ],
+  "start": "2025-05-01 00:00:00",
+  "end_exclusive": "2026-10-01 00:00:00",
+  "time_origin": "2025-04-29 00:00:00",
+  "f0_cycles_per_day": 1.0,
+  "window_days": 30,
+  "step_days": 1,
+  "bin_minutes": [
+    15,
+    120
+  ],
+  "bin_time": "Calendar centers (+7min30s or +1h); input timestamps unchanged",
+  "aggregation": "Arithmetic mean of all accepted source observations in each cell; equal weight per common cell in Fourier sum",
+  "normalization": "1/N after subtraction of each channel mean over the same common cells",
+  "phase": "wrap(Arg(F_upper * conjugate(F_lower))) in [-pi,pi)",
+  "differences": {
+    "aggregation": "wrap(Arg(exp(i*(phase_15min_subsurface-phase_120min_subsurface))))",
+    "air_support": "wrap(Arg(exp(i*(phase_120min_subsurface-phase_120min_with_air))))"
+  },
+  "input_sha256": {
+    "Project_description/Research_log/data/stage02_candidate_selection/1275_candidate_measurements.parquet": "413002ac71106d9317bc2204dd75f0ff2db3f0db61f4902673c87b8198843037",
+    "Project_description/Research_log/data/stage02_final_admission/1275_measurements.parquet": "724c73ab80bff7bbf603b7ac73e1081a8f74c9e5fd53d484059ddb7e988a1236",
+    "Project_description/Research_log/data/stage02_candidate_selection/996_candidate_measurements.parquet": "1f140ecb95d8d6254936617ec5e9001818cd7f0efde85335cc51d2aa98a95a5d",
+    "Project_description/Research_log/data/stage02_final_admission/996_measurements.parquet": "51370ddfee5a97d16707ca12ba6276c6303dfc37d82e11ed069070bcc462152f",
+    "Project_description/Research_log/data/stage02_candidate_selection/1012_candidate_measurements.parquet": "aa79f513f3ec6fde1ebd20b955cc4bfe952cb7f919dbd3215ab9af6655540bb5",
+    "Project_description/Research_log/data/stage02_final_admission/1012_measurements.parquet": "8378655d26f9b783337a2a4f46c70e83bcc6c505b41aa77dd366c08a24f80c6a",
+    "Project_description/Research_log/data/stage02_candidate_selection/1035_candidate_measurements.parquet": "53cd0212578d76a09861906765d29a7a9b742994505a7775be17d131c0f6a92a",
+    "Project_description/Research_log/data/stage02_final_admission/1035_measurements.parquet": "29e68aa5cddf6e7db85ce1b27df1f094ef02299a3441f01854d38f66ada2f3f6",
+    "Project_description/Research_log/output/stage02_candidate_selection/passport.json": "1c1ce6e9968a33567751cf3f59533693b7c4c38868228de5f5885bd15b1d0f15",
+    "Project_description/Research_log/data/stage02_candidate_selection/calendar_2h_grid.parquet": "ddc84d6daed99dc0b25bb0b679b267099440d4c5028e210148d555605ffcf292"
+  },
+  "upstream_hashes_verified": 1433,
+  "reference_document_updates": {
+    "Project_description/Research_log/README.md": {
+      "passport_sha256": "0488f03c9c25924c2f674eb2e3950f98e8455016f5aed3670bdf6a761e47ddac",
+      "current_sha256": "e3f2b2557c8fee728ff0905ca4d34631f61cebba75f6492f7b842bfe633c3fb3",
+      "historical_commit": "9c677cacd2a6a1b008a3cc7b73aa30b63e998c8d"
+    },
+    "Project_description/Research_log/PLAN.md": {
+      "passport_sha256": "dc3e76d1a5ef71f6ae7de9f58f395be5266ca46980030db0f5df30022a3d5d42",
+      "current_sha256": "832e82092eff245ff4dc712322b849ebeda266ae9a7687bb68a373bbdc45ae32",
+      "historical_commit": "9c677cacd2a6a1b008a3cc7b73aa30b63e998c8d"
+    }
+  },
+  "point_checks": [
+    {
+      "sensorid": 1275,
+      "points": 7491,
+      "exact_time_value_and_metadata_match": true,
+      "fine_cells_with_multiple_points": 0,
+      "plateau_review_points": 93
+    },
+    {
+      "sensorid": 996,
+      "points": 49311,
+      "exact_time_value_and_metadata_match": true,
+      "fine_cells_with_multiple_points": 0,
+      "plateau_review_points": 0
+    },
+    {
+      "sensorid": 1012,
+      "points": 49293,
+      "exact_time_value_and_metadata_match": true,
+      "fine_cells_with_multiple_points": 0,
+      "plateau_review_points": 0
+    },
+    {
+      "sensorid": 1035,
+      "points": 49267,
+      "exact_time_value_and_metadata_match": true,
+      "fine_cells_with_multiple_points": 0,
+      "plateau_review_points": 0
+    }
+  ],
+  "implementation_sha256": "a680f4939cdf5677bc7f74c86ff33c223daa97646b7d897065718c9eb1b01ade",
+  "captions": {
+    "grid_aggregation": "Subsurface 15-minute versus 2-hour estimates from the accepted Stage 0.2 observations. The lower row uses Arg(exp(i(left − right))) on [−π, π). Windows overlap.",
+    "grid_air_support": "Additional LI-COR availability restriction on the same subsurface 2-hour means; no air phase estimated. The lower row uses Arg(exp(i(left − right))) on [−π, π). Windows overlap.",
+    "grid_context": "Actual common-cell coverage and |F| of the three subsurface channels for each variant; no new amplitude or coverage threshold."
+  },
+  "limitations": [
+    "Overlapping windows are dependent; descriptive spread is not measurement uncertainty",
+    "No new small-module, coverage or sufficiency threshold; extrema are ranks only",
+    "2h support can retain source observations whose 15min cell lacks another subsurface channel",
+    "LI-COR only restricts 2h support here; no 15min air reconstruction or air phase",
+    "No fast-transport or physical-mechanism inference; sufficiency requires I.R. Gabitov decision"
+  ]
+}

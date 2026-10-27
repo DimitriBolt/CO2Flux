@@ -15,6 +15,8 @@ from preliminary_fourier_phases import (
     IDS, PAIRS, aggregate_bins, broken_line, compute_windows, direct_fourier,
     html_payload, longest_missing_run, phase_difference, validation_examples,
     window_slices, wrap, complex_step, select_phase_jump, phase_jump_tables,
+    GRID_START, SUBSURFACE_IDS, resolution_grid, resolution_windows,
+    compare_resolution_windows, resolution_summary, resolution_extrema,
 )
 
 
@@ -243,6 +245,133 @@ class FourierPhaseTests(unittest.TestCase):
         self.assertEqual(steps.coefficient.tolist(), ['F5','F20','Q'])
         with self.assertRaises(AssertionError): phase_jump_tables(phases, coverage.iloc[::-1])
         with self.assertRaises(ValueError): phase_jump_tables(phases, coverage.assign(window_days=60))
+
+    def resolution_frames(self, days=30):
+        times = pd.date_range(GRID_START+pd.Timedelta(minutes=7.5), periods=days*96, freq='15min')
+        t = np.arange(days*96)/96 + 1/192
+        frames = {}
+        for j,sid in enumerate(SUBSURFACE_IDS):
+            frames[sid] = pd.DataFrame(dict(localdatetime=times,
+                datavalue=500+(4+2*j)*np.cos(2*np.pi*t-j*np.pi/3),
+                technically_retained=True,doubtful=False,plateau_review=False))
+        return frames
+
+    def test_resolution_known_phase_sign_and_regular_aggregation(self):
+        frames=self.resolution_frames()
+        results=[]
+        for minutes in (15,120):
+            grid=resolution_grid(frames,minutes,GRID_START,GRID_START+pd.Timedelta(days=30))
+            table=resolution_windows(grid,minutes)
+            results.append(table)
+            self.assertEqual(table.complete_bins.iloc[0],30*1440//minutes)
+            for pair in PAIRS[1:]:
+                self.assertAlmostEqual(table[pair+'_rad'].iloc[0],math.pi/3,places=11)
+            a=complex(table.F_real_996.iloc[0],table.F_imag_996.iloc[0])
+            b=complex(table.F_real_1012.iloc[0],table.F_imag_1012.iloc[0])
+            self.assertAlmostEqual(phase_difference(b,a),-math.pi/3,places=11)
+        attenuation=math.sin(math.pi/12)/(8*math.sin(math.pi/96))
+        self.assertAlmostEqual(results[0].F_abs_996.iloc[0],2,places=11)
+        self.assertAlmostEqual(results[1].F_abs_996.iloc[0],2*attenuation,places=11)
+        comparison=compare_resolution_windows(*results,'aggregation')
+        np.testing.assert_allclose(comparison.delta_rad,0,atol=1e-12,rtol=0)
+
+    def test_resolution_circular_difference_across_branch(self):
+        frame=resolution_windows(resolution_grid(self.resolution_frames(),15,GRID_START,
+            GRID_START+pd.Timedelta(days=30)),15)
+        left,right=frame.copy(),frame.copy()
+        left['5_to_20_rad']=np.pi-.01
+        right['5_to_20_rad']=-np.pi+.01
+        right['20_to_50_rad']=np.nan
+        comparison=compare_resolution_windows(left,right,'aggregation')
+        self.assertAlmostEqual(comparison.iloc[0].delta_rad,-.02)
+        self.assertFalse(comparison.iloc[1].comparable)
+        self.assertTrue(np.isnan(comparison.iloc[1].delta_rad))
+        summary=resolution_summary(comparison)
+        self.assertEqual(summary.undefined_windows.tolist(),[0,1])
+        with self.assertRaises(AssertionError):
+            compare_resolution_windows(left,right.assign(center=right.center+pd.Timedelta(days=1)),'aggregation')
+
+    def test_resolution_missing_cells_use_actual_centers(self):
+        frames=self.resolution_frames()
+        frames[996]=frames[996].drop([0,1,200])
+        frames[1012]=frames[1012].drop([2,201])
+        frames[1035]=frames[1035].drop([3])
+        original=frames[996].copy(deep=True)
+        grid=resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=30))
+        self.assertFalse(grid.complete_subsurface.iloc[:4].any())
+        self.assertTrue(np.isnan(grid.mean_996.iloc[0]))
+        self.assertEqual(grid.n_996.iloc[0],0)
+        result=resolution_windows(grid,15).iloc[0]
+        self.assertEqual(result.missing_bins,6)
+        self.assertEqual(result.longest_gap_hours,1)
+        used=grid.loc[grid.complete_subsurface]
+        z=[]
+        for sid in SUBSURFACE_IDS:
+            values=used[f'mean_{sid}'].to_numpy()
+            mean=math.fsum(values)/len(values)
+            z.append(sum((float(x)-mean)*cmath.exp(-2j*math.pi*float(t))
+                         for t,x in zip(used.t_days,values))/len(values))
+        self.assertAlmostEqual(result['5_to_20_rad'],cmath.phase(z[0]*z[1].conjugate()),places=11)
+        pd.testing.assert_frame_equal(frames[996],original)
+
+    def test_resolution_raw_observation_weighting_and_accepted_selector(self):
+        times=pd.to_datetime(['2025-05-01 00:00','2025-05-01 00:05','2025-05-01 00:15',
+                              '2025-05-01 00:30','2025-05-01 00:45','2025-05-01 02:00'])
+        frames={s:pd.DataFrame(dict(localdatetime=times,datavalue=[1,3,8,900,800,10],
+                technically_retained=[True,True,True,False,True,True],
+                doubtful=[False,False,False,False,True,False],plateau_review=False)) for s in SUBSURFACE_IDS}
+        fine=resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=1))
+        coarse=resolution_grid(frames,120,GRID_START,GRID_START+pd.Timedelta(days=1))
+        self.assertEqual(fine.mean_996.iloc[0],2)
+        self.assertEqual(fine.mean_996.iloc[1],8)
+        self.assertEqual(coarse.mean_996.iloc[0],4)  # (1+3+8)/3, NOT mean(2,8)
+        self.assertTrue(np.isnan(coarse.mean_996.iloc[2]))
+        self.assertEqual(coarse.mean_996.iloc[1],10)  # boundary belongs to next cell
+        self.assertEqual(coarse.bin_center.iloc[0],GRID_START+pd.Timedelta(hours=1))
+        self.assertEqual(fine.bin_center.iloc[0],GRID_START+pd.Timedelta(minutes=7.5))
+
+    def test_resolution_air_restriction_is_separate_support_only(self):
+        frames=self.resolution_frames()
+        times=pd.date_range(GRID_START,periods=360,freq='2h')
+        frames[1275]=pd.DataFrame(dict(localdatetime=times[12:],datavalue=400,
+            technically_retained=True,doubtful=False,plateau_review=False))
+        grid=resolution_grid(frames,120,GRID_START,GRID_START+pd.Timedelta(days=30))
+        full=resolution_windows(grid,120)
+        restricted=resolution_windows(grid,120,'with_air')
+        self.assertEqual(full.complete_bins.iloc[0],360)
+        self.assertEqual(restricted.complete_bins.iloc[0],348)
+        self.assertEqual(restricted.air_removed_bins.iloc[0],12)
+        self.assertEqual(restricted.longest_gap_hours.iloc[0],24)
+        self.assertNotIn('F_abs_1275',restricted)
+        compare=compare_resolution_windows(full,restricted,'air_support')
+        np.testing.assert_allclose(compare.delta_rad,0,atol=1e-12,rtol=0)
+        with self.assertRaises(ValueError):resolution_windows(grid,15,'with_air')
+
+    def test_resolution_undefined_and_tiny_nonzero_without_new_cutoff(self):
+        frames=self.resolution_frames()
+        frames[1012]['datavalue']=500.
+        table=resolution_windows(resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=30)),15)
+        self.assertTrue(table[['5_to_20_rad','20_to_50_rad']].isna().all().all())
+        self.assertEqual(table.F_abs_1012.iloc[0],0)
+        frames=self.resolution_frames()
+        for s in SUBSURFACE_IDS:frames[s]['datavalue']=(frames[s].datavalue-500)*1e-12
+        table=resolution_windows(resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=30)),15)
+        self.assertAlmostEqual(table['5_to_20_rad'].iloc[0],np.pi/3,places=11)
+        for s in SUBSURFACE_IDS:frames[s]=frames[s].iloc[:1]
+        table=resolution_windows(resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=30)),15)
+        self.assertEqual(table['5_to_20_reason'].iloc[0],'fewer_than_two_common_cells')
+        self.assertTrue(np.isnan(table['5_to_20_rad'].iloc[0]))
+
+    def test_resolution_calendar_step_and_descriptive_extrema(self):
+        frames=self.resolution_frames(32)
+        fine=resolution_grid(frames,15,GRID_START,GRID_START+pd.Timedelta(days=32))
+        table=resolution_windows(fine,15)
+        self.assertEqual(len(table),3)
+        self.assertEqual(table.start.iloc[-1],GRID_START+pd.Timedelta(days=2))
+        self.assertEqual(table.end_exclusive.iloc[-1],GRID_START+pd.Timedelta(days=32))
+        extrema=resolution_extrema(table.assign(variant='15min_subsurface'))
+        self.assertEqual(set(extrema.metric),{f'F_abs_{s}' for s in SUBSURFACE_IDS})
+        with self.assertRaises(ValueError):resolution_grid(frames,60)
 
 
 if __name__=='__main__':
