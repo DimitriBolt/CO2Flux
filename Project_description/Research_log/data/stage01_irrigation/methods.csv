@@ -1,0 +1,40 @@
+methodid,methoddescription,methodlink,variableid,sensortypeid
+26,Kipp Zonen Net Radiometer CNR4: Incoming and outgoing shortwave radiation,,45,22
+27,Kipp Zonen Net Radiometer CNR4: Incoming and outgoing shortwave radiation,,46,22
+28,Kipp Zonen Net Radiometer CNR4: Pt100 temperature,,49,22
+29,Kipp Zonen Net Radiometer CNR4: Incoming and outgoing longwave radiation corrected for temperature (added 5.67 10^-8 * T^4),,47,22
+30,Kipp Zonen Net Radiometer CNR4: Incoming and outgoing longwave radiation  corrected for temperature (added 5.67 10^-8 * T^4),,48,22
+34,CSAT3 from Campbell Scientific measurement of wind velocity components and speed of sound (Ux),,35,19
+35,CSAT3 from Campbell Scientific measurement of wind velocity components and speed of sound (Uy),,36,19
+36,CSAT3 from Campbell Scientific measurement of wind velocity components and speed of sound (Uz),,37,19
+37,CSAT3 from Campbell Scientific measurement of wind velocity components and speed of sound (Sound Speed),,28,19
+38,DVI7911 from Davis Instruments: Wind speed measurement,,33,20
+39,DVI7911 from Davis Instruments: Wind direction measurement,,34,20
+40,HMP60 from Vaisala: Relative Humidity and Temperature measurement,,40,21
+41,HMP60 from Vaisala: Relative Humidity and Temperature measurement,,41,21
+42,SQ-110 from Apogee: Photosynthetic photon flux measurement,,50,23
+13,Mass estimated by Honeywell Tension/Compression Canister Load Cell Model 3130,,17,7
+14,Campbell Scientific Spatial Averaging Thermocouple TCAV,,3,10
+15,Vibrating Wire Piezometer GEO-VW-PZO from Geo-Instruments LLC,,10,12
+16,Vibrating Wire Piezometer GEO-VW-PZO from Geo-Instruments LLC,,11,12
+17,Water pressure estimated from frequency and resistance measured by Vibrating Wire Piezometer GEO-VW-PZO from Geo-Instruments LLC ,,19,12
+18,Seametrics electromagnetic flow sensor EX81,,13,3
+19,Volume of flow computed from  Seametrics electromagnetic flow sensor EX81 output,,14,3
+20,Seametrics low flow electromagnetic flow meter PE102,,13,9
+21,Volume of flow computed from Seametrics low flow electromagnetic flow meter PE102 output,,14,9
+22,NovaLynx rain gage for estimation of very low flow,,13,8
+23,Volume of flow computed from NovaLynx rain gage output for estimation of very low flow,,14,8
+24,Valworx valve is open=1 or close=0,,18,11
+25,Temperature of cRIO datalogger,,20,13
+1,Decagon Dielectric Water Potential and temperature sensor MPS-2,,7,2
+2,Decagon Dielectric Water Potential and temperature sensor MPS-2,,3,2
+3,Decagon 5TM to measure dielectric permittivity and temperature of soil ,,4,1
+4,Decagon 5TM to measure dielectric permittivity and temperature of soil ,,3,1
+5,Soil volumetric water content (VWC) computed from measuring the dielectric permittivity by Decagon 5TM sensor,,6,1
+6,Vaisala GMM222 module to measures CO2 concentration (raw output),,1,4
+7,Vaisala GMM222 module to measures CO2 concentration computed from a sensor voltage output,,9,4
+8,Hukseflux surface heat flux plates HFP01 (raw output),,1,5
+9,Hukseflux surface heat flux plates HFP01 (heat flux computed from raw voltage output),,8,5
+10,Hukseflux surface heat flux plates HFP0SC (raw output),,1,6
+11,Hukseflux surface heat flux plates HFP0SC (heat flux computed from raw voltage output),,8,6
+12,Honeywell Tension/Compression Canister Load Cell Model 3130,,15,7

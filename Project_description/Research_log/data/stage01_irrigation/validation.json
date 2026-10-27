@@ -1,0 +1,31 @@
+{
+  "checks": {
+    "17_months": true,
+    "timestamps_inside_authorized_period": true,
+    "only_hydrologic_variables": true,
+    "raw_valueids_unique": true,
+    "100_channels_1700_month_rows": true,
+    "row_counts_reconcile": true,
+    "service_counts_reconcile": true,
+    "MPS_negative_values_retained": true,
+    "no_fabricated_event_fields": true,
+    "all_37_dates_have_independent_sign_agreement": true,
+    "35_source_dates_are_in_37_wetting_dates": true,
+    "raw_sha256_unchanged": true,
+    "oracle_query_counts_match_parts": true,
+    "protected_files_unchanged": true
+  },
+  "passed": true,
+  "raw_rows": 3828754,
+  "selected_channels": 100,
+  "observed_channels": 77,
+  "nonservice_channels": 63,
+  "wetting_dates": 37,
+  "source_candidate_blocks": 35,
+  "changed_preexisting_tracked_files": [
+    "Project_description/Research_log/JOURNAL.md",
+    "Project_description/Research_log/README.md"
+  ],
+  "checked_utc": "2026-10-23T19:13:24.424644+00:00",
+  "caution": "Nonservice means finite and not -9999, not proven scientifically reliable"
+}

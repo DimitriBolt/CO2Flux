@@ -1,0 +1,26 @@
+sensortypeid,sensortype,sensordescription,sensorlink,producer,tablename,sensorname,tablenameviz
+26,CS451,"Pressure transducers for water-level measurements provide reliable, accurate pressure and temperature measurements.",http://www.campbellsci.com/cs451,Campbell Scientific,DATAVALUES,Pressure Transducer (CS451),DataValuesViz
+19,CSAT3,3D Sonic Anemometer,,Campbell Scientific,DATAVALUES,Sonic Anemometer (CSAT3),DataValuesViz
+20,DVI7911,Anemometer includes both wind speed and wind direction sensors,,Davis Instruments,DATAVALUES,Anemometer (DVI7911),DataValuesViz
+21,HMP60,Humidity and Temperature Probe ,,Vaisala,DATAVALUES,Temperature and RH (HMP60),DataValuesViz
+23,SQ-110,The SQ-110 is a self-powered quantum sensor that measures photosynthetically active radiation and is calibrated for use in sunlight,,Apogee Instruments,DATAVALUES,Quantum (SQ-110),DataValuesViz
+22,CNR4,Net Radiometer,,Kipp Zonen,DATAVALUES,Net Radiometer (CNR4),DataValuesViz
+24,SurfaceHeatFlux,Computed surface heat flux and average heat flux,http://desert.uits.arizona.edu:8080/wiki/bin/view/DSC/SurfaceHeatFlux,Derived Value,DATAVALUES,,DataValuesViz
+27,TRIAC,Electric actuators model is WE500A,,TRIAC,DATAVALUES,,DataValuesViz
+1,5TM,Sensor measures soil moisture; soil temperature; and bulk electrical conductivity,,decagon,DATAVALUES,Soil Moisture (5TM),DataValuesViz
+2,MPS-2,Dielectric Water Potential Sensor,,decagon,DATAVALUES,Water Potential (MPS-2),DataValuesViz
+3,EX81,Electromagnetic flow sensor,,decagon,DATAVALUES,Flow (EX81),DataValuesViz
+4,GMM222,Carbon Dioxide Module,,decagon,DATAVALUES,Carbon Dioxide (GMM222),DataValuesViz
+5,HFP-1,Surface heat flux plates,,hukseflux,DATAVALUES,Heat Flux (HFP-1),DataValuesViz
+6,HFP-1SC,Surface heat flux plates,,hukseflux,DATAVALUES,Heat Flux (HFP-1SC),DataValuesViz
+7,Model3130,Model 3130 Tension/Compression Canister Load Cell,,honeywell,DATAVALUES,Load Cell (Model3031),DataValuesViz
+8,NovaLynx,Rain Gage,,NovaLynx,DATAVALUES,Flow Gage Low (NovaLynx),DataValuesViz
+9,PE102,Low flow electromagnetic flow meter,,Seametrics,DATAVALUES,Flow Gage High (PE102),DataValuesViz
+10,TCAV,Averaging Thermocouple,,Campbell Scientific,DATAVALUES,Thermocouple (TCAV),DataValuesViz
+11,VALWORX,Valworx valve,,Valworx,DATAVALUES,,DataValuesViz
+12,VW-PZO,Vibrating Wire Piezometer,,Geo-Instruments,DATAVALUES,,DataValuesViz
+13,DeviceT,Temperature sensor located on a device,,NA,DATAVALUES,,DataValuesViz
+14,PTB110,Local atmospheric pressure measurement inside LEO measured at the ground level in the center bay by Barometer PTB110,,Vaisala,DATAVALUES,Barometer (PTB110),DataValuesViz
+18,TC-E,custom type E thermocouple,,Omega,DATAVALUES,Thermocouple (TC-E),DataValuesViz
+28,CSAT3 Flux,3D Sonic Anemometer for Fluxes,,Campbell Scientific,DATAVALUESCSAT3,Sonic Anemometer for Flux (CSAT3),DATAVALUESCSAT3
+25,LI-7000,LI-COR LI-7000 CO2/H2O Analyzer,http://desert.uits.arizona.edu:8080/wiki/bin/view/DSC/LI7000,LI-COR,DATAVALUESLICOR,Gas Analyzer (LI-7000),DATAVALUESLICOR

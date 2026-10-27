@@ -1,0 +1,4 @@
+rows,note,first,last,mass_service_rows,p_service_rows,positive_p_rows,negative_q_rows,same_note_duplicate_times
+2065,6hr,2025-05-01 00:00:00,2026-09-30 18:00:00,97,0,70,4,0
+511,daily,2025-05-01 12:00:00,2026-09-30 12:00:00,12,18,34,4,0
+12431,hr,2025-05-01 00:00:00,2026-09-30 23:00:00,651,0,231,4,0

@@ -1,0 +1,35 @@
+calibrationid,calibrationdatetime,contactname,description
+26,2015-01-12 00:00:00,Michael,Factory callibration of Campbell Scientific pressure transducer CS451
+19,2015-04-14 00:00:00,Michael,Factory callibration of 3D Sonic Anemometer CSAT3
+20,2015-04-14 00:00:00,Michael,Factory callibration of Anemometer includes both wind speed and wind direction sensors DVI7911
+21,2015-04-14 00:00:00,Michael,Factory callibration of Humidity and Temperature Probe HMP60
+22,2015-04-14 00:00:00,Michael,Factory callibration of Net Radiometer CNR4
+23,2015-04-14 00:00:00,Michael,Factory callibration of SQ-110; a self-powered quantum sensor that measures photosynthetically active radiation and is calibrated for use in sunlight
+24,2014-09-23 00:00:00,Michael,"Computed surface heat fluxes usig 5TM, TCAV, and HFP-1/SC data"
+29,2019-06-11 17:43:51,Wei-Ren,"Valve +1 is open, 0 is transition, -1 is closed position"
+18,2020-02-10 00:00:00,Wei-Ren,Factory callibration of Thermocouple Type E
+15,2013-03-14 00:00:00,Michael,Factory callibration of device temperature sensors
+1,2011-11-16 00:00:00,Michael,Factory callibration for Carbon Dioxide Module (GMM)
+2,2011-11-16 00:00:00,Steve,"C8 soil calibration as provided by Decagon Devices on August 15, 2011"
+3,2011-11-16 00:00:00,Michael,Factory callibration of 5TM temperature
+4,2011-11-16 00:00:00,Michael,Factory callibration of MPS2 temperature
+5,2011-11-16 00:00:00,Michael,Factory callibration of MPS2 water potential
+6,2012-02-23 00:00:00,Michael,Factory callibration of HFP-1 heat flux sensors
+7,2012-02-23 00:00:00,Michael,Factory callibration of HFP-1SC heat flux sensors
+8,2012-02-23 00:00:00,Michael,Factory callibration of thermocouple TCAV
+9,2012-03-16 00:00:00,Michael,Factory calibrated flow sensor EX80
+10,2012-03-16 00:00:00,Michael,Factory calibrated flow meter PE102
+11,2012-03-16 00:00:00,Michael,Factory calibrated raingage and value (0.01 in) recomputed for measuring volume kv in liters.
+12,2012-06-19 00:00:00,Michael,Factory callibration of Model3130 loading cells
+13,2012-06-19 00:00:00,Michael,"Valve +1 is open, 0 is transition, -1 is closed position"
+14,2012-06-19 00:00:00,Michael,Factory calibration parameters for VW-PZO
+28,2016-07-12 00:00:00,Michael,NovaLynx raingage calibration  and the estimation of k coeficient
+30,2018-09-30 00:00:00,Wei-Ren,Recalibrated tipping buckets for all slopes
+38,2024-02-22 00:00:00,Wei-Ren,Factory calibration of Vaisala PTB110 barometer sn#: W0843541
+31,2020-07-13 00:00:00,Hannes Bauser,Recalibrated tipping buckets for all slopes
+32,2022-04-29 00:00:00,Hannes Bauser,Recalibrated tipping buckets for all slopes
+33,2022-09-28 00:00:00,Hannes Bauser,Recalibrated tipping buckets for all slopes
+35,2023-01-28 00:00:00,Hannes Bauser,Recalibrated tipping buckets for all slopes
+36,2024-01-01 00:00:00,Rhiannon Nabours,CO2 callibration standard 301 ppm
+37,2024-01-01 00:00:00,Rhiannon Nabours,CO2 callibration standard 401 ppm
+25,2023-06-26 00:00:00,Wei-Ren,Factory callibration of LI-COR LI-7000 CO2/H2O Analyzer

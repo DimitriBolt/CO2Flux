@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "checks": {
+    "source_sha256_all_17_parts": true,
+    "all_source_columns_bitwise_preserved": true,
+    "no_extra_or_removed_measurement_rows": true,
+    "all_14_required_channels": true,
+    "all_native_times_in_authorized_period": true,
+    "valueids_unique": true,
+    "service_values_preserved": true,
+    "negative_MPS_values_retained": true,
+    "no_ambiguous_nominal_slots": true,
+    "no_duplicate_native_timestamps": true,
+    "all_238_channel_months": true,
+    "native_units_preserved": true,
+    "soil_coordinates_and_depths_match_accepted_input": true,
+    "coverage_reconciles_to_source_rows": true,
+    "coverage_matches_independent_existing_audit": true,
+    "all_37_accepted_wetting_dates_marked_in_every_panel": true,
+    "plot_has_every_nonservice_point": true,
+    "no_old_artifact_or_other_stage_changed": true
+  },
+  "checked_utc": "2026-10-27T19:53:06.866071+00:00",
+  "rows": 696136,
+  "channels": 14,
+  "months": 17,
+  "wetting_dates": 37,
+  "nonservice_rows": 695847,
+  "service_rows": 289,
+  "allowed_changed_preexisting_files": [
+    "Project_description/Research_log/JOURNAL.md",
+    "Project_description/Research_log/PLAN.md",
+    "Project_description/Research_log/README.md",
+    "Project_description/Research_log/data/stage01_irrigation/.gitignore",
+    "Project_description/Research_log/data/stage01_irrigation/README.md",
+    "Project_description/Research_log/details/00_irrigation_audit.md",
+    "Project_description/sensorDB/stage01_irrigation_audit.py"
+  ],
+  "unexpected_changed_files": [],
+  "status": "0.1-B technical hydrologic input for the authorized limited pilot only",
+  "exact_irrigation_calendar": "not obtained; criterion remains unmet"
+}

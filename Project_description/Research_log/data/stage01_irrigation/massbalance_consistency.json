@@ -1,0 +1,8 @@
+{
+  "compared_hours": 11780,
+  "max_abs_mass_difference_kg": 2.3283064365386963e-10,
+  "median_abs_mass_difference_kg": 0.0,
+  "identity_compared_rows": 11724,
+  "max_abs_ET_identity_residual_kg": 4.547473508864641e-13,
+  "warning": "ET=P-Q-DM is an algebraic identity, not independent confirmation of P"
+}

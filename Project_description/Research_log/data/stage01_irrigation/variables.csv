@@ -1,0 +1,69 @@
+variableid,variablecode,variablename,variableunitsid,samplemedium,valuetype,isregular,timesupport,timeunitsid,datatype,generalcategory,nodatavalue,variablecodeold
+61,waterTemp,Temperature,96,water,Field Observation,1,15,102,Continuous,Unknown,-9999.0,waterTemp
+62,waterPress,Pressure,91,water,Field Observation,1,15,102,Continuous,Unknown,-9999.0,waterPress
+63,waterLevel,Water level,89,water,Field Observation,1,15,102,Continuous,Unknown,-9999.0,waterLevel
+31,PulseCnt,Counter,137,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,PulseCnt
+32,Voltage,Voltage,168,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Voltage
+33,Wind,Wind speed,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Wind
+34,WindDir,Wind direction,2,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,WindDir
+35,Ux,Wind speed,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Ux
+36,Uy,Wind speed,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Uy
+37,Uz,Wind speed,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Uz
+38,Voutput1,Voltage,168,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Voutput1
+39,Voutput2,Voltage,168,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Voutput2
+40,RH,Relative humidity,1,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,RH
+41,AirTemp,Temperature,96,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,AirTemp
+42,Voutput3,Voltage,168,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Voutput3
+43,Voutput4,Voltage,168,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Voutput4
+44,VoltageRatio,Voltage Ratio,137,Other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,VoltageRatio
+45,ShortRadIn,"Radiation, incoming shortwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,ShortRadIn
+46,ShortRadOut,"Radiation, outgoing shortwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,ShortRadOut
+47,LongRadIn,"Radiation, incoming longwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,LongRadIn
+48,LongRadOut,"Radiation, outgoing longwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,LongRadOut
+49,PyrgeoTemp,Temperature,99,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,PyrgeoTemp
+50,PAR,"Radiation, incoming PAR",143,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,PAR
+51,Resistance,Resistance,176,other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Resistance
+52,SurfaceHeatFluxHFP1,Heat Flux,33,soil,Derived Value,1,15,102,Continuous,Unknown,-9999.0,SurfaceHeatFluxHFP1
+53,SurfaceHeatFluxHFP1sc,Heat Flux,33,soil,Derived Value,1,15,102,Continuous,Unknown,-9999.0,SurfaceHeatFluxHFP1sc
+54,SurfaceHeatFluxAvg,Heat Flux,33,soil,Derived Value,1,15,102,Continuous,Unknown,-9999.0,SurfaceHeatFluxAvg
+20,DeviceTemp,Temperature,96,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,DeviceTemp
+21,ShortRad,"Radiation, shortwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,ShortRad
+64,AirPress_hPa,Pressure,315,air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,AirPress
+23,LongRad,"Radiation, longwave",33,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,LongRad
+1,Volt,Voltage,168,soil,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Volt
+2,milliVolt,Voltage,169,soil,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,milliVolt
+3,soilTemp,Temperature,96,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,soilTemp
+4,bulkPerm,Permittivity,137,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,bulkPerm
+5,soilEC,Electric Conductivity,1001,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,soilEC
+6,VWC,Volumetric water content,1,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,VWC
+7,MWP,Water potential,170,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,MWP
+8,HeatFlux,Heat Flux,33,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,HeatFlux
+9,CO2,Carbon dioxide,205,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,CO2
+10,Frequency,Frequency,19,soil,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Frequency
+11,Resistance,Resistance,176,soil,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,Resistance
+13,Cnt,Counter,257,water,Sensor Response,1,15,102,Incremental,Unknown,-9999.0,Cnt
+14,Volume,Discharge,128,water,Field Observation,1,15,102,Incremental,Unknown,-9999.0,Volume
+15,LCout,Ratiometric,1004,other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,LCout
+16,Force,Force,43,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Force
+17,Mass,Mass,66,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Mass
+18,ValveState,Valve State,137,other,Sensor Response,1,15,102,Continuous,Unknown,-9999.0,ValveState
+19,WaterPressure,Pressure,89,soil,Field Observation,1,15,102,Continuous,Unknown,-9999.0,WaterPressure
+25,Wind,Wind speed,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Wind
+26,Azimuth,Wind direction,2,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Azimuth
+27,Elevation,Wind direction,2,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Elevation
+28,Sound,Speed of sound,119,Other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Sound
+29,SonicTemp,Temperature,96,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,SonicTemp
+30,SurfaceTemp,Temperature,96,other,Field Observation,1,15,102,Continuous,Unknown,-9999.0,SurfaceTemp
+70,WindAvg,Wind speed,119,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,Wind
+71,WindDirAvg,Wind direction,2,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,WindDir
+68,SoundAvg,Speed of sound,119,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,Sound
+69,SonicTempAvg,Temperature,96,other,Field Observation,1,15,102,Average,Unknown,-9999.0,SonicTemp
+65,UxAvg,Wind speed,119,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,Ux
+66,UyAvg,Wind speed,119,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,Uy
+67,UzAvg,Wind speed,119,Other,Field Observation,1,15,102,Average,Unknown,-9999.0,Uz
+55,CO2_cellA,Carbon dioxide,382,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,CO2_cellA
+56,CO2_cellB,Carbon dioxide,382,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,CO2_cellB
+57,H2O_cellA,Water vapor concentration,383,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,H2O_cellA
+58,H2O_cellB,Water vapor concentration,383,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,H2O_cellB
+59,IRGA_Temp,Temperature,96,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,IRGA_Temp
+60,Press_cellB,Pressure,170,Air,Field Observation,1,15,102,Continuous,Unknown,-9999.0,Press_cellB

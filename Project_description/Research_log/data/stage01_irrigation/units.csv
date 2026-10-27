@@ -1,0 +1,35 @@
+unitsid,unitsname,unitstype,unitsabbreviation
+91,pound force per square inch,Pressure/Stress,psi
+99,degree kelvin,Temperature,degK
+143,micromoles per square meter per second,Areal Flux,umol/m^2 s
+382,micromoles per mole,Concentration,umol/mol
+383,millimoles per mole,Concentration,mmol/mol
+315,hectopascal,Pressure/Stress,hPa
+119,meters per second,Velocity,m/s
+2,degree,Angle,deg
+1,percent,Dimensionless,%
+19,hertz,Frequency,Hz
+33,watts per square meter,Energy Flux,W/m^2
+43,newton,Force,N
+54,millimeter,Length,mm
+66,kilogram,Mass,kg
+69,pound mass (avoirdupois),Mass,lb
+83,pascal,Pressure/Stress,Pa
+87,millimeter of water,Pressure/Stress,mm H2O
+89,centimeter of water,Pressure/Stress,cm H2O
+96,degree celcius,Temperature,degC
+102,minute,Time,min
+128,liter,Volume,L
+137,dimensionless,Dimensionless,-
+168,volts,Potential Difference,V
+169,millivolts,Potential Difference,mV
+170,kilopascal,Pressure/Stress,kPa
+176,ohm,Resistance,ohm
+205,parts per million,Concentration,ppm
+257,count,Dimensionless,#
+269,millisiemens per centimeter,Electrical Conductivity,mS/cm
+293,percent by volume,Concentration,% by vol
+1001,decasiemens per meter,Electrical Conductivity,dS/m
+1002,Milivolt per nanosecond,rate,mV/ns
+1003,pico second,Time,ps
+1004,Milivolt per Volt,Potential Ratio,mV/V

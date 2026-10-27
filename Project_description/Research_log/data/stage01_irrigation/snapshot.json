@@ -1,0 +1,7 @@
+{
+  "period_start_inclusive": "2025-05-01 00:00:00",
+  "period_end_exclusive": "2026-10-01 00:00:00",
+  "time_correction": "none",
+  "queried_utc": "2026-10-23 18:45:55.553645+00:00",
+  "scope": "LEO West stage 0.1 hydrology; metadata first"
+}

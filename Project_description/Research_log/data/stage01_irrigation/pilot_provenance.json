@@ -1,0 +1,142 @@
+{
+  "base_commit": "50c9a93faf93972e3fc0c736006780ec8881d150",
+  "period_start_inclusive": "2025-05-01 00:00:00",
+  "period_end_exclusive": "2026-10-01 00:00:00",
+  "time_policy": "Oracle LOCALDATETIME unchanged; no timezone attachment or correction",
+  "source_inputs": {
+    "raw_manifest.json": "383924b768d997be828548dfaf7678f1eb3f352853ff33e2abce7d29fdc15112",
+    "wetting_dates.csv": "466867d73cde8437f4a0a9ef6a3c4f3cb4eccc5966bde7d300425b9e20cfb84e",
+    "channels.csv": "bfe274a535e30482463ca32db219186ab4d919d5d5009cc47d2b5122a6ec7245",
+    "units.csv": "00efd097d6c54721b02bae2cf4a3c2f1e1e142cb8a232822d740976bdf260482",
+    "monthly_coverage.csv": "428f431a46355e8d2fbde59ef1753bd57becaed38e212d836e09e10742e440fa",
+    "pilot_protected_before.json": "8a05cf3497550b0004a7ac0fd1af1f2dbcebe8ae3bc5d04ca4dad37abe348782"
+  },
+  "source_parts": {
+    "raw/measurements_2025-05.parquet": {
+      "bytes": 2017157,
+      "sha256": "c515af3eaa301c881979dd21ce6f58d84762f46aadca348ee0fda0d9097a88a2",
+      "rows": 229152
+    },
+    "raw/measurements_2025-06.parquet": {
+      "bytes": 1972510,
+      "sha256": "3ee62cb53bd6cfe641486a8c2f9e737b0fc8234beeeaf836ce20507c1fef7a97",
+      "rows": 221760
+    },
+    "raw/measurements_2025-07.parquet": {
+      "bytes": 2025898,
+      "sha256": "ef801897bf587f88b703562b07d73700fd65e5b7dcb5e81d3f2ccbd7967a2582",
+      "rows": 229152
+    },
+    "raw/measurements_2025-08.parquet": {
+      "bytes": 2045817,
+      "sha256": "a2899710b3c68d70c109ec5d89c3fa6d4fec36b244b64b01ba1c06a9ccaa2766",
+      "rows": 229152
+    },
+    "raw/measurements_2025-09.parquet": {
+      "bytes": 1983219,
+      "sha256": "c2bf24b85b922c216015b6fd9204c4d0adc23990905ac93d8874815d2414f59a",
+      "rows": 221760
+    },
+    "raw/measurements_2025-10.parquet": {
+      "bytes": 2047281,
+      "sha256": "ea7ae98be0f142ea9ac60a0852e6d2526e162ba271c55d78ba728451070ce5aa",
+      "rows": 229152
+    },
+    "raw/measurements_2025-11.parquet": {
+      "bytes": 1967128,
+      "sha256": "781aeb769f234f9133c447c2a67aa5602b161b851388edcce0ffe8e20b05d427",
+      "rows": 221760
+    },
+    "raw/measurements_2025-12.parquet": {
+      "bytes": 2055792,
+      "sha256": "6cbb0b6b0ebb98581ea32ee144c650499c352f915ccb963c8946ce63e6dc0f69",
+      "rows": 229152
+    },
+    "raw/measurements_2026-01.parquet": {
+      "bytes": 2103606,
+      "sha256": "0f9d3df1d91fa4438706ec5aef670741c644ca0c6adc4700f01d6539fa1265fe",
+      "rows": 229152
+    },
+    "raw/measurements_2026-02.parquet": {
+      "bytes": 1897961,
+      "sha256": "769db5e59c20f215700c92f05477ff7e333b352a42039faccddc3440f82a551a",
+      "rows": 206974
+    },
+    "raw/measurements_2026-03.parquet": {
+      "bytes": 2008971,
+      "sha256": "0c67bb013e82a2d55d204a7c926e57ba87c9b99900c184ec447e789738bbb0d8",
+      "rows": 228852
+    },
+    "raw/measurements_2026-04.parquet": {
+      "bytes": 2003150,
+      "sha256": "0ce12f61c82c2499c590bd7b0179f7f7d94af5aea9855172a0d77920cca28782",
+      "rows": 221760
+    },
+    "raw/measurements_2026-05.parquet": {
+      "bytes": 2057260,
+      "sha256": "309591bfe205596adcf2cf3ef67d71541afcd4ae10d3a1545a13eab13060ae26",
+      "rows": 229152
+    },
+    "raw/measurements_2026-06.parquet": {
+      "bytes": 2019945,
+      "sha256": "2111d6bd153336b337f3f40432d1098a08b4268dfdeaef72bd2aed7264c52573",
+      "rows": 221760
+    },
+    "raw/measurements_2026-07.parquet": {
+      "bytes": 2063282,
+      "sha256": "404ef984da93715cdd56e7fede390328c8905fd13f3db6a9b822a1c578fd1d15",
+      "rows": 229152
+    },
+    "raw/measurements_2026-08.parquet": {
+      "bytes": 2025581,
+      "sha256": "2b70cfa498138d553b6e1af6ca8b1fc47d83f13cf584cda90c9527f52c719cbc",
+      "rows": 229152
+    },
+    "raw/measurements_2026-09.parquet": {
+      "bytes": 2003302,
+      "sha256": "5401bb3003eda2f1e968882fbe96649e51b4ccf10be95d539c8326fa5669b805",
+      "rows": 221760
+    }
+  },
+  "code_sha256": "759472cd8ff221e6bd6a3337f5858d2658e6c8590fb0fc2189dbf614243a0e92",
+  "entrypoint_sha256": "0c37b4a169f08c82666cb986be164f894caaaeabc5c5d542d2dab81a475dae86",
+  "outputs": {
+    "Project_description/Research_log/data/stage01_irrigation/pilot_series.parquet": {
+      "sha256": "7857cbcc8e38d4d125a4bd1fb8cbe9198a0a6fc9a09b9e19e5f9adc0538f57ec",
+      "bytes": 7847722
+    },
+    "Project_description/Research_log/output/stage01_irrigation/pilot_hydrology_17months.png": {
+      "sha256": "f2d6eb08d3a398d034672b8786728f530183e481eef487c24a7dbbaf90f5aca8",
+      "bytes": 1075821
+    },
+    "Project_description/Research_log/data/stage01_irrigation/pilot_series_summary.csv": {
+      "sha256": "04c4977ec4ac075266398f4318243d8aeaed9f69e3675dd5d27f100a8a895e60",
+      "bytes": 4972
+    },
+    "Project_description/Research_log/data/stage01_irrigation/pilot_monthly_coverage.csv": {
+      "sha256": "7b09ae3b5d9af6f7325b3a1c0cc044b524da4f8299fdda55bc97848bfdfe22d7",
+      "bytes": 76818
+    },
+    "Project_description/Research_log/data/stage01_irrigation/pilot_missing_intervals.csv": {
+      "sha256": "fb7ae543a77ab0a8ca6e2dd61e054931143c991b009bdd4421f54e498421083f",
+      "bytes": 47414
+    },
+    "Project_description/Research_log/data/stage01_irrigation/pilot_native_cadence.csv": {
+      "sha256": "0f4a7ccec647be4ead03e70de7e1b9a0cf50029c020396ad18c98828a8ed7734",
+      "bytes": 2965
+    },
+    "Project_description/Research_log/data/stage01_irrigation/pilot_plot_spec.json": {
+      "sha256": "cc2f20200a4f292831fc07793b9ff0c2c31d28ddeb1732fc97601a5bdd41751d",
+      "bytes": 496
+    }
+  },
+  "command": "MPLCONFIGDIR=/tmp/co2flux-mpl python3 Project_description/sensorDB/stage01_irrigation_audit.py pilot",
+  "python": "3.14.4",
+  "pandas": "2.3.3",
+  "rows": 696136,
+  "policy": "lossless subset; no interpolation, resampling of values, calendar inference, or metrological certification",
+  "technical_flag": "is_nonservice_value = finite and datavalue != -9999; not a reliability label",
+  "coverage_clock": "15-minute slots only for availability counts and line breaks; raw time retained",
+  "spatial_limits": "VWC at (2,4), depths 5/35 cm; MPS at (1,4), depths 20/50 cm; mass at ten slope supports",
+  "stored_mass": "VariableID 17 in kg retained; VariableID 15 is never converted to kg"
+}

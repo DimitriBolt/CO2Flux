@@ -1,0 +1,798 @@
+view_name,text
+SOIL_VARIABLES,"SELECT t0.sensorid, 
+    t0.sensorcode, 
+    t4.sensortype, 
+    t1.outputvariableid, 
+    t2.variableid,
+    t2.variablecode, 
+    t2.variablename,
+    t5.unitsabbreviation,
+    t3.boxx,
+    t3.boxy,
+    t3.dlevel
+  FROM sensors t0, sensoroutput t1, variables t2, locations t3, sensortypes t4, units t5
+  WHERE t2.variableid IN (3,4,5,6,7,8,9,52,53,54,61,62,63) AND t1.outputvariableid=t2.variableID AND t0.sensorid=t1.sensorid AND t0.locationid=t3.locationid
+        AND t0.SensorTypeID=t4.SensorTypeID AND t2.variableunitsid = t5.unitsid
+  ORDER BY t2.variableid"
+VIEW_EXP20160118,"Select ""DATETIME"",""tm"",""rn"",""ot1"",""ot2""
+FROM
+(select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+FROM datavaluesviz
+where localdatetime >= '18-JAN-2016' and variableId = 14 and sensorid > 1085 and  sensorid < 1092 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+1 as outtype
+from datavaluesviz  
+where localdatetime >= '18-JAN-2016' and variableId = 14 and sensorid > 1091 and  sensorid < 1098 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+from datavaluesviz  
+where variableId = 17 and sensorid >= 1066 and  sensorid <= 1085 and localdatetime >= '18-JAN-2016' and datavalue > 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+2 as outtype
+from datavaluesviz  
+where variableId = 14 and sensorid = 993 and localdatetime >= '18-JAN-2016' and datavalue >= 0
+)
+PIVOT (sum(datavalue) FOR outtype IN (17 as ""tm"", 16 as ""rn"", 14 as ""ot1"", 15 as ""ot2""))
+ORDER BY DateTime"
+SENSORS2JSON,"SELECT t0.sensorid, 
+    t0.sensorcode, 
+    t4.sensortype, 
+    t1.outputvariableid, 
+    t2.variablecode, 
+    t3.boxx,
+    t3.boxy,
+    t3.dlevel
+  FROM sensors t0, sensoroutput t1, variables t2, locations t3, sensortypes t4
+  WHERE t0.sensorid=t1.sensorid AND t1.outputvariableid=t2.variableID AND t0.locationid=t3.locationid
+        AND t0.SensorTypeID=t4.SensorTypeID"
+SENSOR_VARIABLES,"SELECT t0.sensorid, 
+    t0.sensorcode, 
+    t4.sensortype, 
+    t1.outputvariableid, 
+    t2.variablecode, 
+    t2.variablename, 
+    t3.unitsabbreviation, 
+    t0.datatablename 
+  FROM sensors t0, sensoroutput t1, variables t2, units t3, sensortypes t4
+  WHERE t0.sensorid=t1.sensorid AND t1.outputvariableid=t2.variableID AND t2.variableunitsid=t3.unitsid
+        AND t0.SensorTypeID=t4.SensorTypeID
+  UNION
+  SELECT DISTINCT t0.sensorid, 
+    t0.sensorcode, 
+    t4.sensortype, 
+    t1.outvariableid, 
+    t2.variablecode, 
+    t2.variablename, 
+    t3.unitsabbreviation, 
+    t0.datatablename 
+  FROM sensors t0, calibrationparameters t1, variables t2, units t3, sensortypes t4
+  WHERE t0.sensorid=t1.sensorid AND t1.outvariableid <> t1.invariableid AND t1.outvariableid=t2.variableID AND t2.variableunitsid=t3.unitsid 
+        AND t0.SensorTypeID=t4.SensorTypeID"
+VIEW_INPUT_VARIABLES_METADATA,"SELECT DISTINCT t5.sensortype,
+      t1.outputorder,
+      t1.outputvariableid,
+      t3.VariableName,
+      t4.UnitsAbbreviation,
+      t3.nodatavalue,
+      t1.validrangefrom,
+      t1.validrangeto
+    FROM sensoroutput t1,
+      sensors t2, 
+      variables t3, 
+      units t4,
+      sensortypes t5 
+    WHERE t5.sensortypeid=t2.sensortypeid AND 
+      t1.sensorid=t2.sensorid AND 
+      t1.outputvariableid=t3.variableid AND 
+      t3.variableunitsid=t4.unitsid
+    ORDER BY t5.sensortype,
+      t1.outputorder,
+      t1.outputvariableid
+ "
+VIEW_CONNECTIONPARAMETERS,"SELECT t1.loggerName,
+      t2.module,
+      t2.channel,
+      t2.address,
+      t2.SensorID
+    FROM dataloggers t1,
+      connectionparameters t2 
+    WHERE t1.dataloggersID=t2.dataloggersID
+    ORDER BY t2.sensorID
+ "
+VIEW_LOCATIONS,"SELECT SensorId, 
+    SensorCode, 
+    BoxY, 
+    BoxX, 
+    Dlevel
+  FROM Locations t1, Sensors t2
+  WHERE t2.LocationID=t1.locationID
+  ORDER BY SensorId
+ "
+DATA_OUT_FLOWMETERS,"SELECT DATETIME,FM1,FM2,FM3,FM4,FM5,FM6 
+FROM
+(select to_date(to_char(localdatetime, 'YYYY/MM/DD HH24:MI'), 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, sensorid
+from datavaluesviz  
+where variableId = 14 and sensorid >= 1092 and sensorid <= 1097)
+PIVOT
+(AVG(datavalue) FOR sensorid IN (1092 as ""FM1"", 1093 as ""FM2"", 1094 as ""FM3"", 1095 as ""FM4"", 1096 as ""FM5"", 1097 as ""FM6""))
+order by DateTime"
+DATA_OUT_RAINGAGES,"SELECT DATETIME,G1,G2,G3,G4,G5,G6 
+FROM
+(select to_date(to_char(localdatetime, 'YYYY/MM/DD HH24:MI'), 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, sensorid
+from datavaluesviz  
+where variableId = 14 and sensorid >= 1086 and sensorid <= 1091)
+PIVOT
+(AVG(datavalue) FOR sensorid IN (1086 as ""G1"", 1087 as ""G2"", 1088 as ""G3"", 1089 as ""G4"", 1090 as ""G5"", 1091 as ""G6""))
+order by DateTime"
+DATA_LC_MASS,"SELECT DATETIME,LC0,LC1,LC2,LC3,LC4,LC5,LC6,LC7,LC8,LC9 
+FROM
+(select to_date(to_char(localdatetime, 'YYYY/MM/DD HH24:MI'), 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, sensorid
+from datavaluesviz  
+where variableId = 17 and sensorid >= 1066 and  sensorid <= 1075)
+PIVOT
+(AVG(datavalue) FOR sensorid IN (1066 as ""LC0"", 1067 as ""LC1"", 1068 as ""LC2"", 1069 as ""LC3"", 1070 as ""LC4"", 1071 as ""LC5"", 1072 as ""LC6"", 1073 as ""LC7"", 1074 as ""LC8"", 1075 as ""LC9""))
+order by DateTime"
+DATA_LC_TOTALMASS,"SELECT DateTime, ROUND(LC0+LC1+LC2+LC3+LC4+LC5+LC6+LC7+LC8+LC9, 1) as TotalMass
+FROM data_lc_mass
+ORDER by DateTime"
+VIEW_SENSORS,"select
+    t1.sensorid,
+    t1.sensorcode,
+    t2.sensortype,
+    t3.methoddescription,
+    t1.status,
+    t4.loggername,
+    t5.module,
+    t5.channel,
+    t5.address
+  FROM sensors t1, sensortypes t2, daqmethods t3, dataloggers t4, connectionparameters t5 
+  WHERE t1.sensortypeid=t2.sensortypeid and t3.daqmethodid=t1.daqmethodid and t4.dataloggersid=t5.dataloggersid and t1.sensorid=t5.sensorid 
+  ORDER BY sensortype, sensorid
+ "
+VIEW_CALIBRATIONPARAMETERS,"SELECT t1.SensorId, 
+    t1.SensorCode, 
+    t2.ParameterCode, 
+    t2.ParameterValue 
+  FROM Sensors t1, Calibrationparameters t2
+  WHERE t1.SensorID=t2.SensorID
+  ORDER BY SensorId, ParameterCode"
+VIEW_EXPERIMENT1,"Select ""DATETIME"",""tm"",""rn"",""ot1"",""ot2""
+FROM
+(select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+FROM datavalues
+where localdatetime >= '12-FEB-2015' and localdatetime < '16-FEB-2015' and variableId = 14 and sensorid > 1085 and  sensorid < 1092 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+1 as outtype
+from datavalues  
+where localdatetime >= '12-FEB-2015' and localdatetime < '16-FEB-2015' and variableId = 14 and sensorid > 1091 and  sensorid < 1098 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+from datavalues  
+where variableId = 17 and sensorid >= 1066 and  sensorid <= 1085 and localdatetime >= '12-FEB-2015' and localdatetime < '16-FEB-2015' and datavalue > 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+2 as outtype
+from datavalues  
+where variableId = 14 and sensorid = 993 and localdatetime >= '12-FEB-2015' and localdatetime < '16-FEB-2015' and datavalue >= 0
+)
+PIVOT (sum(datavalue) FOR outtype IN (17 as ""tm"", 16 as ""rn"", 14 as ""ot1"", 15 as ""ot2""))
+ORDER BY DateTime"
+VIEW_STORAGE,"SELECT ""DATETIME"",""s1"",""s2"",""s3"",""s4"",""s5"",""s6"",""s7"",""s8"",""s9"",""s10"",""s11"",""s12"",""s13"",""s14"",""s15"",""s16"",""s17"",""s18"",""s19"",""s20"",""s21"",""s22"",""s23"",""s24"",""s25"",""s26"",""s27"",""s28"",""s29"",""s30"",""s31"",""s32"",""s33"",""s34"",""s35"",""s36"",""s37"",""s38"",""s39"",""s40"",""s41"",""s42"",""s43"",""s44"",""s45"",""s46"",""s47"",""s48"",""s49"",""s50"",""s51"",""s52"",""s53"",""s54"",""s55"",""s56"",""s57"",""s58"",""s59"",""s60"",""s61"",""s62"",""s63"",""s64"",""s65"",""s66"",""s67"",""s68"",""s69"",""s70"",""s71"",""s72"",""s73"",""s74"",""s75"",""s76"",""s77"",""s78"",""s79"",""s80"",""s81"",""s82"",""s83"",""s84"",""s85"",""s86"",""s87"",""s88"",""s89"",""s90"",""s91"",""s92"",""s93"",""s94"",""s95"",""s96"",""s97"",""s98"",""s99"",""s100"",""s101"",""s102"",""s103"",""s104"",""s105"",""s106"",""s107"",""s108"",""s109"",""s110"",""s111"",""s112"",""s113"",""s114"",""s115"",""s116"",""s117"",""s118"",""s119"",""s120"",""s121"",""s122"",""s123"",""s124"",""s125"",""s126"",""s127"",""s128"",""s129"",""s130"",""s131"",""s132"",""s133"",""s134"",""s135"",""s136"",""s137"",""s138"",""s139"",""s140"",""s141"",""s142"",""s143"",""s144"",""s145"",""s146"",""s147"",""s148"",""s149"",""s150"",""s151"",""s152"",""s153"",""s154"",""s155"",""s156"",""s157"",""s158"",""s159"",""s160"",""s161"",""s162"",""s163"",""s164"",""s165"",""s166"",""s167"",""s168"",""s169"",""s170"",""s171"",""s172"",""s173"",""s174"",""s175"",""s176"",""s177"",""s178"",""s179"",""s180"",""s181"",""s182"",""s183"",""s184"",""s185"",""s186"",""s187"",""s188"",""s189"",""s190"",""s191"",""s192"",""s193"",""s194"",""s195"",""s196"",""s197"",""s198"",""s199"",""s200"",""s201"",""s202"",""s203"",""s204"",""s205"",""s206"",""s207"",""s208"",""s209"",""s210"",""s211"",""s212"",""s213"",""s214"",""s215"",""s216"",""s217"",""s218"",""s219"",""s220"",""s221"",""s222"",""s223"",""s224"",""s225"",""s226"",""s227"",""s228"",""s229"",""s230"",""s231"",""s232"",""s233"",""s234"",""s235"",""s236"",""s237"",""s238"",""s239"",""s240"",""s241"",""s242"",""s243"",""s244"",""s245"",""s246"",""s247"",""s248"",""s249"",""s250"",""s251"",""s252"",""s253"",""s254"",""s255"",""s256"",""s257"",""s258"",""s259"",""s260"",""s261"",""s262"",""s263"",""s264"",""s265"",""s266"",""s267"",""s268"",""s269"",""s270"",""s271"",""s272"",""s273"",""s274"",""s275"",""s276"",""s277"",""s278"",""s279"",""s280"",""s281"",""s282"",""s283"",""s284"",""s285"",""s286"",""s287"",""s288"",""s289"",""s290"",""s291"",""s292"",""s293"",""s294"",""s295"",""s296"",""s297"",""s298"",""s299"",""s300"",""s301"",""s302"",""s303"",""s304"",""s305"",""s306"",""s307"",""s308"",""s309"",""s310"",""s311"",""s312"",""s313"",""s314"",""s315"",""s316"",""s317"",""s318"",""s319"",""s320"",""s321"",""s322"",""s323"",""s324"",""s325"",""s326"",""s327"",""s328"",""s329"",""s330"",""s331"",""s332"",""s333"",""s334"",""s335"",""s336"",""s337"",""s338"",""s339"",""s340"",""s341"",""s342"",""s343"",""s344"",""s345"",""s346"",""s347"",""s348"",""s349"",""s350"",""s351"",""s352"",""s353"",""s354"",""s355"",""s356"",""s357"",""s358"",""s359"",""s360"",""s361"",""s362"",""s363"",""s364"",""s365"",""s366"",""s367"",""s368"",""s369"",""s370"",""s371"",""s372"",""s373"",""s374"",""s375"",""s376"",""s377"",""s378"",""s379"",""s380"",""s381"",""s382"",""s383"",""s384"",""s385"",""s386"",""s387"",""s388"",""s389"",""s390"",""s391"",""s392"",""s393"",""s394"",""s395"",""s396"",""s397"",""s398"",""s399"",""s400"",""s401"",""s402"",""s403"",""s404"",""s405"",""s406"",""s407"",""s408"",""s409"",""s410"",""s411"",""s412"",""s413"",""s414"",""s415"",""s416"",""s417"",""s418"",""s419"",""s420"",""s421"",""s422"",""s423"",""s424"",""s425"",""s426"",""s427"",""s428"",""s429"",""s430"",""s431"",""s432"",""s433"",""s434"",""s435"",""s436"",""s437"",""s438"",""s439"",""s440"",""s441"",""s442"",""s443"",""s444"",""s445"",""s446"",""s447"",""s448"",""s449"",""s450"",""s451"",""s452"",""s453"",""s454"",""s455"",""s456"",""s457"",""s458"",""s459"",""s460"",""s461"",""s462"",""s463"",""s464"",""s465"",""s466"",""s467"",""s468"",""s469"",""s470"",""s471"",""s472"",""s473"",""s474"",""s475"",""s476"",""s477"",""s478"",""s479"",""s480"",""s481"",""s482"",""s483"",""s484"",""s485"",""s486"",""s487"",""s488"",""s489"",""s490"",""s491"",""s492"",""s493"",""s494"",""s495"",""s496"" 
+FROM
+(select Concat(to_char(localdatetime, 'YYYY/MM/DD HH24:'), trim(to_char((floor(to_number(to_char(localdatetime,'MI'))/15))*15,'09'))) as DateTime, datavalue, sensorid
+from datavaluesviz 
+where variableId = 6 and localdatetime > (SELECT max(DT)+0.0099 FROM tsmsaturation) and localdatetime < (SELECT to_date(to_char(SYSDATE-1/24, 'YYYY/MM/DD HH24:')||'58:00', 'YYYY/MM/DD HH24:MI:SS') FROM dual))
+PIVOT
+(AVG(datavalue) FOR sensorid IN (
+1 as ""s1"",
+2 as ""s2"",
+3 as ""s3"",
+4 as ""s4"",
+5 as ""s5"",
+6 as ""s6"",
+7 as ""s7"",
+8 as ""s8"",
+9 as ""s9"",
+10 as ""s10"",
+11 as ""s11"",
+12 as ""s12"",
+13 as ""s13"",
+14 as ""s14"",
+15 as ""s15"",
+16 as ""s16"",
+17 as ""s17"",
+18 as ""s18"",
+19 as ""s19"",
+20 as ""s20"",
+21 as ""s21"",
+22 as ""s22"",
+23 as ""s23"",
+24 as ""s24"",
+25 as ""s25"",
+26 as ""s26"",
+27 as ""s27"",
+28 as ""s28"",
+29 as ""s29"",
+30 as ""s30"",
+31 as ""s31"",
+32 as ""s32"",
+33 as ""s33"",
+34 as ""s34"",
+35 as ""s35"",
+36 as ""s36"",
+37 as ""s37"",
+38 as ""s38"",
+39 as ""s39"",
+40 as ""s40"",
+41 as ""s41"",
+42 as ""s42"",
+43 as ""s43"",
+44 as ""s44"",
+45 as ""s45"",
+46 as ""s46"",
+47 as ""s47"",
+48 as ""s48"",
+49 as ""s49"",
+50 as ""s50"",
+51 as ""s51"",
+52 as ""s52"",
+53 as ""s53"",
+54 as ""s54"",
+55 as ""s55"",
+56 as ""s56"",
+57 as ""s57"",
+58 as ""s58"",
+59 as ""s59"",
+60 as ""s60"",
+61 as ""s61"",
+62 as ""s62"",
+63 as ""s63"",
+64 as ""s64"",
+65 as ""s65"",
+66 as ""s66"",
+67 as ""s67"",
+68 as ""s68"",
+69 as ""s69"",
+70 as ""s70"",
+71 as ""s71"",
+72 as ""s72"",
+73 as ""s73"",
+74 as ""s74"",
+75 as ""s75"",
+76 as ""s76"",
+77 as ""s77"",
+78 as ""s78"",
+79 as ""s79"",
+80 as ""s80"",
+81 as ""s81"",
+82 as ""s82"",
+83 as ""s83"",
+84 as ""s84"",
+85 as ""s85"",
+86 as ""s86"",
+87 as ""s87"",
+88 as ""s88"",
+89 as ""s89"",
+90 as ""s90"",
+91 as ""s91"",
+92 as ""s92"",
+93 as ""s93"",
+94 as ""s94"",
+95 as ""s95"",
+96 as ""s96"",
+97 as ""s97"",
+98 as ""s98"",
+99 as ""s99"",
+100 as ""s100"",
+101 as ""s101"",
+102 as ""s102"",
+103 as ""s103"",
+104 as ""s104"",
+105 as ""s105"",
+106 as ""s106"",
+107 as ""s107"",
+108 as ""s108"",
+109 as ""s109"",
+110 as ""s110"",
+111 as ""s111"",
+112 as ""s112"",
+113 as ""s113"",
+114 as ""s114"",
+115 as ""s115"",
+116 as ""s116"",
+117 as ""s117"",
+118 as ""s118"",
+119 as ""s119"",
+120 as ""s120"",
+121 as ""s121"",
+122 as ""s122"",
+123 as ""s123"",
+124 as ""s124"",
+125 as ""s125"",
+126 as ""s126"",
+127 as ""s127"",
+128 as ""s128"",
+129 as ""s129"",
+130 as ""s130"",
+131 as ""s131"",
+132 as ""s132"",
+133 as ""s133"",
+134 as ""s134"",
+135 as ""s135"",
+136 as ""s136"",
+137 as ""s137"",
+138 as ""s138"",
+139 as ""s139"",
+140 as ""s140"",
+141 as ""s141"",
+142 as ""s142"",
+143 as ""s143"",
+144 as ""s144"",
+145 as ""s145"",
+146 as ""s146"",
+147 as ""s147"",
+148 as ""s148"",
+149 as ""s149"",
+150 as ""s150"",
+151 as ""s151"",
+152 as ""s152"",
+153 as ""s153"",
+154 as ""s154"",
+155 as ""s155"",
+156 as ""s156"",
+157 as ""s157"",
+158 as ""s158"",
+159 as ""s159"",
+160 as ""s160"",
+161 as ""s161"",
+162 as ""s162"",
+163 as ""s163"",
+164 as ""s164"",
+165 as ""s165"",
+166 as ""s166"",
+167 as ""s167"",
+168 as ""s168"",
+169 as ""s169"",
+170 as ""s170"",
+171 as ""s171"",
+172 as ""s172"",
+173 as ""s173"",
+174 as ""s174"",
+175 as ""s175"",
+176 as ""s176"",
+177 as ""s177"",
+178 as ""s178"",
+179 as ""s179"",
+180 as ""s180"",
+181 as ""s181"",
+182 as ""s182"",
+183 as ""s183"",
+184 as ""s184"",
+185 as ""s185"",
+186 as ""s186"",
+187 as ""s187"",
+188 as ""s188"",
+189 as ""s189"",
+190 as ""s190"",
+191 as ""s191"",
+192 as ""s192"",
+193 as ""s193"",
+194 as ""s194"",
+195 as ""s195"",
+196 as ""s196"",
+197 as ""s197"",
+198 as ""s198"",
+199 as ""s199"",
+200 as ""s200"",
+201 as ""s201"",
+202 as ""s202"",
+203 as ""s203"",
+204 as ""s204"",
+205 as ""s205"",
+206 as ""s206"",
+207 as ""s207"",
+208 as ""s208"",
+209 as ""s209"",
+210 as ""s210"",
+211 as ""s211"",
+212 as ""s212"",
+213 as ""s213"",
+214 as ""s214"",
+215 as ""s215"",
+216 as ""s216"",
+217 as ""s217"",
+218 as ""s218"",
+219 as ""s219"",
+220 as ""s220"",
+221 as ""s221"",
+222 as ""s222"",
+223 as ""s223"",
+224 as ""s224"",
+225 as ""s225"",
+226 as ""s226"",
+227 as ""s227"",
+228 as ""s228"",
+229 as ""s229"",
+230 as ""s230"",
+231 as ""s231"",
+232 as ""s232"",
+233 as ""s233"",
+234 as ""s234"",
+235 as ""s235"",
+236 as ""s236"",
+237 as ""s237"",
+238 as ""s238"",
+239 as ""s239"",
+240 as ""s240"",
+241 as ""s241"",
+242 as ""s242"",
+243 as ""s243"",
+244 as ""s244"",
+245 as ""s245"",
+246 as ""s246"",
+247 as ""s247"",
+248 as ""s248"",
+249 as ""s249"",
+250 as ""s250"",
+251 as ""s251"",
+252 as ""s252"",
+253 as ""s253"",
+254 as ""s254"",
+255 as ""s255"",
+256 as ""s256"",
+257 as ""s257"",
+258 as ""s258"",
+259 as ""s259"",
+260 as ""s260"",
+261 as ""s261"",
+262 as ""s262"",
+263 as ""s263"",
+264 as ""s264"",
+265 as ""s265"",
+266 as ""s266"",
+267 as ""s267"",
+268 as ""s268"",
+269 as ""s269"",
+270 as ""s270"",
+271 as ""s271"",
+272 as ""s272"",
+273 as ""s273"",
+274 as ""s274"",
+275 as ""s275"",
+276 as ""s276"",
+277 as ""s277"",
+278 as ""s278"",
+279 as ""s279"",
+280 as ""s280"",
+281 as ""s281"",
+282 as ""s282"",
+283 as ""s283"",
+284 as ""s284"",
+285 as ""s285"",
+286 as ""s286"",
+287 as ""s287"",
+288 as ""s288"",
+289 as ""s289"",
+290 as ""s290"",
+291 as ""s291"",
+292 as ""s292"",
+293 as ""s293"",
+294 as ""s294"",
+295 as ""s295"",
+296 as ""s296"",
+297 as ""s297"",
+298 as ""s298"",
+299 as ""s299"",
+300 as ""s300"",
+301 as ""s301"",
+302 as ""s302"",
+303 as ""s303"",
+304 as ""s304"",
+305 as ""s305"",
+306 as ""s306"",
+307 as ""s307"",
+308 as ""s308"",
+309 as ""s309"",
+310 as ""s310"",
+311 as ""s311"",
+312 as ""s312"",
+313 as ""s313"",
+314 as ""s314"",
+315 as ""s315"",
+316 as ""s316"",
+317 as ""s317"",
+318 as ""s318"",
+319 as ""s319"",
+320 as ""s320"",
+321 as ""s321"",
+322 as ""s322"",
+323 as ""s323"",
+324 as ""s324"",
+325 as ""s325"",
+326 as ""s326"",
+327 as ""s327"",
+328 as ""s328"",
+329 as ""s329"",
+330 as ""s330"",
+331 as ""s331"",
+332 as ""s332"",
+333 as ""s333"",
+334 as ""s334"",
+335 as ""s335"",
+336 as ""s336"",
+337 as ""s337"",
+338 as ""s338"",
+339 as ""s339"",
+340 as ""s340"",
+341 as ""s341"",
+342 as ""s342"",
+343 as ""s343"",
+344 as ""s344"",
+345 as ""s345"",
+346 as ""s346"",
+347 as ""s347"",
+348 as ""s348"",
+349 as ""s349"",
+350 as ""s350"",
+351 as ""s351"",
+352 as ""s352"",
+353 as ""s353"",
+354 as ""s354"",
+355 as ""s355"",
+356 as ""s356"",
+357 as ""s357"",
+358 as ""s358"",
+359 as ""s359"",
+360 as ""s360"",
+361 as ""s361"",
+362 as ""s362"",
+363 as ""s363"",
+364 as ""s364"",
+365 as ""s365"",
+366 as ""s366"",
+367 as ""s367"",
+368 as ""s368"",
+369 as ""s369"",
+370 as ""s370"",
+371 as ""s371"",
+372 as ""s372"",
+373 as ""s373"",
+374 as ""s374"",
+375 as ""s375"",
+376 as ""s376"",
+377 as ""s377"",
+378 as ""s378"",
+379 as ""s379"",
+380 as ""s380"",
+381 as ""s381"",
+382 as ""s382"",
+383 as ""s383"",
+384 as ""s384"",
+385 as ""s385"",
+386 as ""s386"",
+387 as ""s387"",
+388 as ""s388"",
+389 as ""s389"",
+390 as ""s390"",
+391 as ""s391"",
+392 as ""s392"",
+393 as ""s393"",
+394 as ""s394"",
+395 as ""s395"",
+396 as ""s396"",
+397 as ""s397"",
+398 as ""s398"",
+399 as ""s399"",
+400 as ""s400"",
+401 as ""s401"",
+402 as ""s402"",
+403 as ""s403"",
+404 as ""s404"",
+405 as ""s405"",
+406 as ""s406"",
+407 as ""s407"",
+408 as ""s408"",
+409 as ""s409"",
+410 as ""s410"",
+411 as ""s411"",
+412 as ""s412"",
+413 as ""s413"",
+414 as ""s414"",
+415 as ""s415"",
+416 as ""s416"",
+417 as ""s417"",
+418 as ""s418"",
+419 as ""s419"",
+420 as ""s420"",
+421 as ""s421"",
+422 as ""s422"",
+423 as ""s423"",
+424 as ""s424"",
+425 as ""s425"",
+426 as ""s426"",
+427 as ""s427"",
+428 as ""s428"",
+429 as ""s429"",
+430 as ""s430"",
+431 as ""s431"",
+432 as ""s432"",
+433 as ""s433"",
+434 as ""s434"",
+435 as ""s435"",
+436 as ""s436"",
+437 as ""s437"",
+438 as ""s438"",
+439 as ""s439"",
+440 as ""s440"",
+441 as ""s441"",
+442 as ""s442"",
+443 as ""s443"",
+444 as ""s444"",
+445 as ""s445"",
+446 as ""s446"",
+447 as ""s447"",
+448 as ""s448"",
+449 as ""s449"",
+450 as ""s450"",
+451 as ""s451"",
+452 as ""s452"",
+453 as ""s453"",
+454 as ""s454"",
+455 as ""s455"",
+456 as ""s456"",
+457 as ""s457"",
+458 as ""s458"",
+459 as ""s459"",
+460 as ""s460"",
+461 as ""s461"",
+462 as ""s462"",
+463 as ""s463"",
+464 as ""s464"",
+465 as ""s465"",
+466 as ""s466"",
+467 as ""s467"",
+468 as ""s468"",
+469 as ""s469"",
+470 as ""s470"",
+471 as ""s471"",
+472 as ""s472"",
+473 as ""s473"",
+474 as ""s474"",
+475 as ""s475"",
+476 as ""s476"",
+477 as ""s477"",
+478 as ""s478"",
+479 as ""s479"",
+480 as ""s480"",
+481 as ""s481"",
+482 as ""s482"",
+483 as ""s483"",
+484 as ""s484"",
+485 as ""s485"",
+486 as ""s486"",
+487 as ""s487"",
+488 as ""s488"",
+489 as ""s489"",
+490 as ""s490"",
+491 as ""s491"",
+492 as ""s492"",
+493 as ""s493"",
+494 as ""s494"",
+495 as ""s495"",
+496 as ""s496""
+))
+order by DateTime"
+VIEW_EXPERIMENT2,"Select ""DATETIME"",""tm"",""rn"",""ot1"",""ot2""
+FROM
+(select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+FROM datavalues
+where localdatetime >= '02-JUN-2015' and localdatetime < '27-JUN-2015' and variableId = 14 and sensorid > 1085 and  sensorid < 1092 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+1 as outtype
+from datavalues  
+where localdatetime >= '02-JUN-2015' and localdatetime < '27-JUN-2015' and variableId = 14 and sensorid > 1091 and  sensorid < 1098 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+from datavalues  
+where variableId = 17 and sensorid >= 1066 and  sensorid <= 1085 and localdatetime >= '02-JUN-2015' and localdatetime < '27-JUN-2015' and datavalue > 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+2 as outtype
+from datavalues  
+where variableId = 14 and sensorid = 993 and localdatetime >= '02-JUN-2015' and localdatetime < '27-JUN-2015' and datavalue >= 0
+)
+PIVOT (sum(datavalue) FOR outtype IN (17 as ""tm"", 16 as ""rn"", 14 as ""ot1"", 15 as ""ot2""))
+ORDER BY DateTime"
+VIEW_EXPERIMENT1B,"Select ""DATETIME"",""tm"",""rn"",""ot1"",""ot2""
+FROM
+(select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+FROM datavalues
+where localdatetime >= '18-MAY-2015' and localdatetime < '22-MAY-2015' and variableId = 14 and sensorid > 1085 and  sensorid < 1092 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+1 as outtype
+from datavalues  
+where localdatetime >= '18-MAY-2015' and localdatetime < '22-MAY-2015' and variableId = 14 and sensorid > 1091 and  sensorid < 1098 and datavalue >= 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid as outtype
+from datavalues  
+where variableId = 17 and sensorid >= 1066 and  sensorid <= 1085 and localdatetime >= '18-MAY-2015' and localdatetime < '22-MAY-2015' and datavalue > 0
+UNION
+select to_char(localdatetime, 'YYYY/MM/DD HH24:MI') as DateTime, datavalue, variableid+2 as outtype
+from datavalues  
+where variableId = 14 and sensorid = 993 and localdatetime >= '18-MAY-2015' and localdatetime < '22-MAY-2015' and datavalue >= 0
+)
+PIVOT (sum(datavalue) FOR outtype IN (17 as ""tm"", 16 as ""rn"", 14 as ""ot1"", 15 as ""ot2""))
+ORDER BY DateTime"
+SENSORTYPE_VARIABLES_WEB,"SELECT DISTINCT 
+      t5.sensortypeId,
+      t5.sensortype, 
+      t5.sensorName, 
+      t5.TABLENAMEVIZ, 
+      t1.outputorder,
+      t1.outputvariableid,
+      t3.VariableName,
+      t3.VariableCode,
+      t4.UnitsAbbreviation,
+      t3.nodatavalue,
+      t6.rangefrom,
+      t6.rangeto
+    FROM sensoroutput t1,
+      sensors t2, 
+      variables t3, 
+      units t4,
+      sensortypes t5, 
+      dataranges_viz t6
+    WHERE 
+      t5.sensortypeid=t2.sensortypeid AND 
+      t1.sensorid=t2.sensorid AND 
+      t1.outputvariableid=t3.variableid AND 
+      t3.variableunitsid=t4.unitsid AND 
+      t5.sensortypeid=t6.sensortypeid AND 
+      t1.outputvariableid=t6.variableid AND 
+      t1.outputvariableid NOT IN (1,10,11,13,15,18,19,20,31,32,38,39,42,43,51,52,53,54,55,57,59,60,65,66,67,68,69,71) and
+      t5.sensortypeid NOT IN (18)
+    ORDER BY t5.sensortype,
+      t1.outputorder,
+      t1.outputvariableid"
+SENSOR_VARIABLES_VIZ,"SELECT t0.sensorid, 
+    t0.sensorcode, 
+    t0.sensortypeid, 
+    t1.variableid, 
+    t1.variablename, 
+    t1.variablecode, 
+    t1.variableunit 
+  FROM sensors t0, SensorType_Variables_Web t1
+  WHERE t0.sensortypeid=t1.sensortypeid AND t0.sensorid NOT IN (1194, 1219, 1234, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085)
+  Order by Sensorid, variableid"
+VIEW_LOCATIONSTAB,"SELECT SensorId, 
+    SensorCode, 
+    BoxY, 
+    BoxX, 
+    BoxZ, 
+    LocalZ, 
+    Dlevel
+  FROM Locations t1, Sensors t2
+  WHERE t2.LocationID=t1.locationID
+  ORDER BY SensorId"
+DATA_FLOWMETERS_INC,"select datetime, dt, diff1, diff2, diff3, diff4, diff5, diff6
+From (
+select datetime, round((datetime - LAG(datetime,1) OVER (ORDER BY datetime))*24*60,0) AS dt, 
+fm1 - LAG(fm1,1,-9999) OVER (ORDER BY datetime) AS diff1, 
+fm2 - LAG(fm2,1,-9999) OVER (ORDER BY datetime) AS diff2, 
+fm3 - LAG(fm3,1,-9999) OVER (ORDER BY datetime) AS diff3, 
+fm4 - LAG(fm4,1,-9999) OVER (ORDER BY datetime) AS diff4, 
+fm5 - LAG(fm5,1,-9999) OVER (ORDER BY datetime) AS diff5, 
+fm6 - LAG(fm6,1,-9999) OVER (ORDER BY datetime) AS diff6 
+from DATA_OUT_FLOWMETERS
+order by datetime) 
+where datetime > (select min(datetime) from DATA_OUT_FLOWMETERS)"
+DATA_RAINGAGES_INC,"select datetime, dt, diff1, diff2, diff3, diff4, diff5, diff6
+From (
+select datetime, round((datetime - LAG(datetime,1) OVER (ORDER BY datetime))*24*60,0) AS dt, 
+g1 - LAG(g1,1,-9999) OVER (ORDER BY datetime) AS diff1, 
+g2 - LAG(g2,1,-9999) OVER (ORDER BY datetime) AS diff2, 
+g3 - LAG(g3,1,-9999) OVER (ORDER BY datetime) AS diff3, 
+g4 - LAG(g4,1,-9999) OVER (ORDER BY datetime) AS diff4, 
+g5 - LAG(g5,1,-9999) OVER (ORDER BY datetime) AS diff5, 
+g6 - LAG(g6,1,-9999) OVER (ORDER BY datetime) AS diff6 
+from DATA_OUT_RAINGAGES
+order by datetime) 
+where datetime > (select min(datetime) from DATA_OUT_RAINGAGES)"

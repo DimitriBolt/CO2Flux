@@ -1,0 +1,6 @@
+daqmethodid,methoddescription
+1,CommBusQuery
+2,ValueChange
+0,sample
+3,counter
+4,SampleAndCounter

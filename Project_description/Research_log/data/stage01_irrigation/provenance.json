@@ -1,0 +1,23 @@
+{
+  "base_commit": "5499cb9a4060e2e6480e0673ff047657119b4270",
+  "current_HEAD": "5499cb9a4060e2e6480e0673ff047657119b4270",
+  "branch": "main",
+  "origin_main_verified_by": "git ls-remote origin refs/heads/main on 2026-10-23; same full SHA as base_commit",
+  "period_start": "2025-05-01 00:00:00",
+  "period_end_exclusive": "2026-10-01 00:00:00",
+  "time_correction": "none",
+  "source_files": {
+    "AGENTS.md": "8a7622e410379f4b2265ace9cff552284e5e9da5debba1f34be646f3c529e978",
+    "Project_description/Research_log/PLAN.md": "1e776c9bd07abae23260e4ca7c69f5b22f62c0fddf84b55b3cebb7c53e2be9b3",
+    "Sensors_Description/LEO-West-Inventory.xlsx": "1fb130181305436819ad0aa9345bd6c29f7402c3de1055c0c4682037e1775a97",
+    "Sensors_Description/variables_schema.xlsx": "f4bec37990e121826dcc223210a3deda1866182476e3c45ef3bb7c49f165fd24",
+    "Sensors_Description/LEOSensorDBdescription.pdf": "fd0fb4d81b0b9628bcc02540a7941ae59c219e1d9563643afe225c5be5af319a",
+    "Sensors_Description/workflow_memory.md": "c35f29ed46a177df39a7c460c69bfd4b3ae9504ccdabac445a46180537ecb686",
+    "Project_description/sensorDB/sensorDB.py": "07700ded8539045e735a029926f1964b8f06bf8892850abbdb47411c994060db"
+  },
+  "code_sha256": "51235538daed73de40106f4ad13eeea313eabd8fea3f85daff07a48d2bed2831",
+  "massbalance_source_sha256": "49f70a6704b8eb3bb43895e112b19f58166dcf4dafbce97f538df39a25f59baa",
+  "source_snapshot": "queries.jsonl and raw_manifest.json; raw/ and massbalance.csv excluded from Git",
+  "oracle_operations": "SELECT only; date-indexed monthly DATAVALUES queries; no unbounded measurement-history scan",
+  "acquisition_isolation": "sequential SELECTs, not a single Oracle SCN; row IDs and hashes freeze this local snapshot"
+}

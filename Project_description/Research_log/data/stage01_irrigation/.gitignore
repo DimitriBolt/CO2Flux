@@ -1,0 +1,4 @@
+raw/
+massbalance.csv
+measurements_*.csv
+pilot_series.parquet
