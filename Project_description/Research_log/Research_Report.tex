@@ -1,10 +1,10 @@
 % Unified CO2Flux report. Compile from Project_description/Research_log
-% Source commit: 67aa98954162d0437bfcc30d7d7b14c4d531f10f
+% Source commit: 5fb1ca89260192f189d69ac73fa360caec7598d5
 % latexmk -pdf -interaction=nonstopmode -halt-on-error Research_Report.tex
 \documentclass[11pt,letterpaper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,pdflscape,geometry,hyperref,microtype}
+\usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,longtable,pdflscape,geometry,hyperref,microtype}
 \geometry{margin=0.85in}
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,pdfauthor={Dimitri Bolt}}
 \newcommand{\CO}{\mathrm{CO}_2}
@@ -13,11 +13,32 @@
 \title{CO2Flux: Relative Spectral Phases of Subsurface CO$_2$ at Biosphere 2 LEO\\
 \large A Unified Report of Documented Results and Open Validation}
 \author{Dimitri Bolt\\{\small Academic Advisor: Professor Ildar R. Gabitov}}
-\date{19 October 2026}
+\date{28.Oct.2026}
 \begin{document}
 \maketitle
 \begin{abstract}
-The current approved task is to display and evaluate the temporal evolution of three adjacent relative Fourier phases for a selected West-slope four-channel CO$_2$ profile, from atmospheric air to 5, 20 and 50 cm depth. Existing preliminary generalized Lomb--Scargle amplitude spectra and a separate direct-Fourier pilot are reported without conflating their estimators. The saved direct-Fourier analysis produces three finite phase coordinates in 492 overlapping 30-day windows stepped by one day at one cycle per day. All 492 windows contain unresolved sensor-review flags; their scientific reliability is not established. An isolated 5-to-20 cm phase change from 17 to 18 December 2025 is diagnosed algebraically but not physically attributed. Earlier studies of the times of maxima of fitted daily harmonics remain historical and do not answer the new spectral-phase question. Neither the final irrigation calendar nor I.~R.~Gabitov's Stage 0.5 methodological approval has been recorded as complete.
+I summarize the documented CO$_2$ analyses at Biosphere 2 LEO
+without changing my approved research plan. For vertical
+W\_x1\_y4, the accepted observation interval is
+01.May.2025--30.Sep.2026 (17 complete months).
+The limited Stage 0.1-B hydrological input consists of
+14 series and 37 indirect wetting dates, not a verified
+irrigation-event calendar. Stage 0.2 is closed using my
+monthly median daily-amplitude threshold of 2.5 in
+each channel's stored units: 6,123 common two-hour cells
+and 489 technically computable 30-day windows.
+My older four-channel phase demonstration comprises
+492 windows obtained with previous input masks; I have
+not recomputed those four-channel phases on the accepted
+Stage 0.2 input. A newer Stage 0.5 diagnostic compares
+15-minute and two-hour subsurface Fourier phases across
+489 matched windows for two adjacent depth pairs.
+It separates the additional common-cell restriction
+caused by the atmospheric sensor. I report both numerical
+sensitivity and limitations without deciding whether
+two-hour sampling is adequate. The final Stage 0.5
+decision by I.~R.~Gabitov and the conditions for new
+Chapter 1 remain open.
 \end{abstract}
 \tableofcontents
 
@@ -35,29 +56,31 @@ In particular, \textbf{0.5/Q1} is a completed diagnostic of one phase change,
 notebooks concern the previous methodology, not the future spectral chapters.
 
 \begingroup
-\small
-\setlength{\tabcolsep}{3.5pt}
-\renewcommand{\arraystretch}{1.25}
-\begin{center}
-\begin{tabular}{@{}p{1.25cm}p{4.15cm}p{3.35cm}p{5.1cm}@{}}
+\footnotesize
+\setlength{\tabcolsep}{2.8pt}
+\renewcommand{\arraystretch}{1.13}
+\begin{longtable}{@{}p{1.28cm}p{4.0cm}p{3.35cm}p{5.05cm}@{}}
 \toprule
 Stage & Object and status & Report section & Canonical source\\
 \midrule
-0.1 & Irrigation calendar; incomplete
-& \hyperref[sec:limits]{Limitations}
-& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#preparation}{PLAN: 0.1}\\
-0.2 & Data and quality control; science-level admission unresolved
+0.1-B & Limited hydrological input accepted; full event log missing
+& \hyperref[sec:hydro]{Hydrology}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/details/00_irrigation_audit.md#stage01b-pilot-input}{Hydrological audit}\\
+0.2 & Accepted 17-month input and author threshold 2.5; closed with limitations
 & \hyperref[sec:data]{Data and QC}
 & \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/details/02_data_checks.md}{Data checks}\\
 0.3 & Preliminary amplitude spectra; calculated, not a final frequency choice
 & \hyperref[sec:gls]{Amplitude spectra}
 & \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_co2_spectra.ipynb}{Spectra notebook}\\
-0.4 & Relative Fourier phases; 492 computed windows, reliability unestablished
+0.4 & Earlier 492-window phase demonstration, not recalculated with 489-window input
 & \hyperref[sec:fourier]{Direct Fourier}; \hyperref[sec:phase-results]{phase series}
 & \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_fourier_phases.ipynb}{Phase notebook, sections 1--9}\\
 0.5/Q1 & One phase jump analyzed; does not close Stage 0.5
 & \hyperref[sec:jump]{Single-jump result}
 & \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_fourier_phases.ipynb#one-phase-jump}{Phase notebook, section 10}\\
+0.5/grid & 15-minute versus two-hour phases for two subsurface pairs; diagnostic completed
+& \hyperref[sec:gridstudy]{Grid comparison}
+& \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/00_preliminary_fourier_phases.ipynb#temporal-grid-resolution}{Phase notebook, section 11}\\
 0.5 & Presentation to I.G. and explicit approval; pending
 & \hyperref[sec:next]{Next approved steps}
 & \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/PLAN.md#preparation}{PLAN: 0.5 and stopping criteria}\\
@@ -76,8 +99,7 @@ Historic 1--3 & Absolute-harmonic maximum times/amplitudes; distinct earlier wor
 \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/02_monthly_changes.ipynb}{02},
 \href{https://github.com/DimitriBolt/CO2Flux/blob/main/Project_description/Research_log/03_long_term_evolution.ipynb}{03}\\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{longtable}
 \endgroup
 \clearpage
 \newpage
@@ -102,37 +124,128 @@ Air & 1275 & LI-COR & $\mu$mol/mol\\
 \end{center}
 The historical West-slope profile W\_R4\_C-4 is different: sensors 994/1010/1026 at 5/20/35 cm. Its results are not pooled with this four-channel 5/20/50 cm pilot.
 
+\section{Hydrological context: accepted Stage 0.1-B input}
+\label{sec:hydro}
+For the interval 01.May.2025--30.Sep.2026 I accepted
+14 hydrological time series: two 5TM volumetric-water-content
+(VWC) channels, two MPS-2 matric-potential channels, and ten
+separate Model3130 stored-mass channels. The existing source
+export contains 696,136 rows, including 289 service values
+of $-9999$. The original time stamps, sensor identifiers,
+real gaps, service values, and monthly coverage are preserved;
+no missing concentrations or hydrological measurements were
+interpolated \cite{hydroaudit,hydrovalidation}.
+
+VWC sensors 19/317 (\%) are at neighboring coordinate $(2,4)$,
+depths 5 and 35~cm, approximately one meter from my CO$_2$
+vertical. MPS-2 sensors 668/889 (kPa) are at W\_x1\_y4,
+depths 20 and 50~cm. The ten stored masses 1066--1075 (kg)
+refer to support locations across the slope, and I do not
+equate them with the amount of supplied water or the water
+content of the selected CO$_2$ profile. No conversion from
+matric potential to VWC is made without an appropriate
+water-retention relationship.
+
+I retained \textbf{37 calendar dates of independently
+corroborated wetting}. These are indirect observations,
+not 37 verified operational irrigation events.
+A complete SCADA log specifying start/end times,
+zone, water volume and flow has not been recovered.
+Thus Stage 0.1-B is complete for the authorized pilot,
+while the original full-event-calendar question remains open.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.96\linewidth]{output/stage01_irrigation/pilot_hydrology_17months.png}
+\caption{Existing 17-month hydrological overview:
+neighboring VWC, on-vertical matric potential and
+ten separate slope-support masses. The 37 marked days
+identify wetting evidence, not exact irrigation events.}
+\label{fig:hydrology}
+\end{figure}
+
 \section{Data and quality control}
 \label{sec:data}
-\subsection{Input and temporal coverage}
-The versioned archive is \texttt{20261002T061358Z-264980}. The pilot calendar is the half-open interval $[2025\text{-}04\text{-}29,2026\text{-}10\text{-}02)$, containing 521 days; 520 have some four-channel daily overlap. The raw atmospheric record has 7,589 measurements; each selected subsurface sensor has 50,009 raw measurements, with 49,784, 49,770 and 49,715 technically retained measurements, respectively. Median native intervals are about two hours for air and 15 minutes for the basalt channels. The database time base is taken as confirmed: no additional time shift is imposed \cite{spectra,passport}.
+\subsection{Accepted vertical and scientific scope of Stage 0.2}
+I selected W\_x1\_y4 with LI-COR 1275 (air) and GMM222
+996/1012/1035 (5, 20, 50~cm). After checking all 16
+candidate West-slope verticals, I closed Stage 0.2 on
+23.Oct.2026 with the half-open interval
+$[01.\mathrm{May}.2025,01.\mathrm{Oct}.2026)$:
+\textbf{17 consecutive complete months} with
+actual data gaps retained \cite{stage02,stage02validation}.
 
-The air channel has 7,589 records flagged because its LI-COR artifact and range checks remain unconfirmed. The corresponding subsurface counts marked for ambiguous excursions are 188, 193 and 206. A technically retained value can still be doubtful. Previously established subsurface instrument thresholds do not automatically apply to LI-COR, and old monthly amplitude criteria are not universal spectral-admission rules \cite{plan,qc}.
+I approved a minimum monthly median diurnal amplitude
+of \textbf{2.5} in each channel's original units:
+ppm for GMM222 and $\mu$mol/mol for LI-COR.
+This was my separate decision and does \emph{not}
+replace or claim to be I.~R.~Gabitov's original
+8-unit threshold. The strict-passport result at 8
+remains unchanged. My accepted Fourier input selector
+is \texttt{technically\_retained \& \textasciitilde doubtful};
+it preserves the original observations and rejection
+reasons elsewhere. The accepted database time reference
+is not shifted.
 
-\subsection{Common two-hour cells and missingness}
-Let $R_{jk}$ be retained observations for channel $j$ within $B_k=[s_k,s_k+2\,\mathrm{h})$. Only when $n_{jk}=|R_{jk}|>0$ define the bin mean
+On this view I obtained \textbf{517 of 518 common days}
+and \textbf{6,123 of 6,216} possible two-hour common
+cells (98.50\%). The removal of doubtful values lost
+25 previously occupied common cells.
+The accepted 30-day / one-day-step calendar has
+\textbf{489 technically computable windows}, each
+with 316--360 common two-hour cells.
+This is a data-availability result: it does not mean
+489 independently corroborated four-channel phase
+calculations. I have not introduced new $R^2$,
+coverage, or Fourier-modulus thresholds.
+
+\subsection{Common cells and preserved missingness}
+For a channel $j$ and calendar cell
+$B_k=[s_k,s_k+2\,\mathrm{h})$, let $R_{jk}$
+be its actually accepted source measurements.
+I define
 \begin{equation}
-x_{jk}=\frac{1}{n_{jk}}\sum_{r\in R_{jk}} C_{jr}.
+n_{jk}=|R_{jk}|,\qquad
+x_{jk}=\frac1{n_{jk}}\sum_{r\in R_{jk}}C_{jr}
+\quad(n_{jk}>0).
 \label{eq:bin}
 \end{equation}
-Each bin retains both its count and the logical union of review flags. For a window $W$, set
+For window $W$ I use only shared occupied cells
 \begin{equation}
-I_W=\{k:B_k\subset W,\ n_{jk}>0\ \text{for every }j=0,1,2,3\},\qquad N=|I_W|.
+I_W=\{k:B_k\subset W,\ n_{jk}>0\
+\text{for all }j=0,1,2,3\},\qquad N=|I_W|.
 \label{eq:common}
 \end{equation}
-All four estimates use these same actually observed bin centers, without interpolating, zero filling, compressing the calendar or carrying the last air value forward. The complete pilot calendar contains 6,184 common two-hour bins out of 6,252 possible. For the saved 30-day windows there are 317--360 common cells per window and 88.06--100\% coverage; the maximum common-bin gap is 42 hours. No new science-level minimum coverage or amplitude threshold has been approved \cite{validation}.
+No absent cell is replaced by zero, no interpolation
+or unlimited atmospheric forward-fill is performed,
+and the actual calendar is not compressed. The
+15-minute comparison below uses separate common
+cells of the three subsurface channels.
+
+\subsection{Older pilot results remain distinguished}
+The surviving Stage~0.3 spectra and original
+Stage~0.4 figures use an earlier calendar beginning
+29.Apr.2025 and older technical masks. That pilot
+had 6,184 occupied common two-hour cells out of
+6,252 possible and computed 492 windows.
+The accepted Stage~0.2 view instead has
+6,123/6,216 cells and 489 potential windows.
+I retain those historical preliminary plots
+\emph{without claiming a recalculation of four-channel
+Fourier phases or amplitude spectra using the newly
+accepted Stage~0.2 masks} \cite{spectra,passport,validation,stage02}.
 
 \section{Fourier methodology}
 \subsection{Stage 0.3: amplitude spectra}
 \label{sec:gls}
-The saved amplitude spectra use a floating-intercept, equal-weight generalized Lomb--Scargle sinusoidal least-squares model at each candidate frequency:
+My previously saved preliminary spectra use a floating-intercept, equal-weight generalized Lomb--Scargle sinusoidal least-squares model at each candidate frequency:
 \begin{equation}
 C_j(t)\simeq c_j(f)+a_j(f)\cos(2\pi ft)+b_j(f)\sin(2\pi ft)
 =c_j(f)+\operatorname{Re}\{Z_j(f)e^{2\pi i ft}\},
 \quad Z_j=a_j-i b_j,\quad A_j(f)=|Z_j|.
 \label{eq:gls}
 \end{equation}
-$A_j$ is a fitted sinusoidal semi-amplitude in the source unit, not spectral power. This is not the direct Fourier estimator employed in Stage 0.4. The existing method is implemented by \texttt{gls(t,y,frequency)} and \texttt{grid(days)} in \texttt{Project\_description/sensorDB/preliminary\_spectra.py}. The frequency step is $1/T\simeq0.001921153$ cycles/day for an observed span $T\simeq520.5208$ days, over $0<f<6$ cycles/day. The display bound is not a strict Nyquist claim for irregular sampling. Other spectral peaks are documented, but their mechanisms and an optimal physical frequency have not been established. The 24-hour harmonic is merely the approved provisional demonstration frequency \cite{spectra,qc}.
+$A_j$ is a fitted sinusoidal semi-amplitude in the source unit, not spectral power. This is not the direct Fourier estimator employed in Stage 0.4. The existing method is implemented by \texttt{gls(t,y,frequency)} and \texttt{grid(days)} in \texttt{Project\_description/sensorDB/preliminary\_spectra.py}. The frequency step is $1/T\simeq0.001921153$ cycles/day for an observed span $T\simeq520.5208$ days, over $0<f<6$ cycles/day. The display bound is not a strict Nyquist claim for irregular sampling. Other spectral peaks are documented, but their mechanisms and an optimal physical frequency have not been established. The 24-hour harmonic remains my provisional demonstration frequency \cite{spectra,qc}.
 \begin{landscape}
 \begin{figure}[p]
 \centering
@@ -144,7 +257,7 @@ $A_j$ is a fitted sinusoidal semi-amplitude in the source unit, not spectral pow
 
 \subsection{Stage 0.4: direct complex coefficients and relative phases}
 \label{sec:fourier}
-Set $t_{\rm ref}=$29 April 2025 00:00. For each common two-hour center $t_k=s_k+1$ hour, express $t_k-t_{\rm ref}$ in days. The working frequency is $f_0=1$ cycle/day, window length 30 days, and step one day. For channel $j$ use
+For the older Stage~0.4 demonstration I set $t_{\rm ref}=$29.Apr.2025 00:00. For each common two-hour center $t_k=s_k+1$ hour, express $t_k-t_{\rm ref}$ in days. The working frequency is $f_0=1$ cycle/day, window length 30 days, and step one day. For channel $j$ use
 \begin{align}
 \bar x_{j,W}&=\frac1N\sum_{k\in I_W}x_{jk},\\
 F_j(f_0;W)&=\frac1N\sum_{k\in I_W}(x_{jk}-\bar x_{j,W})\,e^{-2\pi i f_0 t_k}.
@@ -173,14 +286,14 @@ The saved synthetic checks recover zero for identical signals, $+\pi/3$ for a fo
 \label{sec:prelim}
 \subsection{Three temporal series}
 \label{sec:phase-results}
-The saved stage 0.4 run reports 492 sliding 30-day windows, with all three relative phases numerically defined in every window. Their centers run from 14 May 2025 to 17 September 2026. Every window retains unresolved review flags, and a scientific reliability classification has \emph{not} been established. A count of zero scientifically certified windows here indicates lack of certification by this procedure, not evidence that every window is invalid.
+The older Stage~0.4 demonstration computed three relative phases in 492 overlapping 30-day windows, with centers 14.May.2025--17.Sep.2026. These results retain the earlier masks and are not a 489-window reanalysis on the new accepted Stage~0.2 input. The coefficient moduli, missingness and approval of phase-admission criteria must be considered before physical interpretation.
 
 The three angular coordinates define a candidate point in $\mathbb T^3=S^1\times S^1\times S^1$. The cube $[-\pi,\pi)^3$ is only one coordinate display with opposite faces identified; a plotted branch jump or Euclidean cube distance is not automatically intrinsic motion on the torus.
 \begin{landscape}
 \begin{figure}[p]
 \centering
 \includegraphics[width=.96\linewidth]{output/preliminary_fourier_phases/phase_evolution_17x11.pdf}
-\caption{Pre-existing time evolution of three direct-Fourier relative phases, 30-day windows, one-day step, one cycle/day. All windows carry review flags.}
+\caption{Pre-existing time evolution of three direct-Fourier relative phases, 30-day windows, one-day step, one cycle/day. Computed on the earlier input masks; not updated to the Stage~0.2 selected input.}
 \label{fig:evolution}
 \end{figure}
 \end{landscape}
@@ -193,7 +306,7 @@ The three angular coordinates define a candidate point in $\mathbb T^3=S^1\times
 
 \subsection{One 5-to-20 cm discontinuity examined for Stage 0.5/Q1}
 \label{sec:jump}
-The latest available diagnostic selects a single adjacent pair by maximal absolute difference on the original $[-\pi,\pi)$ phase branch, with earlier occurrence breaking ties. The centers are 17 and 18 December 2025, corresponding to 30-day windows from 2 December through 1 January and from 3 December through 2 January, respectively. Neighboring windows overlap for 29 days and must not be treated as independent events. For the complex product $Q=F_5\overline{F_{20}}$, distinguish
+My earlier 0.5/Q1 diagnostic selected a single adjacent pair by maximal absolute difference on the original $[-\pi,\pi)$ phase branch, with earlier occurrence breaking ties. The centers are 17.Dec.2025 and 18.Dec.2025, corresponding to 30-day windows from 02.Dec.2025 through 01.Jan.2026 and from 03.Dec.2025 through 02.Jan.2026, respectively. Neighboring windows overlap for 29 days and must not be treated as independent events. For the complex product $Q=F_5\overline{F_{20}}$, distinguish
 \begin{equation}
 d_Q=\wrap(\Arg Q_2)-\wrap(\Arg Q_1),\qquad
 \delta_Q=\wrap(\Arg(Q_2\overline{Q_1})),\qquad
@@ -214,20 +327,167 @@ The saved phases are $1.3815969902$ and $1.9625409175$ rad, so $d_Q=\delta_Q=+0.
 \label{fig:jumpcomplex}
 \end{figure}
 
+\subsection{Stage 0.5: sensitivity to 15-minute versus two-hour grids}
+\label{sec:gridstudy}
+After discussion with I.~R.~Gabitov on 23.Oct.2026,
+I undertook one restricted diagnostic of the
+\emph{subsurface} relative phases 5$\to$20~cm and
+20$\to$50~cm. I used the accepted 17-month Stage~0.2
+source observations, $f_0=1$ cycle/day, and matching
+30-day windows stepped by one day.
+I distinguished three supports:
+(i) common 15-minute subsurface bins;
+(ii) common two-hour subsurface bins;
+(iii) two-hour subsurface means further restricted to
+cells containing an actual atmospheric LI-COR reading.
+This last operation is \emph{not} the same as aggregation,
+and does not reconstruct a 15-minute air signal
+\cite{gridpassport,gridvalidation}.
+
+For the aggregation comparison I calculate the
+cyclic difference
+\begin{equation}
+\delta_{u\to v}(W)=
+\operatorname{Arg}\left[
+\exp\left(i\left\{
+\Delta\phi_{u\to v}^{(15\,\mathrm{min})}(W)
+-\Delta\phi_{u\to v}^{(2\,\mathrm h)}(W)
+\right\}\right)\right].
+\label{eq:griddiff}
+\end{equation}
+I calculate an analogous circular difference between
+the unrestricted two-hour subsurface phase and the
+phase on two-hour cells also occupied by air. All
+\textbf{489 windows} yielded finite paired estimates
+for both subsurface depth pairs in all three variants.
+
+\begin{center}
+\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Effect & Pair & Median $|\delta|$ & 95th pct.\ $|\delta|$ & Maximum $|\delta|$\\
+\midrule
+15 min -- 2 h & 5$\to$20 cm & 0.010179 & 0.050569 & 0.080158\\
+15 min -- 2 h & 20$\to$50 cm & 0.050098 & 0.154327 & 0.317131\\
+Air support & 5$\to$20 cm & 0.011741 & 0.315633 & 0.430516\\
+Air support & 20$\to$50 cm & 0.052175 & 0.297058 & 0.399709\\
+\bottomrule
+\end{tabular}
+\end{center}
+All values are in radians. The 15-minute subsurface
+windows have 2,776--2,831 occupied common cells
+out of 2,880 possible; two-hour subsurface support
+has 360/360, and the two-hour support additionally
+restricted by air has 316--360/360. The respective
+longest missing common-cell intervals are 1, 0 and
+42 hours. The preserved validation records
+\textbf{26 passing tests}, including seven new narrow
+checks; it does not establish physical uncertainty
+or a new acceptance threshold.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\linewidth]{output/preliminary_fourier_phases/grid_resolution/grid_aggregation.png}
+\caption{Existing comparison between actual subsurface
+15-minute and two-hour Fourier phases on the same
+accepted measurements. The lower panels show circular
+differences between estimates, not errors relative
+to an unknown true phase.}
+\label{fig:gridaggregation}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\linewidth]{output/preliminary_fourier_phases/grid_resolution/grid_air_support.png}
+\caption{Existing effect of restricting two-hour
+subsurface support by atmospheric LI-COR availability.
+The two-hour subsurface means themselves are preserved;
+this is not a 15-minute atmospheric phase analysis.}
+\label{fig:gridair}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\linewidth]{output/preliminary_fourier_phases/grid_resolution/grid_context.png}
+\caption{Existing coverage and Fourier-coefficient
+moduli by grid variant. Low extrema and missingness
+are shown descriptively; no new admissibility
+threshold is introduced.}
+\label{fig:gridcontext}
+\end{figure}
+I interpret this calculation as a check of sampling
+and common-support sensitivity for two subsurface
+pairs at one daily frequency. Overlapping windows
+are not independent observations. The sufficiency
+of two-hour resolution remains a matter for an
+explicit methodological decision by I.~R.~Gabitov.
+
 \section{Historical analyses, not spectral-phase evidence}
 \label{sec:historical}
-The earlier Chapter 1 fitted a fixed diurnal harmonic. Earlier Chapter 2 studied the different West vertical W\_R4\_C-4 from 11 September 2013 through 30 September 2026, over 157 months and 2,614,638 archived raw measurements. Its final historical processing retained 43 jointly admitted months, 23 vectors of absolute daily maximum times $H(d)$ and 25 daily-amplitude vectors $A(d)$. These are not four-channel spectral-window admissions. Earlier Chapter 3 found no established reproducible long-term evolution under its original absolute-maximum-time and amplitude procedure. The historical input and its limitations are retained but are not recalculated or interpreted as either confirming or refuting the new relative spectral-phase problem \cite{readme,historical}.
+In my earlier Chapter 1, I fitted a fixed diurnal harmonic. My earlier Chapter 2 studied the different West vertical W\_R4\_C-4 from 11.Sep.2013 through 30.Sep.2026, over 157 months and 2,614,638 archived raw measurements. Its final historical processing retained 43 jointly admitted months, 23 vectors of absolute daily maximum times $H(d)$ and 25 daily-amplitude vectors $A(d)$. These are not four-channel spectral-window admissions. My earlier Chapter 3 found no established reproducible long-term evolution under its original absolute-maximum-time and amplitude procedure. The historical input and its limitations are retained but are not recalculated or interpreted as either confirming or refuting the new relative spectral-phase problem \cite{readme,historical}.
 
 \section{Mathematical validation and physical interpretation}
 \label{sec:validation}
-A Fourier phase is defined only for nonzero complex coefficients; when a modulus approaches zero, the argument becomes sensitive to perturbations. A discrete branch crossing must be distinguished from an intrinsic circular increment by equation~\eqref{eq:jump}. Missing samples and changing source quality can affect direct Fourier coefficients. The successful synthetic and Python/browser cross-checks certify implementation properties, not error bars or a physical causal model.
+I treat the argument of a nonzero complex Fourier
+coefficient as a computed angular coordinate, not
+automatically as a reliable physical travel time.
+In particular, small moduli can make phase sensitive
+to perturbation, and changing the common observation
+support can change the result. The single older Q1
+jump and the new grid-resolution diagnostic test
+different mathematical issues. Neither establishes
+a CO$_2$ transport mechanism.
 
-A reduced diffusion--reaction reference equation might be written
+For subsequent physical interpretation, the PLAN
+records an elementary one-dimensional diffusion
+hypothesis discussed with I.~R.~Gabitov on
+23.Oct.2026:
 \begin{equation}
-\partial_t C=\partial_z(D_{\rm eff}\,\partial_z C)
--\partial_z(vC)+S-R,
+\frac{\partial C}{\partial t}
+=D\frac{\partial^2 C}{\partial x^2},\qquad D>0,
+\label{eq:diffusion}
 \end{equation}
-but it has not been fitted or uniquely identified in this pilot. Moisture, storage, boundary forcing, thermal variations, physical sensor quality, and source/sink terms remain possible confounders. Phase alone is not a diffusion coefficient and cannot identify biological versus geochemical origin \cite{plan,maier}.
+where $x$ is depth directed downward.
+This has not been fitted or validated for LEO.
+A possible, not yet established, extension is
+\begin{equation}
+\partial_t C=
+\partial_x\bigl(D_{\rm eff}(\theta,x,t)\partial_xC\bigr)
++S(x,t),
+\label{eq:diffusionwet}
+\end{equation}
+where moisture $\theta$, transport coefficient
+$D_{\rm eff}$ and combined source/sink term $S$
+require their own definitions and measurements.
+Any physical balance must additionally account for
+the choice of concentration variable and pore-gas
+storage. Candidate idealized boundary conditions
+discussed with I.~R.~Gabitov are
+\begin{equation}
+-D_{\rm eff}\,\partial_x C(0,t)
+=k[C_{\rm air}(t)-C(0,t)],\qquad
+\partial_x C(L,t)=0.
+\label{eq:bc}
+\end{equation}
+The surface Robin condition is not automatically
+equivalent to my separate observational assumption
+$C_0(t)=C_{\rm air}(t)$.
+I keep them distinct pending a physical model.
+
+With $\tau=t/T_0$ and $y=x/X_0$ the constant-$D$
+reference equation becomes
+\begin{equation}
+\partial_\tau C=
+\frac{DT_0}{X_0^2}\partial_y^2C,\qquad
+T_0=\frac{X_0^2}{D_0}\quad(D=D_0>0).
+\label{eq:scale}
+\end{equation}
+The illustrative length $X_0=0.1$~m
+does not supply a numerical $T_0$ without $D_0$;
+the scale is not a measured phase delay.
+None of these models starts future Chapter~6
+or implies an estimate of biological activity
+or chemical interaction \cite{plan,maier}.
 
 \section{Buchstaber framework: approved methodological preparation only}
 \label{sec:buchstaber}
@@ -245,26 +505,80 @@ This standard mathematical identity is not a measured LEO result. In particular 
 
 \section{Limitations and open questions}
 \label{sec:limits}
-The scientific admission of LI-COR and basalt signals is unfinished. No confirmed threshold for phase stability or amplitude has been selected. Overlapping windows are dependent; direct Fourier coefficients may be affected by missingness and spectral leakage. The adopted daily frequency is provisional; investigation of phase as a function of frequency is not currently authorized. Complete actual West-slope irrigation events (including SCADA logs, timing, intensity and location) remain outstanding. The public Arevalo et al. data provide only partial 2015--2019 precipitation coverage and cannot replace the complete operational history. None of the preliminary curves identifies a chemical, biological, or transport mechanism \cite{plan}.
+My accepted 0.2 data scope and limited 0.1-B
+hydrology do not establish a complete operational
+irrigation-event calendar. The 37 wetting dates
+provide coarse indirect environmental markers,
+not exact known forcing times. The earlier 0.3/0.4
+illustrations are retained on their old input masks.
+I have not recomputed the three four-channel phase
+series for the newly accepted 489-window view.
+The later 15-minute/two-hour study tests only two
+subsurface pairs, not a 15-minute atmospheric
+signal. I have not adopted a cutoff declaring
+two-hour sampling sufficient, or quantified error
+against a known true phase. Overlapping windows
+are dependent and coefficient moduli and real gaps
+may limit interpretation. The partial Arevalo et al.
+precipitation dataset does not replace a full
+operational log. No diffusion coefficient or
+transport, chemical or biological source has
+been identified from these observations
+\cite{plan,hydroaudit,gridpassport}.
 
 \section{Next approved steps}
 \label{sec:next}
-The existing PLAN requires documented spectral-specific quality and coverage, the actual irrigation calendar or an explicit decision about its missing portion, presentation of the four amplitude spectra and three temporal phase curves with formulas and tests, and explicit feedback from I.~R.~Gabitov on frequency, time window, step and experimental interval. Until those completion conditions hold, the new spectral Chapter 1 cannot begin. The single Q1 discontinuity diagnostic does not authorize wider jump analysis or mechanism inference. The separately allowed Buchstaber preparation remains subject to its own input and approval conditions \cite{plan}.
+I remain at Stage~0.5 before new Chapter~1.
+The approved immediate discussion with
+I.~R.~Gabitov must present the original
+amplitude spectra, the three preliminary temporal
+phase series, the 0.5/Q1 example, the accepted
+17-month input, hydrological coverage and 37
+wetting-day markers, and the new two-pair
+temporal-resolution diagnostic.
+The open decision is whether two-hour sampling
+is sufficient for the selected daily spectral
+phase question, with explicit consideration of
+the remaining irrigation-log gaps and the
+chosen frequency, window, step and phase
+assessment protocol. I do not automatically
+launch 15-minute atmospheric reconstruction,
+machine learning, additional frequencies or
+physical modeling, or mark Chapter~1 as begun.
+The independent Buchstaber preparation is
+not evidence of its application to LEO.
 
 \section*{Sources, figures and reproducibility}
 \addcontentsline{toc}{section}{Sources, figures and reproducibility}
-This report consolidates the source repository at commit \texttt{67aa98954162d0437bfcc30d7d7b14c4d531f10f}, 19 October 2026. The existing figures used here, without regeneration, are:
+This report consolidates the source repository at commit \texttt{5fb1ca89260192f189d69ac73fa360caec7598d5}, 28.Oct.2026. The existing figures used here, without regeneration, are:
 \begin{itemize}
+\item \texttt{output/stage01\_irrigation/pilot\_hydrology\_17months.png};
+\item \texttt{output/preliminary\_fourier\_phases/grid\_resolution/grid\_aggregation.png};
+\item \texttt{output/preliminary\_fourier\_phases/grid\_resolution/grid\_air\_support.png};
+\item \texttt{output/preliminary\_fourier\_phases/grid\_resolution/grid\_context.png};
 \item \texttt{output/preliminary\_spectra/four\_channel\_spectra\_17x11.pdf};
 \item \texttt{output/preliminary\_fourier\_phases/phase\_evolution\_17x11.pdf};
 \item \texttt{output/preliminary\_fourier\_phases/phase\_trajectory\_3d.png};
 \item \texttt{output/preliminary\_fourier\_phases/jump\_diagnostic/phase\_jump\_local.png};
 \item \texttt{output/preliminary\_fourier\_phases/jump\_diagnostic/phase\_jump\_complex.png}.
 \end{itemize}
-The original numerical and audit files remain in \texttt{output/preliminary\_spectra/} and \texttt{output/preliminary\_fourier\_phases/} as passport, validation, phase, coverage and Q1 diagnostic tables. Supplementary interactive HTML is \texttt{output/preliminary\_spectra/interactive\_spectra.html} and \texttt{output/preliminary\_fourier\_phases/phase\_evolution.html}. Compile this sole master file from \texttt{Project\_description/Research\_log/} using \texttt{latexmk -pdf -interaction=nonstopmode -halt-on-error Research\_Report.tex}.
+I preserve the original numerical audit files and their
+passports rather than generating second versions. In particular,
+I use the accepted hydrological source
+\texttt{data/stage01\_irrigation/pilot\_validation.json},
+the selected input passport
+\texttt{output/stage02\_candidate\_selection/passport.json},
+and the grid-resolution passport, summary and validation
+within \texttt{output/preliminary\_fourier\_phases/grid\_resolution/}.
+The original Fourier phase demonstration and Q1 figures
+retain their earlier masks. Interactive supplementary
+figures remain in the corresponding \texttt{output/}
+directories. I compile this sole master file from
+\texttt{Project\_description/Research\_log/} using
+\texttt{latexmk -pdf -interaction=nonstopmode -halt-on-error Research\_Report.tex}.
 
 \begin{thebibliography}{99}
-\bibitem{readme} CO2Flux, \emph{Project\_description/Research\_log/README.md}, revision 4 October 2026.
+\bibitem{readme} CO2Flux, \emph{Project\_description/Research\_log/README.md}, revision 27.Oct.2026.
 \bibitem{plan} CO2Flux, \emph{Project\_description/Research\_log/PLAN.md}, preparatory Stage 0 and unified report policy, source commit specified above.
 \bibitem{spectra} CO2Flux, \emph{00\_preliminary\_co2\_spectra.ipynb}, and \emph{output/preliminary\_spectra/passport.json}.
 \bibitem{phase} CO2Flux, \emph{00\_preliminary\_fourier\_phases.ipynb}, including Section 10 (single Q1 phase jump).
@@ -272,6 +586,24 @@ The original numerical and audit files remain in \texttt{output/preliminary\_spe
 \bibitem{validation} CO2Flux, \emph{output/preliminary\_fourier\_phases/validation.json}.
 \bibitem{jump} CO2Flux, \emph{output/preliminary\_fourier\_phases/jump\_diagnostic/phase\_jump\_validation.json}.
 \bibitem{qc} CO2Flux, \emph{details/02\_data\_checks.md}, verified computational procedures and stated limitations.
+\bibitem{hydroaudit} CO2Flux,
+\emph{details/00\_irrigation\_audit.md},
+accepted limited Stage 0.1-B hydrological input, 27.Oct.2026.
+\bibitem{hydrovalidation} CO2Flux,
+\emph{data/stage01\_irrigation/pilot\_validation.json},
+14-series hydrological checks.
+\bibitem{stage02} CO2Flux,
+\emph{output/stage02\_candidate\_selection/passport.json},
+selected vertical, threshold and 17-month admissibility.
+\bibitem{stage02validation} CO2Flux,
+\emph{output/stage02\_candidate\_selection/validation.json},
+recorded accepted-input checks.
+\bibitem{gridpassport} CO2Flux,
+\emph{output/preliminary\_fourier\_phases/grid\_resolution/grid\_passport.json},
+three supports, Fourier definitions and limitations.
+\bibitem{gridvalidation} CO2Flux,
+\emph{output/preliminary\_fourier\_phases/grid\_resolution/grid\_summary.csv}
+and \emph{grid\_validation.json}, 489-window comparisons and tests.
 \bibitem{historical} CO2Flux, \emph{01\_october\_2017.ipynb; 02\_monthly\_changes.ipynb; 03\_long\_term\_evolution.ipynb}.
 \bibitem{buchnotebook} CO2Flux, \emph{04\_buchstaber.ipynb}, proposed method only.
 \bibitem{buch1994} V. M. Buchstaber, \emph{Time Series Analysis and Grassmannians}, American Mathematical Society Translations, Series 2, vol. 162 (1994), pp. 1--17.
