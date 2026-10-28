@@ -518,6 +518,97 @@ def load_saved_phase_jump(source=OUT):
     return (*tables, json.loads((out/'phase_jump_validation.json').read_text()))
 
 
+def saved_phase_jump_agreement(local):
+    """Maximum circular discrepancy of the two saved Q1 phase columns."""
+    angles = local[['Q_arg_rad', '5_to_20_rad']].to_numpy(float)
+    if not len(angles) or not np.isfinite(angles).all():
+        raise ValueError('Expected finite saved Q1 phases')
+    difference = np.angle(np.exp(1j*(angles[:, 0]-angles[:, 1])))
+    return float(np.max(np.abs(difference)))
+
+
+def plot_phase_jump_unit_circles(local, steps, out=None):
+    """Illustrate saved Before/After arguments; never recompute Fourier data.
+
+    Optional export creates only phase_jump_unit_circles.png/.svg. The returned
+    figure lets callers inspect the drawing; ordinary notebook execution reads
+    the saved PNG. All positions use unrounded angles from the Q1 tables.
+    """
+    from matplotlib.patches import Circle, Wedge
+
+    endpoints = local.loc[local.selected_endpoint].sort_values('window')
+    if endpoints.window.tolist() != [217, 218]:
+        raise ValueError('This illustration is limited to the selected Q1 pair')
+    saved = steps.set_index('coefficient')
+    angles = saved.loc[['F5', 'F20'], ['arg_before_rad', 'arg_after_rad']].to_numpy(float)
+    phases = endpoints['5_to_20_rad'].to_numpy(float)
+    if not np.isfinite(angles).all() or not np.all((phases > 0) & (phases < np.pi)):
+        raise ValueError('Expected the saved positive Q1 sectors')
+    np.testing.assert_allclose(angles[0]-angles[1], phases, rtol=0, atol=1e-14)
+    np.testing.assert_allclose(
+        saved.loc['Q', ['arg_before_rad', 'arg_after_rad']].to_numpy(float),
+        phases, rtol=0, atol=1e-14)
+    months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+    colors = ('#126b98', '#c46518')
+    sector_color = '#8067a9'
+    fig, axes = plt.subplots(1, 2, figsize=(12.6, 7.6))
+    fig.subplots_adjust(left=.06, right=.95, bottom=.30, top=.90, wspace=.25)
+    for k, (ax, label) in enumerate(zip(axes, ('Before', 'After'))):
+        theta5, theta20 = angles[:, k]
+        date = pd.Timestamp(endpoints.center.iloc[k])
+        date_text = f'{date.day:02d}.{months[date.month-1]}.{date.year}'
+        ax.set_title(f'{label}, {date_text}', fontsize=16, pad=20)
+        ax.set(xlim=(-1.32, 1.32), ylim=(-1.32, 1.32), aspect='equal',
+               xticks=[-1, 0, 1], yticks=[-1, 0, 1])
+        ax.spines[['top', 'right']].set_visible(False)
+        ax.spines[['bottom', 'left']].set_position('zero')
+        ax.spines[['bottom', 'left']].set_color('#a5acb4')
+        ax.tick_params(labelsize=10, colors='#58616b', length=3)
+        ax.text(1.29, -.13, 'Re', ha='right', va='top', fontsize=12)
+        ax.text(.07, 1.28, 'Im', ha='left', va='top', fontsize=12)
+        ax.add_patch(Circle((0, 0), 1, fill=False, ec='#58616b', lw=1.3))
+        # Wedge expects degrees; all saved and displayed phase values stay in radians.
+        ax.add_patch(Wedge((0, 0), 1, np.degrees(theta20), np.degrees(theta5),
+                           facecolor=sector_color, alpha=.20, edgecolor='none'))
+        for theta, color in zip((theta5, theta20), colors):
+            point = (np.cos(theta), np.sin(theta))
+            ax.annotate('', xy=point, xytext=(0, 0),
+                        arrowprops=dict(arrowstyle='-|>', lw=2.4, color=color,
+                                        mutation_scale=16, shrinkA=0, shrinkB=0))
+        arc = np.linspace(theta20, theta5, 100)
+        ax.plot(.62*np.cos(arc), .62*np.sin(arc), color=sector_color, lw=1.6)
+        ax.annotate('', xy=(.62*np.cos(arc[-1]), .62*np.sin(arc[-1])),
+                    xytext=(.62*np.cos(arc[-8]), .62*np.sin(arc[-8])),
+                    arrowprops=dict(arrowstyle='-|>', color=sector_color, lw=1.6,
+                                    mutation_scale=13, shrinkA=0, shrinkB=0))
+        middle = (theta5+theta20)/2
+        ax.text(.36*np.cos(middle), .36*np.sin(middle), r'$\Delta\phi$',
+                color=sector_color, fontsize=15, ha='center', va='center')
+        ax.text(.5, -.075, rf'$\arg F_5 = {theta5:.6f}$ rad',
+                transform=ax.transAxes, ha='center', color=colors[0], fontsize=13)
+        ax.text(.5, -.145, rf'$\arg F_{{20}} = {theta20:.6f}$ rad',
+                transform=ax.transAxes, ha='center', color=colors[1], fontsize=13)
+        ax.text(.5, -.23, rf'$\Delta\phi_{{\mathrm{{{label.lower()}}}}} = {phases[k]:.6f}$ rad',
+                transform=ax.transAxes, ha='center', fontsize=14)
+    change = float(saved.loc['Q', 'circular_increment_rad'])
+    fig.text(.5, .105, f'Change in relative phase: {change:+.6f} rad',
+             ha='center', fontsize=16, weight='bold')
+    fig.text(.5, .045,
+             'Unit circles show arguments only; actual Fourier magnitudes are not represented.',
+             ha='center', fontsize=12, color='#58616b')
+    if out is not None:
+        out = Path(out)
+        out.mkdir(parents=True, exist_ok=True)
+        for extension in ('png', 'svg'):
+            fig.savefig(out/f'phase_jump_unit_circles.{extension}', dpi=180,
+                        bbox_inches='tight', pad_inches=.2,
+                        metadata={'Description': 'Before/After unit-circle illustration from saved Q1 angles.'})
+        svg = out/'phase_jump_unit_circles.svg'
+        svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
+    return fig
+
+
 GRID_START, GRID_END = pd.Timestamp('2025-05-01'), pd.Timestamp('2026-10-01')
 SUBSURFACE_IDS = (996, 1012, 1035)
 RESOLUTION_OUT = OUT/'grid_resolution'
