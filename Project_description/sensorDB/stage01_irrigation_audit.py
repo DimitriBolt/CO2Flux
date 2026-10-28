@@ -282,13 +282,18 @@ def wetting_dates(d,daily,h,total):
     mo['concordant_wetting_dates']=[int(dates.dt.strftime('%Y-%m').eq(m).sum()) for m in mo.month]
     mo.to_csv(OUT/'monthly_overview.csv',index=False)
 
-def draw_overview(d,total,candidates):
+def draw_overview(d,total,candidates,*,window=None,output_stem='hydrology_overview'):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
     output=ROOT/'Project_description/Research_log/output/stage01_irrigation'
     output.mkdir(exist_ok=True)
+    if window is not None:
+        start,end=window
+        d=d[d.localdatetime.between(start,end)]
+        total=total.loc[start:end]
+        candidates=[e for e in candidates if start<=e['first_positive_p_record']<=end]
     fig,axs=plt.subplots(4,1,figsize=(16,11),sharex=True,constrained_layout=True)
     axs[0].plot(total.index,total/1000,lw=.5,label='10 stored Mass channels (VariableID 17)')
     axs[0].set_ylabel('Stored mass, t');axs[0].legend(loc='upper right')
@@ -304,15 +309,67 @@ def draw_overview(d,total,candidates):
     axs[3].plot(x.localdatetime,x.datavalue.where(x.usable),lw=.4,color='grey')
     axs[3].set_ylabel('EX81 stored volume, L\nreported noise; cause unverified')
     for ax in axs:
-        for e in candidates:ax.axvline(e['first_positive_p_record'],color='tab:red',alpha=.3,lw=.6)
+        for e in candidates:
+            ax.axvline(e['first_positive_p_record'],color='tab:red',
+                       alpha=.3 if window is None else .7,lw=.6,clip_on=window is None,
+                       zorder=2 if window is None else 4)
         ax.grid(alpha=.2)
-    axs[-1].xaxis.set_major_locator(mdates.MonthLocator())
-    axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+    if window is None:
+        axs[-1].xaxis.set_major_locator(mdates.MonthLocator())
+        axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        axs[-1].set_xlim(START,END)
+        title='LEO West 2025-05-01 to 2026-09-30: independent records and source-derived candidates'
+    else:
+        axs[-1].xaxis.set_major_locator(mdates.DayLocator())
+        axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('%d.%b'))
+        axs[-1].xaxis.set_minor_locator(mdates.HourLocator(byhour=[6,12,18]))
+        axs[-1].set_xlim(start,end)
+        axs[-1].set_xlabel('Source LOCALDATETIME (unchanged); daily ticks, minor ticks every 6 hours')
+        title=f'LEO West: {start:%d.%b.%Y %H:%M} to {end:%d.%b.%Y %H:%M} ({(end-start).total_seconds()/86400:g} days)'
+        for ax in axs:
+            for line in ax.lines:
+                line.set_linewidth(1)
     axs[-1].tick_params(axis='x',rotation=45)
-    axs[-1].set_xlim(START,END)
-    fig.suptitle('LEO West 2025-05-01 to 2026-09-30: independent records and source-derived candidates\nRed lines: positive P in MASSBALANCE, not a verified irrigation calendar')
-    fig.savefig(output/'hydrology_overview.png',dpi=150)
+    fig.suptitle(title+'\nRed lines: positive P in MASSBALANCE, not a verified irrigation calendar')
+    fig.savefig(output/(output_stem+'.png'),dpi=150)
+    if window is not None:
+        fig.savefig(output/(output_stem+'.svg'))
     plt.close(fig)
+
+def draw_saved_interval(first_candidate_id='MB02'):
+    """Zoom between adjacent saved overview markers without rerunning the audit."""
+    candidate_path=OUT/'massbalance_candidates.csv'
+    candidates=pd.read_csv(candidate_path,parse_dates=['first_positive_p_record'])
+    candidates=candidates.sort_values('first_positive_p_record').reset_index(drop=True)
+    matches=candidates.index[candidates.candidate_id.eq(first_candidate_id)]
+    if len(matches)!=1 or matches[0]+1>=len(candidates):
+        raise ValueError('Choose a saved candidate with a following marker')
+    pair=candidates.iloc[matches[0]:matches[0]+2]
+    start,end=pair.first_positive_p_record.tolist()
+    months=pd.date_range(start.to_period('M').start_time,end.to_period('M').start_time,freq='MS')
+    raw_paths=[OUT/'raw'/f'measurements_{month:%Y-%m}.parquet' for month in months]
+    d=pd.concat([pd.read_parquet(path,filters=[('localdatetime','>=',start),
+                                               ('localdatetime','<=',end)])
+                 for path in raw_paths],ignore_index=True)
+    d=d.sort_values(['sensorid','variableid','localdatetime','valueid'])
+    # Exactly the existing overview mask; native timestamps/values are retained.
+    d['usable']=np.isfinite(d.datavalue) & d.datavalue.ne(-9999)
+    total_path=OUT/'total_mass_15min.csv'
+    total=pd.read_csv(total_path,index_col='slot_for_comparison',parse_dates=True)['stored_total_mass_kg']
+    stem=f'hydrology_interval_{start:%Y-%m-%d}_to_{end:%Y-%m-%d}'
+    draw_overview(d,total,pair.to_dict('records'),window=(start,end),output_stem=stem)
+    output=ROOT/'Project_description/Research_log/output/stage01_irrigation'
+    dump_json(output/(stem+'.json'),dict(
+        start_inclusive=start,end_inclusive=end,candidate_ids=pair.candidate_id.tolist(),
+        duration_days=(end-start).total_seconds()/86400,
+        marker_meaning='First positive P record of consecutive saved MASSBALANCE blocks; not established irrigation boundaries',
+        display='Same four overview panels; native sensor timestamps/values and existing usability mask; saved total mass / 1000 in tonnes',
+        processing='No new averaging, interpolation, smoothing, event detection or source queries',
+        base_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        source_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
+                       for path in [candidate_path,total_path,*raw_paths]},
+        code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
+    print(output/(stem+'.png'))
 
 def report_tables():
     target=ROOT/'Project_description/Research_log/details/00_irrigation_audit.md'
@@ -464,8 +521,12 @@ class Audit:
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('step', choices=['metadata','context','measurements','analyze','validate','pilot'])
+    p.add_argument('step', choices=['metadata','context','measurements','analyze','validate','pilot','interval'])
+    p.add_argument('--first-candidate',default='MB02',help='Left overview marker for interval; right marker is the next saved candidate')
     args = p.parse_args()
+    if args.step == 'interval':
+        draw_saved_interval(args.first_candidate)
+        return
     if args.step == 'pilot':
         from stage01_hydrology_pilot import build
         build()

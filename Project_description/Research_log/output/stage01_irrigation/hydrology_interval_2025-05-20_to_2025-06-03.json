@@ -1,0 +1,20 @@
+{
+  "start_inclusive": "2025-05-20 09:00:00",
+  "end_inclusive": "2025-06-03 09:00:00",
+  "candidate_ids": [
+    "MB02",
+    "MB03"
+  ],
+  "duration_days": 14.0,
+  "marker_meaning": "First positive P record of consecutive saved MASSBALANCE blocks; not established irrigation boundaries",
+  "display": "Same four overview panels; native sensor timestamps/values and existing usability mask; saved total mass / 1000 in tonnes",
+  "processing": "No new averaging, interpolation, smoothing, event detection or source queries",
+  "base_commit": "6525bc5006afbe7a8a1653d96f1d5eedf574c767",
+  "source_sha256": {
+    "Project_description/Research_log/data/stage01_irrigation/massbalance_candidates.csv": "48e1c05993fd09e08ab4a751321b5d45f219e0448b6d3403a2dff93ecce6b2d7",
+    "Project_description/Research_log/data/stage01_irrigation/total_mass_15min.csv": "698c1eeb7c023e174b460c75d152e20e9bb586af8399ed3e7fd5ff8a5eee6c63",
+    "Project_description/Research_log/data/stage01_irrigation/raw/measurements_2025-05.parquet": "c515af3eaa301c881979dd21ce6f58d84762f46aadca348ee0fda0d9097a88a2",
+    "Project_description/Research_log/data/stage01_irrigation/raw/measurements_2025-06.parquet": "3ee62cb53bd6cfe641486a8c2f9e737b0fc8234beeeaf836ce20507c1fef7a97"
+  },
+  "code_sha256": "6dd2e27d759de64aa0b8fdaecd8527b09d914a900b9427615169ff07746c712c"
+}
