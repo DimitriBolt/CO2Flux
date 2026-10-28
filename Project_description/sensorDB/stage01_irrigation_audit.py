@@ -331,9 +331,8 @@ def draw_overview(d,total,candidates,*,window=None,output_stem='hydrology_overvi
                 line.set_linewidth(1)
     axs[-1].tick_params(axis='x',rotation=45)
     fig.suptitle(title+'\nRed lines: positive P in MASSBALANCE, not a verified irrigation calendar')
-    fig.savefig(output/(output_stem+'.png'),dpi=150)
-    if window is not None:
-        fig.savefig(output/(output_stem+'.svg'))
+    fig.savefig(output/(output_stem+'.jpg'),dpi=300,facecolor='white',
+                pil_kwargs={'quality':95,'subsampling':0})
     plt.close(fig)
 
 def draw_saved_interval(first_candidate_id='MB02'):
@@ -362,6 +361,7 @@ def draw_saved_interval(first_candidate_id='MB02'):
     dump_json(output/(stem+'.json'),dict(
         start_inclusive=start,end_inclusive=end,candidate_ids=pair.candidate_id.tolist(),
         duration_days=(end-start).total_seconds()/86400,
+        figure_file=stem+'.jpg',image_format='JPEG',dpi=300,
         marker_meaning='First positive P record of consecutive saved MASSBALANCE blocks; not established irrigation boundaries',
         display='Same four overview panels; native sensor timestamps/values and existing usability mask; saved total mass / 1000 in tonnes',
         processing='No new averaging, interpolation, smoothing, event detection or source queries',
@@ -369,7 +369,7 @@ def draw_saved_interval(first_candidate_id='MB02'):
         source_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
                        for path in [candidate_path,total_path,*raw_paths]},
         code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
-    print(output/(stem+'.png'))
+    print(output/(stem+'.jpg'))
 
 def report_tables():
     target=ROOT/'Project_description/Research_log/details/00_irrigation_audit.md'
