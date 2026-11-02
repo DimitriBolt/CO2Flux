@@ -374,5 +374,82 @@ class FourierPhaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):resolution_grid(frames,60)
 
 
+
+class IntrabinTests(unittest.TestCase):
+    """Concentration-only cases; no Fourier evaluation, archive or database."""
+    def calculate(self, values, minutes=None, hours=2):
+        from preliminary_fourier_phases import intrabin_statistics
+        start=pd.Timestamp('2025-05-01')
+        if minutes is None: minutes=np.arange(len(values))*15
+        f=pd.DataFrame(dict(localdatetime=[start+pd.Timedelta(minutes=float(v)) for v in minutes],
+            datavalue=values,technically_retained=True,doubtful=False,plateau_review=False))
+        return intrabin_statistics({996:f},start,start+pd.Timedelta(hours=hours))
+
+    def test_constant(self):
+        c,a=self.calculate([400]*8);r=c.iloc[0]
+        self.assertEqual(r.mean_ppm,400)
+        for key in ['range_ppm','max_abs_deviation_ppm','last_minus_first_ppm','max_adjacent_abs_change_ppm','max_change_rate_ppm_h']:
+            self.assertEqual(r[key],0)
+        self.assertEqual(len(a),7);self.assertTrue(r.complete_15min_coverage)
+
+    def test_linear(self):
+        c,a=self.calculate([400+2*i for i in range(8)]);r=c.iloc[0]
+        self.assertEqual(r.mean_ppm,407);self.assertEqual(r.range_ppm,14)
+        self.assertEqual(r.max_abs_deviation_ppm,7);self.assertEqual(r.last_minus_first_ppm,14)
+        self.assertEqual(r.max_change_rate_ppm_h,8)
+        self.assertTrue(a.dt_seconds.eq(900).all())
+
+    def test_single_peak(self):
+        c,a=self.calculate([400,400,400,480,400,400,400,400]);r=c.iloc[0]
+        self.assertEqual(r.mean_ppm,410);self.assertEqual(r.range_ppm,80)
+        self.assertEqual(r.max_abs_deviation_ppm,70);self.assertEqual(r.last_minus_first_ppm,0)
+        self.assertEqual(r.max_change_from,pd.Timestamp('2025-05-01 00:30'))
+
+    def test_missing_and_insufficient(self):
+        c,a=self.calculate([500],[15],hours=4)
+        self.assertEqual(c.n.tolist(),[1,0]);self.assertEqual(len(a),0)
+        self.assertEqual(c.iloc[0].mean_ppm,500);self.assertTrue(np.isnan(c.iloc[1].mean_ppm))
+        for key in ['range_ppm','max_abs_deviation_ppm','last_minus_first_ppm','max_adjacent_abs_change_ppm','max_change_dt_seconds','max_change_rate_ppm_h']:
+            self.assertTrue(c[key].isna().all())
+        self.assertEqual(c.missing_15min_cells.tolist(),[7,8])
+        self.assertTrue(c.insufficient_variation.all())
+
+    def test_incomplete_gap(self):
+        c,a=self.calculate([400,410,430,440],[0,15,60,105]);r=c.iloc[0]
+        self.assertEqual(r.mean_ppm,420);self.assertEqual(r.range_ppm,40)
+        self.assertEqual(r.occupied_15min_cells,4);self.assertEqual(r.longest_missing_15min_cells,2)
+        self.assertEqual(r.max_change_dt_seconds,2700)
+        self.assertAlmostEqual(r.max_change_rate_ppm_h,20/.75)
+        self.assertEqual(a.missing_15min_cells_between.tolist(),[0,2,2])
+
+    def test_half_open_boundaries(self):
+        c,a=self.calculate([1,2,3,4,5],[0,119.9,120,239.9,240],hours=4)
+        self.assertEqual(c.n.tolist(),[2,2]);self.assertEqual(c.mean_ppm.tolist(),[1.5,3.5])
+        self.assertEqual(len(a),2)
+        self.assertEqual(c.iloc[0].bin_end_exclusive,c.iloc[1].bin_start)
+
+    def test_irregular_timestamps(self):
+        c,a=self.calculate([100,110,106],[1/60,15+2/60,45+4/60]);r=c.iloc[0]
+        self.assertEqual(a.dt_seconds.tolist(),[901,1802])
+        self.assertAlmostEqual(r.mean_ppm,316/3)
+        self.assertEqual(r.max_change_dt_seconds,901)
+        self.assertAlmostEqual(r.max_change_rate_ppm_h,36000/901)
+        self.assertEqual(r.first_time,pd.Timestamp('2025-05-01 00:00:01'))
+
+    def test_actual_points_not_means_of_slots(self):
+        c,a=self.calculate([0,0,90],[1,2,16]);r=c.iloc[0]
+        self.assertEqual(r.mean_ppm,30);self.assertEqual(r.n,3)
+        self.assertEqual(r.occupied_15min_cells,2);self.assertEqual(r.duplicate_slot_points,1)
+        self.assertEqual(a.missing_15min_cells_between.tolist(),[0,0])
+
+    def test_selection_earliest_ties_and_deduplication(self):
+        from preliminary_fourier_phases import select_intrabin_examples
+        c,_=self.calculate([400]*16,hours=4)
+        c=pd.concat([c.assign(sensorid=s) for s in SUBSURFACE_IDS],ignore_index=True)
+        e=select_intrabin_examples(c)
+        self.assertEqual(len(e),1);self.assertEqual(e.iloc[0].bin_start,pd.Timestamp('2025-05-01'))
+        self.assertEqual(e.iloc[0].selection_rules.count('maximum within-bin range'),3)
+
+
 if __name__=='__main__':
     unittest.main()

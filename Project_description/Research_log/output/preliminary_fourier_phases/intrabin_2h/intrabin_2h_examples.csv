@@ -1,0 +1,9 @@
+example,bin_start,bin_end_exclusive,selection_rules
+example_01,2025-05-02 06:00:00,2025-05-02 08:00:00,GMM222 996: earliest incomplete bin across three sensors; lowest sensor ID tie
+example_02,2025-05-04 22:00:00,2025-05-05 00:00:00,GMM222 1035: range closest to sensor median; earliest tied bin
+example_03,2025-05-06 08:00:00,2025-05-06 10:00:00,"GMM222 996: maximum absolute adjacent change across all three sensors; earliest bin, then lowest sensor ID"
+example_04,2025-08-24 22:00:00,2025-08-25 00:00:00,GMM222 1012: range closest to sensor median; earliest tied bin
+example_05,2025-12-18 22:00:00,2025-12-19 00:00:00,GMM222 1035: maximum within-bin range; earliest tied bin
+example_06,2026-01-01 10:00:00,2026-01-01 12:00:00,GMM222 996: maximum within-bin range; earliest tied bin
+example_07,2026-01-29 14:00:00,2026-01-29 16:00:00,GMM222 1012: maximum within-bin range; earliest tied bin
+example_08,2026-02-02 22:00:00,2026-02-03 00:00:00,GMM222 996: range closest to sensor median; earliest tied bin

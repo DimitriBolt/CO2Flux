@@ -1,0 +1,298 @@
+{
+  "tests_passed": true,
+  "test_log": "test_actual_points_not_means_of_slots (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_actual_points_not_means_of_slots) ... ok\ntest_constant (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_constant) ... ok\ntest_half_open_boundaries (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_half_open_boundaries) ... ok\ntest_incomplete_gap (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_incomplete_gap) ... ok\ntest_irregular_timestamps (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_irregular_timestamps) ... ok\ntest_linear (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_linear) ... ok\ntest_missing_and_insufficient (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_missing_and_insufficient) ... ok\ntest_selection_earliest_ties_and_deduplication (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_selection_earliest_ties_and_deduplication) ... ok\ntest_single_peak (Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests.test_single_peak) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.092s\n\nOK\n",
+  "accepted_counts": {
+    "996": 49311,
+    "1012": 49293,
+    "1035": 49267
+  },
+  "accepted_2h_means_counts_boundaries_exact": true,
+  "independent_scalar_checks": [
+    {
+      "sensorid": 996,
+      "bin_start": "2025-05-02 06:00:00",
+      "n": 7,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2025-05-02 06:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2025-05-02 06:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2025-05-04 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2025-05-04 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2025-05-04 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2025-05-06 08:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2025-05-06 08:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2025-05-06 08:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2025-08-24 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2025-08-24 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2025-08-24 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2025-12-18 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2025-12-18 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2025-12-18 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2026-01-01 10:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2026-01-01 10:00:00",
+      "n": 7,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2026-01-01 10:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2026-01-29 14:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2026-01-29 14:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2026-01-29 14:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 996,
+      "bin_start": "2026-02-02 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1012,
+      "bin_start": "2026-02-02 22:00:00",
+      "n": 8,
+      "passed": true
+    },
+    {
+      "sensorid": 1035,
+      "bin_start": "2026-02-02 22:00:00",
+      "n": 8,
+      "passed": true
+    }
+  ],
+  "independent_absolute_tolerance_ppm": 2e-12,
+  "upstream_checksums_verified": 1433,
+  "upstream_inputs_unchanged": true,
+  "previous_results_unchanged": true,
+  "previous_result_sha256": {
+    "Project_description/Research_log/output/stage02_candidate_selection/season_coverage.csv": "a40fcdc79c72d1f8318c04fe154e8d852dae59fdf7c7fc3f85732ab65336170b",
+    "Project_description/Research_log/output/stage02_candidate_selection/channel_months.csv": "e3d614ef2a2b6ca50e4947d54de28b16e97955f840e6a509d8e3346215ee3aac",
+    "Project_description/Research_log/output/stage02_candidate_selection/joint_months.csv": "b67702371dd528cc5145c8f6a88aa4daca784c1754ef0e311ec1a417b2dc8064",
+    "Project_description/Research_log/output/stage02_candidate_selection/channel_gaps.csv": "2b96e500f0f69a00ed64f56145987e9e3e4f4f95b53c45aa1b488cd4005eaa69",
+    "Project_description/Research_log/output/stage02_candidate_selection/common_gap_runs.csv": "c35fc8d72125fe005bcb92e83b74e54f93293f651c2006931f39645fc772a49e",
+    "Project_description/Research_log/output/stage02_candidate_selection/window_coverage_30d_1d.csv": "41f5bafa1c5d80fa64536bb019317c13c6ef004ca0edd717f2f6f1c7b814062a",
+    "Project_description/Research_log/output/stage02_candidate_selection/measurement_reasons.csv": "f4e5dfa8eb30831023efa4b9e969a6fa824b02b284646e561df142782b6e94f6",
+    "Project_description/Research_log/output/stage02_candidate_selection/vertical_comparison.csv": "66e4b28eb667f6c414477c3634f0ead9c7840af5bde9b301d510c40b7d559acb",
+    "Project_description/Research_log/output/stage02_candidate_selection/month_coverage.csv": "29b303a5d977769cf850f605a6084841715b9686115028be759e20e409d0512d",
+    "Project_description/Research_log/output/stage02_candidate_selection/channel_counts.csv": "a3fd417575ec33d7e301ec107ba0ad1eac225536f3dd2720802b3ce57d13a9c1",
+    "Project_description/Research_log/output/stage02_candidate_selection/validation.json": "8155f6e975aa746660fabbc178f984cbfeaf7e23d58d96b9a8810c105085764a",
+    "Project_description/Research_log/output/stage02_candidate_selection/W_x1_y10_channel_months.csv": "c689e4d07c686e5cd6df38df78f0443b89dfe3c9bc29669db59a6ecd8e750cd6",
+    "Project_description/Research_log/output/stage02_candidate_selection/passport.json": "1c1ce6e9968a33567751cf3f59533693b7c4c38868228de5f5885bd15b1d0f15",
+    "Project_description/Research_log/output/stage02_final_admission/window_admission_30d_1d.csv": "ef59abf93b344515dc79f2c3ec96d277969008dfc1c8cbd19167707a87509f01",
+    "Project_description/Research_log/output/stage02_final_admission/channel_months.csv": "bfd4740943ee8e0e609995ecbece73e113a2acbd8e3dcb61103104c7495e64a3",
+    "Project_description/Research_log/output/stage02_final_admission/channel_days.csv": "f478149ba1716489917e0a564fc21c2bedc09e44244206572f050582f840974f",
+    "Project_description/Research_log/output/stage02_final_admission/joint_days.csv": "9cb6a7f0b5b364b2f7116b51b6cf459db407fa4cad6c01a80d41296e9b7c3ebf",
+    "Project_description/Research_log/output/stage02_final_admission/joint_admitted_intervals.csv": "7579670b3f8c7448fa40146bc895160f1dad3dfdc6440017956a5bfbe99b7845",
+    "Project_description/Research_log/output/stage02_final_admission/joint_months.csv": "94b20f5a85463251c8c4c690b727a3c8e7abdb7e148d0dab449b3eb6f38cb6ac",
+    "Project_description/Research_log/output/stage02_final_admission/measurement_reasons.csv": "35b6e70db9fe528a23f280a6126b4b3776c608f63153b2e49a34cc7dd65bbd53",
+    "Project_description/Research_log/output/stage02_final_admission/channel_summary.csv": "779857c7918aebf64afdab7391ffa5a08bb70df96678a7e510b7bdced70907d4",
+    "Project_description/Research_log/output/stage02_final_admission/validation.json": "e036b875ebf07a14b540fdbd58a6c920f1d8a0a1ac8ce47a56cbdf7c273e1554",
+    "Project_description/Research_log/output/stage02_final_admission/passport.json": "2a0ffdd7b56d6396d69065a2b4d800a432720fa35d87a3f15396dc9211ac4d2c",
+    "Project_description/Research_log/output/preliminary_spectra/historical_monthly_ranges.csv": "d0142ffae3509f047751f053d4e4416e017bdb5ec185c239a965260de7c4e24c",
+    "Project_description/Research_log/output/preliminary_spectra/sampling_window.png": "6c1e779e3af2ea0d62389d2c63ff58f9f930858e8c5b0f82d6b013b7aef6798b",
+    "Project_description/Research_log/output/preliminary_spectra/monthly_coverage.csv": "c43dd45bc473bcf4fec00399a9c22fff92423f8cf02729463e91b93b412c83e7",
+    "Project_description/Research_log/output/preliminary_spectra/1035_before_candidate.png": "4a9deecd245ed773509be5904be61ccfeb87b43d7fe041ecd45346c484968992",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_30d_1d_coverage.csv": "7c0f285cbb9807673cffdec063d3d7d66fb4f8887210b7827a697ecf1db81718",
+    "Project_description/Research_log/output/preliminary_spectra/interactive_spectra.html": "9db95a3595aa70948d34d2eac24505c898f95621764eee97a70ce47ba7295ea4",
+    "Project_description/Research_log/output/preliminary_spectra/static_spectra.csv": "15387d691528cdbfebc8f4364da360254ab731a8eb74248b08e3a9cdaf963f46",
+    "Project_description/Research_log/output/preliminary_spectra/gaps.csv": "72d02ed89876a67b52ccb570ad718294f8c3a25e0b0266e992082c9111847875",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.svg": "c8351fb447334d48385899279702c5bfdd66fd1cd8d8b192f89afb7416c92837",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_spectra_30d_1d.gif": "06394265134639dbfe216d9b339528b5453f764ae4189965bfef156ebef9fd50",
+    "Project_description/Research_log/output/preliminary_spectra/sliding_spectra.html": "069eceae4e2b6b5ffbcfbb1a63774eceea07bbd664f75cf4e7a09e34393e6d1d",
+    "Project_description/Research_log/output/preliminary_spectra/historical_diagnostic.json": "ae2cb2bac1733e4c017ce803ca169a6214f62b64b9cfeeed351d76b6837e21b4",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.pdf": "02858f99eb3bf745aea41232af403f86228167ad15a14086fcfef5e4ee2a7a7e",
+    "Project_description/Research_log/output/preliminary_spectra/validation.json": "f6806d8610b48fe4464135f99639aa97904b85ca426a5fe3c46425b14fcc8d0e",
+    "Project_description/Research_log/output/preliminary_spectra/passport.json": "9c21e083491fbc5077df8eabe15309f26e993443b3c11a9f313c9d52de6513fd",
+    "Project_description/Research_log/output/preliminary_spectra/four_channel_spectra_17x11.png": "28c41d2374c839df8e888368f8f66c92b678c203d92d4a1c8256917afd1d7503",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_evolution.html": "5b6a022d6152396fb692d96dd597ca2e8051c14f1272db9d2d53e477986d7640",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_trajectory_3d.png": "15d6738f1d0b84277c9c556a5995252af31174d42951363b5c0051533e52e7de",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_evolution_17x11.pdf": "dd6032832a24f06b4339d26fe8f0c088be2a55b09f1153cd8f5b2e3d5bb1eff8",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_evolution_17x11.svg": "7301dfc78b25f2589a1116fe8ddf292846c7b1a2ee87ac5491059e2fb9f68810",
+    "Project_description/Research_log/output/preliminary_fourier_phases/window_coverage.csv": "6f8862a01267aa9096ef2cdeb7b392d854a7d55bdfe3d41b0be7528631f1f5f0",
+    "Project_description/Research_log/output/preliminary_fourier_phases/common_2h_bins.csv": "b993c07ca9904e7b649891be164909832b41af3501a599ec984aa12f054a6b55",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_timeseries.csv": "df0c74fbe6d7d4504796cdabe5a873c9344a9344b63cf3076bc3e6c31d879902",
+    "Project_description/Research_log/output/preliminary_fourier_phases/phase_evolution_17x11.png": "40eea9f68ba2f6854277c0927532170cd7e18ba3bbabe92aa0e5f48278a730f3",
+    "Project_description/Research_log/output/preliminary_fourier_phases/validation.json": "7905bfcd702c19e1ba398fc148b9d5d5b7d172e3a72ad9c9c0e892ed57558aec",
+    "Project_description/Research_log/output/preliminary_fourier_phases/passport.json": "f45827b6a477f8c3e11e842660fe2e7cb73083bf0e812d0eb435c1b4356f4886",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_complex.png": "9adfaa71d5f31e722894982383ddbca8c8ea657ccf07649e4c8348b9fdd3af89",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_unit_circles.png": "4a674395d518e2197e42e730a99ec083904f8f932d218739db4bc0e29a4ac513",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_coverage.csv": "12bd85305ed9d32b2e6653c73a92f00e4a093b5c485b79db3bc482f12183b7d2",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_windows.csv": "80f559af6cf869e87ab5cbdd182266e053afcd247edcca3525222dc0ed21445e",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_unit_circles.svg": "70b3750000eb8f0e5bbd4808f301d0238ab1ad955d507a90eb889ef04aa4522f",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_local.png": "24204bd18288337cfa111452a8c69a748c16d37f9d7a0c244e8eda1d6d0041e4",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_validation.json": "b1343a45e767fa71fa5ca6953952b56dbcb8bed32d6d1b8297b5c628eb244143",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_step.csv": "693ae6777a0daa126d8f35c02713f958ace8b1f722082c603a1b78b475036740",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_local.svg": "b4f10f5cec8a18085775c89d6b21b58be6249a31788e00d4940b697e43139a2b",
+    "Project_description/Research_log/output/preliminary_fourier_phases/jump_diagnostic/phase_jump_complex.svg": "814db40a3215cf4a3e834715e1f940f867cd42e432623660a131758af39d8dfc",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_extrema.csv": "aa8cb2b76934ea5f4809f1cfa90fb3cd33093b0e54ffb19abe7cc92bf4e9f2d0",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_2h.csv.gz": "e087b03d58408a2bbe49e42599bf82b392b06136b7326b9f2f6878dc01c0f746",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_aggregation.svg": "90c350abb97bafd477e013cb3c8d51d6cec093b0101db9a10302620c0028e253",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_air_support.svg": "af6533c9f9d750d40ef4ef68d19603d06c3202cc9a378f271ebef6eb57c02b62",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_aggregation.png": "433880fe8e88fd3ce64126b09ac72268f969460e4e3979416d5ac857f0bf300a",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_windows.csv": "942d0b3bbac1047c958e63702fc2f130851eba01bdcd214e6eb73f8671f0e573",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_validation.json": "5d60f2bb8e1e7f537153c319361012f6e0f3bb1adaa7374098c739fbf2556b22",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_air_support.png": "f4773257b7c03a268c0338db32f00feb1b5f580c9aa2f3a164e229979aa2db88",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_comparisons.csv": "21a141158857be8fdbc1b140c98fab389eb16e77c497ecfbdec2829ea02553e6",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_summary.csv": "722924a0f4899d8f5a2ac8610b31dabce278350d5e5d577b8c320bf460f7d075",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_15min.csv.gz": "db7933a65cc6457afc61225d65fd428d28517d52e2030681bd8af3e7d1fb8cd6",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_context.svg": "7f34d0bdbda177d75647d5b61e272c8480714d994e6195771e65178dc2be5e6d",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_gap_runs.csv": "2266706cb574d2f7e80c799a65a05c48be8a76df67001d4c555836fad5d65fbd",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_context.png": "d0ed5a1516325d2fac3060659e511db6b9e6df2d9a5f96a91406b7f64977babf",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_passport.json": "45c973a25f8c9dd447c0728b1089297b96ba2dfe8af8d6e66cf8131132cee6b6",
+    "Project_description/Research_log/output/preliminary_fourier_phases/grid_resolution/grid_quality.csv": "2b385d6b5aab661e195972f946b37c40a8c36e8f48bf2829dbae7b4e56a2f481"
+  },
+  "cells": 18648,
+  "adjacent_pairs": 129223,
+  "unique_examples": 8,
+  "fourier_calculation_performed": false,
+  "artifact_sha256": {
+    "example_03.png": "e88772fc491e31b01a654e48291bc216bd34475d6204424c51677f75cd2fa803",
+    "intrabin_2h_all.csv": "ccd53f86ba6e16514ce5589150d0a34e729b026adb9e8a709348ff42f5984d4d",
+    "example_01.svg": "fa55b6623b5dfc43c7d7e3852212b187d5a437ef80f91dcc14d68aba0f0dcb30",
+    "example_04.svg": "9478f213bae3923c9c0fabb1e8191cd67ef15c1c332b5cf912e7849dd51694b8",
+    "intrabin_2h_example_points.csv": "22dab5bba610b994dcf7c202811d36e191cbca9adb2d9e1d6aa665b81c9108d8",
+    "example_06.svg": "2a3d4af72dc31d4582c5a017e4d5154b2058acb65be1348f85ced951d8d2342c",
+    "example_07.png": "7d4560fdb4c8ecc255c23e64a9e19016f8b4336a0b390b23846fc5223dfdb25f",
+    "example_06.png": "986e2282850e8f6a38c0246c34855c55134f71d916b98796563f93e2b476f775",
+    "example_08.png": "f635252a072506fc49482f7b4ca2520b3746667505acf93bdc6f181d2c956952",
+    "intrabin_2h_adjacent_distributions.svg": "08120edf1033879b0c5281fc81c184f47bf8f6bedfa6b547d8b03465ab15b5fe",
+    "example_05.png": "6346d2375acb2a0964647a44f9d9f070cb455c818c563f317dc7b1c258275c76",
+    "example_02.png": "d22329efa15959dd26d6333d4bcec41df6850ea2e248d68cc2ba775a8e41ae03",
+    "example_03.svg": "c3b93c8b1e842be82f74ad151f225b19130d62aedae57ec38e324ce96c6476c5",
+    "intrabin_2h_distributions.png": "445e90add5a045916c3acb7301f785e3364a99c3a54045192d214a193104442d",
+    "example_04.png": "ece873c8fc29a8d71e71c51a58dd434cbec312e173ba68f7c27f0189a0fc9c9d",
+    "intrabin_2h_counts.csv": "ea7323941110662ec3fffc85cecda21e882eb6bfd9e4885fd8f1da962ff3e7ba",
+    "intrabin_2h_passport.json": "b0cf94ce6a131b72f58725e432a1c11018c58e5f8b244ae148a460bea6e12f5d",
+    "intrabin_2h_summary.csv": "160a7a0978903f0da5e961e7d2e2ab5ea2042a6485aa3fa4b66b86c5bbec1ecc",
+    "example_07.svg": "e46e4baaaf6c3fdbe60a480a3f6ff9585495932e1bb68a4a57f55e2563a18228",
+    "intrabin_2h_adjacent_distributions.png": "b65e2d99a792a6b0e5e99382e2a80315a08180949cfbf1e50e906e93624597ae",
+    "intrabin_2h_distributions.svg": "68b071e8aa41c5767614f9bddf7536c83f00524319703ec5f32f681f99bd349c",
+    "example_02.svg": "84e4c3b65ba494091c036fc36adf3b0a21e5ddea25637a9e2febe5239e5ab006",
+    "example_05.svg": "6b7e425d452d8e3e695c233ba846f51d3ba1482ce714279d4d44a987a7220129",
+    "intrabin_2h_examples.csv": "69f258eb784957f637804938db195a453954bead40ae8f780ea35dc308197506",
+    "intrabin_2h_extrema.csv": "489bbf68466cc5dfef9c9bd7660cb2ca51671e739adbc299203a9b7f73c150e1",
+    "example_08.svg": "cdb54ee484258fc3ba7b26fe0223d9ea9a17549f259de2aedcac39a5f19e6992",
+    "intrabin_2h_adjacent.csv.gz": "71851e6906cb37c835cd0d8b56ff5258b8870299b011d7576f2c70c0d212a9c0",
+    "example_01.png": "cc79b4562dce83feb0b21aab2855a7d52a90f9c4d5b09d5f97e53e8a5365ac0a"
+  },
+  "delivery_checks": {
+    "baseline_files": 45115,
+    "protected_files": 45110,
+    "protected_files_unchanged": true,
+    "old_functions_and_tests_unchanged": true,
+    "clean_kernel_cells": 43,
+    "clean_kernel_no_scientific_recomputation": true,
+    "previous_notebook_outputs_exact": true,
+    "previous_34_functions_unchanged": true,
+    "rendered_math_expressions": 261,
+    "new_local_links_checked": 30,
+    "figures_visually_inspected": [
+      "intrabin_2h_distributions",
+      "intrabin_2h_adjacent_distributions",
+      "example_01",
+      "example_02",
+      "example_03",
+      "example_04",
+      "example_05",
+      "example_06",
+      "example_07",
+      "example_08"
+    ],
+    "figure_labels_english_with_verified_sensor_locations": true,
+    "all_fourier_entry_points_disabled_during_final_generation": true,
+    "notebook_sha256": "40130cedf7dc8d74f3b590ae9a07b0f773d3d3d5abe263d4af52c92900e9ab99"
+  }
+}

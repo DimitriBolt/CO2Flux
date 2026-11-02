@@ -958,6 +958,306 @@ def generate_grid_resolution(out=RESOLUTION_OUT):
     return windows,comparison,summary,extrema,validation
 
 
+# Stage 0.5: concentration-only diagnostic. No Fourier functions are called.
+INTRABIN_OUT = OUT/'intrabin_2h'
+INTRABIN_COUNTS = {996: 49311, 1012: 49293, 1035: 49267}
+
+
+def intrabin_statistics(frames, start=GRID_START, end=GRID_END):
+    """Own-sensor observations in [s,s+2h); no new cleaning or common mask.
+
+    Missingness counts empty nominal 15-minute cells (not assumed exact times).
+    Adjacent pairs are consecutive accepted records within one 2-hour cell,
+    including pairs across missing slots, with their actual elapsed seconds.
+    """
+    calendar = pd.date_range(start, end, freq='2h', inclusive='left')
+    rows, pairs = [], []
+    for sid, frame in frames.items():
+        points = frame.loc[frame.technically_retained & ~frame.doubtful
+            & frame.localdatetime.ge(start) & frame.localdatetime.lt(end)].sort_values('localdatetime')
+        if points.localdatetime.duplicated().any() or not np.isfinite(points.datavalue).all():
+            raise ValueError('Expected unique finite accepted observations')
+        groups = {k: g for k, g in points.groupby(points.localdatetime.dt.floor('2h'))}
+        # Same groupby reduction as the accepted input: preserve exact means.
+        means = points.groupby(points.localdatetime.dt.floor('2h')).datavalue.mean()
+        for s in calendar:
+            g = groups.get(s, points.iloc[:0])
+            n = len(g)
+            t, y = g.localdatetime, g.datavalue.to_numpy(dtype=float)
+            slots = t.dt.floor('15min')
+            occupied = slots.nunique()
+            missing = ~pd.date_range(s, periods=8, freq='15min').isin(slots)
+            row = dict(sensorid=sid, bin_start=s, bin_end_exclusive=s+pd.Timedelta(hours=2),
+                n=n, first_time=t.iloc[0] if n else pd.NaT, last_time=t.iloc[-1] if n else pd.NaT,
+                mean_ppm=float(means.loc[s]) if n else np.nan,
+                min_ppm=float(y.min()) if n else np.nan, max_ppm=float(y.max()) if n else np.nan,
+                occupied_15min_cells=occupied, missing_15min_cells=8-occupied,
+                duplicate_slot_points=n-occupied, complete_15min_coverage=occupied == 8,
+                longest_missing_15min_cells=longest_missing_run(~missing),
+                insufficient_variation=n < 2, plateau_review_points=int(g.plateau_review.sum()),
+                leading_unobserved_seconds=(t.iloc[0]-s).total_seconds() if n else np.nan,
+                trailing_unobserved_seconds=(s+pd.Timedelta(hours=2)-t.iloc[-1]).total_seconds() if n else np.nan)
+            for key in ('range_ppm','max_abs_deviation_ppm','last_minus_first_ppm',
+                        'max_adjacent_abs_change_ppm','max_change_dt_seconds','max_change_rate_ppm_h',
+                        'max_observed_gap_seconds'):
+                row[key] = np.nan
+            row['max_change_from'] = row['max_change_to'] = pd.NaT
+            if n >= 2:
+                delta = np.diff(y)
+                dt = t.diff().dt.total_seconds().iloc[1:].to_numpy()
+                if np.any(dt <= 0):
+                    raise ValueError('Nonpositive adjacent elapsed time')
+                k = int(np.argmax(np.abs(delta)))  # earliest exact tie
+                row.update(range_ppm=float(np.ptp(y)), max_abs_deviation_ppm=float(np.max(np.abs(y-row['mean_ppm']))),
+                    last_minus_first_ppm=float(y[-1]-y[0]), max_adjacent_abs_change_ppm=float(abs(delta[k])),
+                    max_change_dt_seconds=float(dt[k]), max_change_rate_ppm_h=float(abs(delta[k])*3600/dt[k]),
+                    max_observed_gap_seconds=float(dt.max()), max_change_from=t.iloc[k], max_change_to=t.iloc[k+1])
+                for k in range(n-1):
+                    pairs.append(dict(sensorid=sid, bin_start=s, from_time=t.iloc[k], to_time=t.iloc[k+1],
+                        from_ppm=y[k], to_ppm=y[k+1], signed_change_ppm=delta[k], abs_change_ppm=abs(delta[k]),
+                        dt_seconds=dt[k], observed_rate_ppm_h=abs(delta[k])*3600/dt[k],
+                        missing_15min_cells_between=max(0, int((slots.iloc[k+1]-slots.iloc[k]).total_seconds()/900)-1)))
+            rows.append(row)
+    return pd.DataFrame(rows), pd.DataFrame(pairs, columns=['sensorid','bin_start','from_time','to_time',
+        'from_ppm','to_ppm','signed_change_ppm','abs_change_ppm','dt_seconds','observed_rate_ppm_h','missing_15min_cells_between'])
+
+
+def intrabin_summary(cells, pairs):
+    """Per-sensor descriptive linear quantiles; no independence/CI claim."""
+    rows, extrema = [], []
+    for sid, g in cells.groupby('sensorid', sort=False):
+        a = pairs.loc[pairs.sensorid.eq(sid)]
+        row = dict(sensorid=int(sid), bins=len(g), points=int(g.n.sum()),
+            full_bins=int(g.complete_15min_coverage.sum()), incomplete_bins=int((~g.complete_15min_coverage).sum()),
+            insufficient_bins=int(g.insufficient_variation.sum()), adjacent_pairs=len(a))
+        for data, metrics in [(g, ['range_ppm','max_abs_deviation_ppm']),
+                              (a, ['abs_change_ppm','dt_seconds','observed_rate_ppm_h'])]:
+            for metric in metrics:
+                for name, value in [('min',data[metric].min()),('median',data[metric].median()),
+                                    ('p95',data[metric].quantile(.95)),('max',data[metric].max())]:
+                    row[f'{metric}_{name}'] = float(value)
+                if data[metric].notna().any():
+                    r = data.loc[data[metric].idxmax()]
+                    extrema.append(dict(sensorid=int(sid), metric=metric, maximum=float(r[metric]),
+                        bin_start=r.bin_start, bin_end_exclusive=r.bin_start+pd.Timedelta(hours=2),
+                        from_time=r.get('from_time',r.get('first_time')), to_time=r.get('to_time',r.get('last_time'))))
+        rows.append(row)
+    counts = cells.groupby(['sensorid','n']).size().rename('bins').reset_index()
+    return pd.DataFrame(rows), counts, pd.DataFrame(extrema)
+
+
+def select_intrabin_examples(cells):
+    """At most eight unique times, earliest exact ties, retain all reasons."""
+    selected = {}
+    def add(row, reason):
+        selected.setdefault(row.bin_start, []).append(f'GMM222 {int(row.sensorid)}: {reason}')
+    ordered = cells.sort_values(['bin_start','sensorid'])
+    for sid, g in ordered.groupby('sensorid', sort=False):
+        valid = g.loc[g.range_ppm.notna()]
+        add(valid.loc[valid.range_ppm.idxmax()], 'maximum within-bin range; earliest tied bin')
+        distance = (valid.range_ppm-valid.range_ppm.median()).abs()
+        add(valid.loc[distance.idxmin()], 'range closest to sensor median; earliest tied bin')
+    add(ordered.loc[ordered.max_adjacent_abs_change_ppm.idxmax()],
+        'maximum absolute adjacent change across all three sensors; earliest bin, then lowest sensor ID')
+    incomplete = ordered.loc[~ordered.complete_15min_coverage]
+    if len(incomplete):
+        add(incomplete.iloc[0], 'earliest incomplete bin across three sensors; lowest sensor ID tie')
+    return pd.DataFrame([dict(example=f'example_{i:02d}', bin_start=s,
+        bin_end_exclusive=s+pd.Timedelta(hours=2), selection_rules='; '.join(reasons))
+        for i,(s,reasons) in enumerate(sorted(selected.items()),1)])
+
+
+def intrabin_metadata(accepted):
+    """Check archived Oracle geometry and the primary workbook, read-only."""
+    import openpyxl
+    path = ARCHIVE/'manifest.json'
+    manifest = json.loads(path.read_text())
+    workbook = ROOT/'Sensors_Description/variables_schema.xlsx'
+    wb = openpyxl.load_workbook(workbook, read_only=True, data_only=True)
+    sheet = wb['CO2']
+    metadata = []
+    try:
+        for sid in SUBSURFACE_IDS:
+            c = next(c for c in manifest['channels'] if c['sensorid'] == sid)
+            assert c == next(c for c in accepted['metadata'] if c['sensorid'] == sid)
+            values = [sheet.cell(c['row'], j).value for j in (3,4,5,11,12,13,18)]
+            assert values == [c['x'],c['y'],c['z'],'GMM222',sid,c['sensorcode'],'ppm']
+            loc = c['oracle_location']
+            assert (float(loc['boxx']),float(loc['boxy']),-float(loc['boxz'])) == (c['x'],c['y'],c['z'])
+            metadata.append(c)
+    finally:
+        wb.close()
+    return metadata, manifest['timezone'], {str(p.relative_to(ROOT)):digest(p) for p in (path,workbook)}
+
+
+def intrabin_figures(cells, pairs, examples, frames, metadata, out):
+    """English, spatially explicit concentration plots; do not bridge gaps."""
+    captions = {}
+    def location(sid):
+        m = next(m for m in metadata if m['sensorid'] == sid)
+        return f"LEO West W_x1_y4, x={m['x']:g} m, y={m['y']:g} m, depth {-100*m['z']:g} cm, GMM222 {sid}"
+    def save(fig, name, caption):
+        for ext in ('png','svg'):
+            fig.savefig(out/f'{name}.{ext}',dpi=160,bbox_inches='tight',pad_inches=.18,
+                        metadata={'Description':caption})
+        plt.close(fig)
+        captions[name] = caption
+    colors = ['#17658a','#b05c16','#7954a0']
+    fig, axes = plt.subplots(3,2,figsize=(13,11),layout='constrained')
+    for row,(sid,color) in enumerate(zip(SUBSURFACE_IDS,colors)):
+        g = cells.loc[cells.sensorid.eq(sid)]
+        for ax,metric,label in zip(axes[row],['range_ppm','max_abs_deviation_ppm'],
+                ['Within-bin CO₂ range (ppm)','Maximum absolute deviation from 2 h mean (ppm)']):
+            values = np.sort(g[metric].dropna())
+            ax.step(values, np.arange(1,len(values)+1)/len(values),where='post',color=color,lw=1.6)
+            ax.set(xlabel=label,ylabel='Empirical cumulative fraction',ylim=(0,1.02),xlim=(0,None))
+            ax.set_title(location(sid).replace(', depth','\ndepth'),fontsize=10)
+            ax.grid(alpha=.2)
+    fig.suptitle('Observed CO₂ variability within calendar 2 h bins\n01.May.2025–30.Sep.2026 · accepted observations only',fontsize=15)
+    save(fig,'intrabin_2h_distributions','I show per-sensor empirical distributions of observed within-bin CO₂ range and maximum absolute deviation from the own-sensor mean. Quantiles are descriptive, not confidence intervals.')
+    fig, axes = plt.subplots(3,2,figsize=(13,11),layout='constrained')
+    for row,(sid,color) in enumerate(zip(SUBSURFACE_IDS,colors)):
+        a = pairs.loc[pairs.sensorid.eq(sid)]
+        for ax,metric,label in zip(axes[row],['abs_change_ppm','dt_seconds'],
+                ['Absolute adjacent CO₂ change (ppm)','Actual time between adjacent records (s)']):
+            values=np.sort(a[metric].dropna())
+            ax.step(values,np.arange(1,len(values)+1)/len(values),where='post',color=color,lw=1.6)
+            ax.set(xlabel=label,ylabel='Empirical cumulative fraction',ylim=(0,1.02))
+            ax.set_title(location(sid).replace(', depth','\ndepth'),fontsize=10)
+            ax.grid(alpha=.2)
+    fig.suptitle('All adjacent accepted pairs within the same 2 h bin\nPairs across missing 15 min cells retain their actual elapsed time',fontsize=15)
+    save(fig,'intrabin_2h_adjacent_distributions','I include every adjacent accepted pair within a 2 h bin, including pairs spanning missing cells; I retain the actual elapsed time. Changes are not measurements of physical process speed.')
+    for e in examples.itertuples():
+        fig,axes=plt.subplots(3,1,figsize=(12,10),sharex=True,layout='constrained')
+        for ax,sid,color in zip(axes,SUBSURFACE_IDS,colors):
+            g=frames[sid].loc[frames[sid].localdatetime.ge(e.bin_start)&frames[sid].localdatetime.lt(e.bin_end_exclusive)]
+            r=cells.loc[cells.sensorid.eq(sid)&cells.bin_start.eq(e.bin_start)].iloc[0]
+            slots=g.localdatetime.dt.floor('15min')
+            for i in range(len(g)-1):
+                if slots.iloc[i+1]-slots.iloc[i] == pd.Timedelta(minutes=15):
+                    ax.plot(g.localdatetime.iloc[i:i+2],g.datavalue.iloc[i:i+2],color=color,lw=1)
+            ax.scatter(g.localdatetime,g.datavalue,color=color,s=30,zorder=3,label='Accepted observations')
+            ax.axhline(r.mean_ppm,color='#4d4d4d',ls='--',lw=1.3,label='Own-sensor 2 h mean')
+            for slot in pd.date_range(e.bin_start,periods=8,freq='15min'):
+                if slot not in set(slots): ax.axvspan(slot,slot+pd.Timedelta(minutes=15),color='#dddddd',alpha=.5)
+            ax.set_title('CO₂ concentration (ppm) — '+location(sid)+'\n'+
+                f'n={r.n}; occupied cells={r.occupied_15min_cells}/8; min={r.min_ppm:.3f}; max={r.max_ppm:.3f}; mean={r.mean_ppm:.3f} ppm',fontsize=10,loc='left')
+            ax.set_ylabel('CO₂ concentration (ppm)')
+            ax.ticklabel_format(axis='y',useOffset=False)
+            ax.grid(alpha=.2)
+        axes[0].legend(frameon=False,ncol=2,loc='best',fontsize=9)
+        axes[-1].set_xlim(e.bin_start,e.bin_end_exclusive)
+        axes[-1].xaxis.set_major_locator(mdates.MinuteLocator(byminute=[0,15,30,45]))
+        axes[-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        axes[-1].set_xlabel('Database LOCALDATETIME (timezone unconfirmed); grey = empty 15 min cell')
+        fig.suptitle(f'{e.example}: [{e.bin_start:%d.%b.%Y %H:%M}, {e.bin_end_exclusive:%d.%b.%Y %H:%M})',fontsize=14)
+        save(fig,e.example,'I compare accepted CO₂ observations with each sensor’s own 2 h mean. Lines join only adjacent occupied 15 min cells; grey spans show missing cells. Selection: '+e.selection_rules)
+    for path in out.glob('*.svg'):
+        path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
+    return captions
+
+
+def validate_intrabin_real_examples(cells, examples, frames):
+    """Independent scalar arithmetic on selected real bins, no Fourier calls."""
+    import math
+    checks=[]
+    for e in examples.itertuples():
+        for sid in SUBSURFACE_IDS:
+            g=frames[sid].loc[frames[sid].localdatetime.ge(e.bin_start)&frames[sid].localdatetime.lt(e.bin_end_exclusive)]
+            y=g.datavalue.tolist(); t=g.localdatetime.tolist()
+            r=cells.loc[cells.sensorid.eq(sid)&cells.bin_start.eq(e.bin_start)].iloc[0]
+            assert len(y)==r.n
+            if len(y)<2: continue
+            mean=math.fsum(y)/len(y)
+            changes=[abs(b-a) for a,b in zip(y,y[1:])]
+            k=changes.index(max(changes)); seconds=(t[k+1]-t[k]).total_seconds()
+            expected=dict(mean_ppm=mean,min_ppm=min(y),max_ppm=max(y),range_ppm=max(y)-min(y),
+                max_abs_deviation_ppm=max(abs(v-mean) for v in y),last_minus_first_ppm=y[-1]-y[0],
+                max_adjacent_abs_change_ppm=changes[k],max_change_dt_seconds=seconds,
+                max_change_rate_ppm_h=changes[k]*3600/seconds)
+            for key,value in expected.items():
+                assert math.isclose(r[key],value,rel_tol=0,abs_tol=2e-12),(sid,e.bin_start,key)
+            assert (r.max_change_from,r.max_change_to)==(t[k],t[k+1])
+            checks.append(dict(sensorid=sid,bin_start=str(e.bin_start),n=len(y),passed=True))
+    return checks
+
+
+def generate_intrabin_2h(out=INTRABIN_OUT):
+    """Bounded raw-concentration analysis from verified accepted Stage 0.2."""
+    out=Path(out)
+    frames,accepted,hashes,used,updates,point_checks=load_resolution_inputs()
+    frames={sid:frames[sid] for sid in SUBSURFACE_IDS}
+    if {sid:len(f) for sid,f in frames.items()} != INTRABIN_COUNTS:
+        raise ValueError('Accepted counts differ; stop')
+    metadata,time_note,meta_hashes=intrabin_metadata(accepted)
+    protected={str(p.relative_to(ROOT)):digest(p) for folder in
+        ('stage02_candidate_selection','stage02_final_admission','preliminary_spectra','preliminary_fourier_phases')
+        for p in (OUT.parent/folder).rglob('*') if p.is_file() and not p.is_relative_to(out)}
+    cells,pairs=intrabin_statistics(frames)
+    grid_path=ROOT/'Project_description/Research_log/data/stage02_candidate_selection/calendar_2h_grid.parquet'
+    grid=pd.read_parquet(grid_path)
+    for sid in SUBSURFACE_IDS:
+        g=cells.loc[cells.sensorid.eq(sid)]
+        np.testing.assert_array_equal(g.mean_ppm,grid[f'C_{sid}'])
+        np.testing.assert_array_equal(g.n,grid[f'n_{sid}'])
+        np.testing.assert_array_equal(g.bin_start,grid.index)
+        np.testing.assert_array_equal(g.bin_end_exclusive,grid.index+pd.Timedelta(hours=2))
+    summary,counts,extrema=intrabin_summary(cells,pairs)
+    examples=select_intrabin_examples(cells)
+    independent=validate_intrabin_real_examples(cells,examples,frames)
+    tests=subprocess.run([sys.executable,'-m','unittest',
+        'Project_description.sensorDB.tests.test_preliminary_fourier_phases.IntrabinTests','-v'],
+        cwd=ROOT,text=True,capture_output=True,check=True)
+    out.mkdir(parents=True,exist_ok=True)
+    for name,data in [('all',cells),('summary',summary),('counts',counts),('extrema',extrema),('examples',examples)]:
+        data.to_csv(out/f'intrabin_2h_{name}.csv',index=False,float_format='%.17g')
+    pairs.to_csv(out/'intrabin_2h_adjacent.csv.gz',index=False,float_format='%.17g',compression={'method':'gzip','mtime':0})
+    selected=pd.concat([f.loc[f.localdatetime.dt.floor('2h').isin(examples.bin_start),
+        ['localdatetime','datavalue','sensorid','plateau_review']] for f in frames.values()])
+    selected.to_csv(out/'intrabin_2h_example_points.csv',index=False,float_format='%.17g')
+    captions=intrabin_figures(cells,pairs,examples,frames,metadata,out)
+    for rel,sha in {**hashes,**meta_hashes,**protected}.items():
+        if digest(ROOT/rel)!=sha: raise ValueError(f'Protected file changed: {rel}')
+    passport=dict(stage='0.5: observed intrabin CO2 concentration',baseline_commit='f22ea460a7db6db1dc38b72233d6601bb2624605',
+        accepted_passport=str(CANDIDATE_PASSPORT.relative_to(ROOT)),accepted_passport_sha256=digest(CANDIDATE_PASSPORT),
+        selector=accepted['selector'],metadata=metadata,start=str(GRID_START),end_exclusive=str(GRID_END),
+        time_basis=time_note,time_conversion=None,bin_minutes=120,nominal_slot_minutes=15,
+        full_bin_definition='All eight calendar 15min cells occupied; descriptive coverage, not an admission rule',
+        adjacent_pairs='Consecutive accepted observations inside the same 2h bin, including gaps; no cross-bin pairs',
+        quantiles='pandas linear empirical quantiles, own-sensor defined cells/pairs only; no confidence intervals',
+        insufficient='n<2: all variation measures NaN; empty means NaN, never zero fill',
+        point_checks=[c for c in point_checks if c['sensorid'] in SUBSURFACE_IDS],input_sha256={**used,**meta_hashes,
+            str(grid_path.relative_to(ROOT)):digest(grid_path)},upstream_hashes_verified=len(hashes),
+        reference_document_updates=updates,implementation_sha256=digest(Path(__file__)),captions=captions,
+        versions=dict(python=sys.version.split()[0],numpy=np.__version__,pandas=pd.__version__,matplotlib=matplotlib.__version__),
+        instrument_source=dict(url='https://www.vaisala.com/sites/default/files/documents/GMM220_Datasheet-B210856EN-E.pdf',
+            document='Vaisala B210856EN-E (2013), page 2',accessed='2026-11-01',
+            accuracy='GMM222 at 25 C, 1013 hPa: +/-(1.5% full range + 2% reading)',
+            analog_output_resolution_bits=12,response_63_percent_seconds=30,
+            installed_range_and_logger_resolution='Not established by the checked archive metadata or workbook'),
+        limitations=['Observed variability is not proof of physical significance or transport time',
+            'A 2h mean can retain an excursion contribution but loses its internal shape',
+            'Missing accepted points and unobserved sub-15min behavior remain unknown',
+            'No Fourier calculation, new quality threshold, interpolation, air mask or physical model'])
+    (out/'intrabin_2h_passport.json').write_text(json.dumps(passport,ensure_ascii=False,indent=2)+'\n')
+    validation=dict(tests_passed=True,test_log=tests.stderr+tests.stdout,accepted_counts=INTRABIN_COUNTS,
+        accepted_2h_means_counts_boundaries_exact=True,independent_scalar_checks=independent,
+        independent_absolute_tolerance_ppm=2e-12,upstream_checksums_verified=len(hashes),
+        upstream_inputs_unchanged=True,previous_results_unchanged=True,previous_result_sha256=protected,
+        cells=len(cells),adjacent_pairs=len(pairs),unique_examples=len(examples),fourier_calculation_performed=False,
+        artifact_sha256={p.name:digest(p) for p in out.iterdir() if p.is_file() and p.name!='intrabin_2h_validation.json'})
+    (out/'intrabin_2h_validation.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2)+'\n')
+    return cells,summary,examples,validation
+
+
+def load_intrabin_2h(out=INTRABIN_OUT):
+    """Published tables for notebook display, without regenerating results."""
+    out=Path(out)
+    return tuple(pd.read_csv(out/f'intrabin_2h_{name}.csv',float_precision='round_trip',parse_dates=dates)
+        for name,dates in [('summary',[]),('counts',[]),('extrema',['bin_start','bin_end_exclusive','from_time','to_time']),
+                           ('examples',['bin_start','bin_end_exclusive'])])
+
+
 def browser_cross_check(grid):
     """Numerical validation of the actual embedded data at two UI settings."""
     engine = Path(__file__).with_suffix('.js')
@@ -1041,8 +1341,13 @@ if __name__ == '__main__':
     parser.add_argument('--step-days', type=int, default=1)
     parser.add_argument('--output', type=Path, default=OUT)
     parser.add_argument('--grid-resolution', action='store_true', help='Run only the accepted-input 15min/2h diagnostic')
+    parser.add_argument('--intrabin-2h', action='store_true', help='Only accepted raw concentration within 2h bins; no Fourier calculation')
     args = parser.parse_args()
-    if args.grid_resolution:
+    if args.grid_resolution and args.intrabin_2h:
+        parser.error('Choose one diagnostic')
+    if args.intrabin_2h:
+        _, _, _, report = generate_intrabin_2h(INTRABIN_OUT if args.output == OUT else args.output)
+    elif args.grid_resolution:
         _, _, _, _, report = generate_grid_resolution(RESOLUTION_OUT if args.output == OUT else args.output)
     else:
         _, _, _, report = generate(args.output,args.window_days,args.step_days)
