@@ -451,5 +451,103 @@ class IntrabinTests(unittest.TestCase):
         self.assertEqual(e.iloc[0].selection_rules.count('maximum within-bin range'),3)
 
 
+
+class TemporalResolutionTests(unittest.TestCase):
+    def frames(self, periods=1344):
+        times=pd.date_range('2025-05-01',periods=periods,freq='15min')+pd.Timedelta(seconds=1)
+        return {sid:pd.DataFrame(dict(localdatetime=times,datavalue=np.arange(periods,dtype=float),
+            technically_retained=True,doubtful=False,plateau_review=False)) for sid in SUBSURFACE_IDS}
+
+    def test_residual_metrics_and_zero_sum(self):
+        from preliminary_fourier_phases import concentration_residuals
+        f=self.frames(8)
+        p,s,b,g=concentration_residuals(f,GRID_START,GRID_START+pd.Timedelta(hours=2))
+        np.testing.assert_allclose(s.MAE_ppm,2)
+        np.testing.assert_allclose(s.RMSE_ppm,np.sqrt(5.25))
+        np.testing.assert_allclose(s.max_abs_ppm,3.5)
+        np.testing.assert_array_equal(b.sum_residual_ppm,0)
+        for sid in SUBSURFACE_IDS:
+            self.assertEqual(p.loc[p.sensorid.eq(sid),'localdatetime'].tolist(),f[sid].localdatetime.tolist())
+
+    def test_missing_points_boundaries_and_weighting(self):
+        from preliminary_fourier_phases import concentration_residuals
+        f=self.frames(17)
+        for sid in SUBSURFACE_IDS:
+            f[sid]=f[sid].drop(index=[1,2,3,4,5,6])
+            f[sid].loc[16,'localdatetime']=GRID_START+pd.Timedelta(hours=4)
+        p,s,b,g=concentration_residuals(f,GRID_START,GRID_START+pd.Timedelta(hours=4))
+        self.assertEqual(s.N.tolist(),[10]*3)
+        # 2 points in first bin, 8 in second: metrics weight observations, not bins.
+        self.assertAlmostEqual(s.MAE_ppm.iloc[0],(7+16)/10)
+        self.assertAlmostEqual(s.RMSE_ppm.iloc[0],np.sqrt((24.5+42)/10))
+        self.assertTrue(b.groupby('sensorid').n.apply(list).map(lambda x:x==[2,8]).all())
+        self.assertLess(b.sum_residual_ppm.abs().max(),1e-12)
+        self.assertFalse(p.localdatetime.eq(GRID_START+pd.Timedelta(hours=4)).any())
+
+    def test_same_source_set_before_coarse_aggregation(self):
+        from preliminary_fourier_phases import matched_resolution_grids
+        f=self.frames(16)
+        f[996].loc[0,'datavalue']=10000 # must not leak into coarse after other sensor loses cell
+        f[1012]=f[1012].drop(index=0)
+        f[1035].loc[3,'doubtful']=True
+        fine,coarse,cohort=matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(hours=4))
+        self.assertEqual(len(cohort),14)
+        for sid in SUBSURFACE_IDS:
+            self.assertEqual(coarse[f'n_{sid}'].tolist(),[6,8])
+            self.assertEqual(coarse[f'mean_{sid}'].iloc[0],sum([1,2,4,5,6,7])/6)
+        self.assertFalse(fine.complete_subsurface.iloc[0]);self.assertFalse(fine.complete_subsurface.iloc[3])
+        self.assertEqual(cohort.time_996.iloc[0],GRID_START+pd.Timedelta(minutes=15,seconds=1))
+        self.assertEqual(fine.bin_center.iloc[0],GRID_START+pd.Timedelta(minutes=7.5))
+        self.assertEqual(coarse.bin_center.iloc[0],GRID_START+pd.Timedelta(hours=1))
+
+    def test_14day_calendar_and_known_phase_sign(self):
+        from preliminary_fourier_phases import matched_resolution_grids
+        f=self.frames(16*96)
+        t=(np.arange(16*96)+.5)/96
+        for j,sid in enumerate(SUBSURFACE_IDS):f[sid].datavalue=np.cos(2*np.pi*t-j*np.pi/3)
+        a,b,_=matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=16))
+        wa=resolution_windows(a,15,window_days=14);wb=resolution_windows(b,120,window_days=14)
+        self.assertEqual(len(wa),3);self.assertEqual(len(wb),3)
+        self.assertTrue((wa.end_exclusive-wa.start).eq(pd.Timedelta(days=14)).all())
+        self.assertTrue(wa.start.diff().dropna().eq(pd.Timedelta(days=1)).all())
+        for pair in PAIRS[1:]:
+            np.testing.assert_allclose(wa[pair+'_rad'],np.pi/3,atol=1e-12)
+            np.testing.assert_allclose(wb[pair+'_rad'],np.pi/3,atol=1e-12)
+        c=compare_resolution_windows(wa,wb,'test')
+        np.testing.assert_allclose(c.delta_rad,0,atol=1e-12)
+        self.assertTrue(wa.complete_bins.eq(1344).all());self.assertTrue(wb.complete_bins.eq(168).all())
+
+    def test_circular_metric_zero_and_small_modules(self):
+        from preliminary_fourier_phases import matched_resolution_grids,temporal_phase_summary
+        f=self.frames()
+        t=(np.arange(1344)+.5)/96
+        for j,sid in enumerate(SUBSURFACE_IDS):f[sid].datavalue=1e-100*np.cos(2*np.pi*t-j*np.pi/3)
+        a,b,_=matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=14))
+        wa=resolution_windows(a,15,window_days=14);wb=resolution_windows(b,120,window_days=14)
+        self.assertTrue(wa['5_to_20_rad'].notna().all())
+        for pair in PAIRS[1:]:wa[pair+'_rad']=np.pi-.01;wb[pair+'_rad']=-np.pi+.02
+        c=compare_resolution_windows(wa,wb,'test');s,_=temporal_phase_summary(c)
+        np.testing.assert_allclose(c.delta_rad,-.03,atol=1e-14)
+        np.testing.assert_allclose(s.MAE_rad,.03,atol=1e-14)
+        for sid in SUBSURFACE_IDS:f[sid].datavalue=400.
+        a,b,_=matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=14))
+        wa=resolution_windows(a,15,window_days=14);wb=resolution_windows(b,120,window_days=14)
+        c=compare_resolution_windows(wa,wb,'test');s,_=temporal_phase_summary(c)
+        self.assertTrue(s.comparable_windows.eq(0).all());self.assertTrue(s.MAE_rad.isna().all())
+        self.assertTrue(wa['5_to_20_reason'].eq('zero_or_nonfinite_coefficient').all())
+
+    def test_actual_support_and_duplicate_slot_guard(self):
+        from preliminary_fourier_phases import matched_resolution_grids
+        f=self.frames()
+        for sid in SUBSURFACE_IDS:f[sid]=f[sid].drop(index=range(8,16))
+        a,b,_=matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=14))
+        wa=resolution_windows(a,15,window_days=14);wb=resolution_windows(b,120,window_days=14)
+        self.assertEqual(wa.complete_bins.iloc[0],1336);self.assertEqual(wb.complete_bins.iloc[0],167)
+        self.assertEqual(wa.longest_gap_hours.iloc[0],2);self.assertEqual(wb.longest_gap_hours.iloc[0],2)
+        self.assertEqual(wa.used_observations_996.iloc[0],wb.used_observations_996.iloc[0])
+        f[996]=pd.concat([f[996],f[996].iloc[:1]])
+        with self.assertRaises(ValueError):matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=14))
+
+
 if __name__=='__main__':
     unittest.main()

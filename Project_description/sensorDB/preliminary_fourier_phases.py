@@ -1258,6 +1258,234 @@ def load_intrabin_2h(out=INTRABIN_OUT):
                            ('examples',['bin_start','bin_end_exclusive'])])
 
 
+# Stage 0.5, 02.Nov.2026: matched observations, 14-day windows.
+TEMPORAL_OUT = OUT.parent/'temporal_resolution_15min_vs_2h'
+
+
+def concentration_residuals(frames, start=GRID_START, end=GRID_END):
+    """Own-sensor means mapped only to actual accepted source timestamps."""
+    grid=resolution_grid(frames,120,start,end)
+    observations=[]
+    for sid,frame in frames.items():
+        keep=frame.technically_retained & ~frame.doubtful & frame.localdatetime.ge(start) & frame.localdatetime.lt(end)
+        r=frame.loc[keep,['localdatetime','datavalue']].copy()
+        r['sensorid']=sid
+        r['bin_start']=r.localdatetime.dt.floor('2h')
+        r['mean_2h_ppm']=r.bin_start.map(grid[f'mean_{sid}'])
+        r['residual_ppm']=r.datavalue-r.mean_2h_ppm
+        observations.append(r)
+    points=pd.concat(observations,ignore_index=True)
+    rows=[]
+    for sid,g in points.groupby('sensorid',sort=False):
+        e=g.residual_ppm.to_numpy()
+        rows.append(dict(sensorid=sid,N=len(g),MAE_ppm=float(np.mean(np.abs(e))),
+            RMSE_ppm=float(np.sqrt(np.mean(e*e))),p95_abs_ppm=float(np.quantile(np.abs(e),.95)),
+            max_abs_ppm=float(np.max(np.abs(e))),mean_residual_ppm=float(e.mean())))
+    bins=points.groupby(['sensorid','bin_start'],sort=True).agg(n=('residual_ppm','size'),
+        sum_residual_ppm=('residual_ppm','sum'),max_abs_error_ppm=('residual_ppm',lambda x: x.abs().max()),
+        RMSE_ppm=('residual_ppm',lambda x: np.sqrt(np.mean(x*x)))).reset_index()
+    return points,pd.DataFrame(rows),bins,grid
+
+
+def matched_resolution_grids(frames, start=GRID_START, end=GRID_END):
+    """Fix the intersection of occupied 15min cells BEFORE either estimate.
+
+    Require exactly one accepted record per sensor per occupied fine cell.
+    Keep actual timestamps; Fourier coordinates remain calendar centers, as
+    in the established method. Coarse means use only those same records.
+    """
+    fine_all=resolution_grid(frames,15,start,end)
+    common=fine_all.index[fine_all.complete_subsurface]
+    matched={}; cohort=pd.DataFrame(index=common)
+    for sid in SUBSURFACE_IDS:
+        f=frames[sid]
+        keep=f.technically_retained & ~f.doubtful & f.localdatetime.ge(start) & f.localdatetime.lt(end)
+        f=f.loc[keep].copy()
+        f['fine_start']=f.localdatetime.dt.floor('15min')
+        if f.fine_start.duplicated().any():
+            raise ValueError('Matched comparison requires one real observation per occupied 15min cell')
+        matched[sid]=f.loc[f.fine_start.isin(common)].sort_values('localdatetime')
+        indexed=matched[sid].set_index('fine_start').reindex(common)
+        cohort[f'time_{sid}']=indexed.localdatetime
+        cohort[f'C_{sid}']=indexed.datavalue
+    fine=resolution_grid(matched,15,start,end)
+    coarse=resolution_grid(matched,120,start,end)
+    for sid in SUBSURFACE_IDS:
+        assert len(matched[sid])==len(common)==int(coarse[f'n_{sid}'].sum())
+        pd.testing.assert_series_equal(fine.loc[common,f'mean_{sid}'],cohort[f'C_{sid}'],check_names=False)
+    cohort.index.name='fine_start'
+    return fine,coarse,cohort
+
+
+def temporal_phase_summary(comparison):
+    rows=[]; diagnostics=[]
+    for pair,g in comparison.groupby('pair',sort=False):
+        valid=g.loc[g.comparable]
+        d=valid.delta_rad.abs()
+        row=dict(pair=pair,total_windows=len(g),comparable_windows=len(valid),undefined_windows=len(g)-len(valid),
+            MAE_rad=float(d.mean()),median_abs_rad=float(d.median()),p95_abs_rad=float(d.quantile(.95)),
+            max_abs_rad=float(d.max()),MAE_over_pi=float(d.mean()/np.pi))
+        if len(valid):
+            r=valid.loc[d.idxmax()]
+            row.update(max_start=r.start,max_end_exclusive=r.end_exclusive,max_center=r.center)
+            diagnostics.append(r.to_dict())
+        rows.append(row)
+    return pd.DataFrame(rows),pd.DataFrame(diagnostics)
+
+
+def temporal_figures(points,metrics,bins,comparison,metadata,out):
+    """Exactly three print-friendly JPG illustrations; no PNG/SVG copies."""
+    depths={m['sensorid']:-100*m['z'] for m in metadata}
+    def location(sid):
+        m=next(m for m in metadata if m['sensorid']==sid)
+        return f"W_x1_y4, x={m['x']:g} m, y={m['y']:g} m, depth {depths[sid]:g} cm, GMM222 {sid}"
+    focus=bins.loc[bins.sensorid.eq(996)].sort_values('bin_start')
+    typical=focus.loc[(focus.RMSE_ppm-focus.RMSE_ppm.median()).abs().idxmin()]
+    largest=focus.loc[focus.max_abs_error_ppm.idxmax()]
+    examples=pd.DataFrame([dict(kind=label,bin_start=r.bin_start,bin_end_exclusive=r.bin_start+pd.Timedelta(hours=2),
+        selector_sensorid=996,rule=rule) for label,r,rule in [
+            ('Typical',typical,'5 cm: bin RMSE closest to its median; earliest exact tie'),
+            ('Largest deviation',largest,'5 cm: maximum absolute deviation from own 2h mean; earliest exact tie')]])
+    colors=['#17658a','#b05c16','#7954a0'];captions={}
+    def save(fig,name,caption):
+        fig.savefig(out/(name+'.jpg'),dpi=300,bbox_inches='tight',facecolor='white',pil_kwargs={'quality':95})
+        plt.close(fig);captions[name]=caption
+    fig,axes=plt.subplots(3,2,figsize=(14,10),layout='constrained')
+    for col,e in enumerate(examples.itertuples()):
+        for row,(sid,color) in enumerate(zip(SUBSURFACE_IDS,colors)):
+            ax=axes[row,col];g=points.loc[points.sensorid.eq(sid)&points.bin_start.eq(e.bin_start)]
+            mean=g.mean_2h_ppm.iloc[0]
+            ax.hlines(mean,e.bin_start,e.bin_end_exclusive,color='#333',ls='--',label='2 h mean')
+            ax.vlines(g.localdatetime,np.minimum(g.datavalue,mean),np.maximum(g.datavalue,mean),color=color,alpha=.5,lw=1.3,label='Residual e(t)')
+            ax.scatter(g.localdatetime,g.datavalue,color=color,s=23,zorder=3,label='Accepted observations')
+            ax.set_title(location(sid).replace(', depth','\ndepth')+f' · n={len(g)}',fontsize=10)
+            ax.set(ylabel='CO₂ concentration (ppm)',xlim=(e.bin_start,e.bin_end_exclusive))
+            ax.xaxis.set_major_locator(mdates.MinuteLocator(byminute=[0,30]))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+            ax.set_xlabel(f'{e.kind}: {e.bin_start:%d.%b.%Y} [{e.bin_start:%H:%M}, {e.bin_end_exclusive:%H:%M})')
+            ax.grid(alpha=.2);ax.ticklabel_format(axis='y',useOffset=False)
+            if row==0:ax.legend(fontsize=8,ncol=3,loc='best')
+    fig.suptitle('Measured CO₂ and its own-sensor 2 h mean at the same source timestamps\nDatabase LOCALDATETIME; timezone unconfirmed · vertical segments show residuals',fontsize=14)
+    save(fig,'concentration_examples','I compare real observations with their own-sensor two-hour mean. Vertical segments show residuals, not imputed observations. The two intervals are selected from the 5 cm sensor by fixed ranks, and all three depths are shown.')
+    fig,ax=plt.subplots(figsize=(11,6),layout='constrained')
+    x=np.arange(3);a=metrics.set_index('sensorid').loc[list(SUBSURFACE_IDS)]
+    ax.bar(x-.19,a.MAE_ppm,.36,color='#17658a',label='MAE')
+    ax.bar(x+.19,a.RMSE_ppm,.36,color='#b05c16',label='RMSE')
+    for i,r in enumerate(a.itertuples()):
+        ax.text(i-.19,r.MAE_ppm+.25,f'{r.MAE_ppm:.3f}',ha='center')
+        ax.text(i+.19,r.RMSE_ppm+.25,f'{r.RMSE_ppm:.3f}',ha='center')
+    ax.set_xticks(x,[f'Depth {depths[s]:g} cm\nGMM222 {s}' for s in SUBSURFACE_IDS])
+    ax.set(ylabel='CO₂ concentration discrepancy (ppm)',ylim=(0,float(a.RMSE_ppm.max())*1.2),
+        title='Effect of replacing each observed concentration by its own 2 h mean\nLEO West W_x1_y4 · x=1 m, y=4 m · 01.May.2025–30.Sep.2026')
+    ax.legend(frameon=False);ax.grid(axis='y',alpha=.2)
+    save(fig,'concentration_errors','I report MAE and RMSE over actual accepted observations separately at each depth. These are aggregation discrepancies, not errors relative to an unknown true concentration.')
+    fig,axes=plt.subplots(2,2,figsize=(14,9),sharex=True,layout='constrained')
+    for col,pair in enumerate(PAIRS[1:]):
+        g=comparison.loc[comparison.pair.eq(pair)]
+        for suffix,color,label in [('left','#17658a','15 min'),('right','#b05c16','2 h')]:
+            tx,y=broken_line(g.center,g[pair+'_rad_'+suffix]);axes[0,col].plot(tx,y,color=color,lw=1,label=label)
+        tx,y=broken_line(g.center,g.delta_rad)
+        axes[1,col].plot(tx,y,color='#303c45',lw=1)
+        axes[1,col].axhline(0,color='#888',lw=.7)
+        j=col;u,v=SUBSURFACE_IDS[j:j+2]
+        title=f'W_x1_y4, x=1 m, y=4 m\nDepths {depths[u]:g} → {depths[v]:g} cm · GMM222 {u} → {v}'
+        axes[0,col].set(title=title,ylabel='Relative Fourier phase of CO₂ (rad)',ylim=(-np.pi,np.pi))
+        axes[0,col].set_yticks([-np.pi,-np.pi/2,0,np.pi/2,np.pi],labels=['−π','−π/2','0','π/2','π'])
+        axes[0,col].legend(frameon=False,ncol=2)
+        axes[1,col].set(title=title,ylabel='Circular phase difference: 15 min − 2 h (rad)',xlabel='14-day window center (LOCALDATETIME)')
+        for ax in axes[:,col]:
+            ax.grid(alpha=.2);ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3));ax.xaxis.set_major_formatter(mdates.DateFormatter('%b.%Y'))
+    fig.suptitle('CO₂ Fourier phases: identical source observations in both representations\n1 cycle/day · 14-day windows · 1-day step · no atmospheric availability mask',fontsize=14)
+    save(fig,'phase_comparison_14d','I compare two representations of the same accepted subsurface observations. The lower panels show the circular difference; gaps at branch crossings are display breaks. Aggregation changes values, calendar-center times and weights.')
+    return examples,captions
+
+
+def generate_temporal_resolution(out=TEMPORAL_OUT):
+    """Only the newly authorized 14-day matched-support comparison."""
+    out=Path(out)
+    frames,accepted,hashes,used,updates,checks=load_resolution_inputs()
+    frames={s:frames[s] for s in SUBSURFACE_IDS}
+    assert {s:len(f) for s,f in frames.items()}==INTRABIN_COUNTS
+    metadata,time_note,meta_hashes=intrabin_metadata(accepted)
+    points,concentration,bins,own=concentration_residuals(frames)
+    historical_path=INTRABIN_OUT/'intrabin_2h_all.csv'
+    historical_sha=digest(historical_path)
+    historical=pd.read_csv(historical_path,float_precision='round_trip',parse_dates=['bin_start'])
+    for sid in SUBSURFACE_IDS:
+        h=historical.loc[historical.sensorid.eq(sid)].set_index('bin_start')
+        np.testing.assert_array_equal(own[f'mean_{sid}'],h.mean_ppm)
+        np.testing.assert_array_equal(own[f'n_{sid}'],h.n)
+    zero_bound=32*np.finfo(float).eps*points.datavalue.abs().max()*bins.n.max()
+    assert bins.sum_residual_ppm.abs().max() <= zero_bound
+    fine,coarse,cohort=matched_resolution_grids(frames)
+    wf=resolution_windows(fine,15,window_days=14,step_days=1)
+    wc=resolution_windows(coarse,120,window_days=14,step_days=1)
+    for sid in SUBSURFACE_IDS:
+        np.testing.assert_array_equal(wf[f'used_observations_{sid}'],wc[f'used_observations_{sid}'])
+    comparison=compare_resolution_windows(wf,wc,'matched_observations_14d')
+    summary,diagnostics=temporal_phase_summary(comparison)
+    assert len(wf)==len(wc)==505
+    assert (wf.end_exclusive-wf.start).eq(pd.Timedelta(days=14)).all()
+    assert wf.start.diff().dropna().eq(pd.Timedelta(days=1)).all()
+    # Independently evaluate selected real coefficients with Python scalar sums.
+    import cmath,math
+    independent=[]
+    for r in diagnostics.itertuples():
+        for minutes,grid,windows in [(15,fine,wf),(120,coarse,wc)]:
+            g=grid.loc[(grid.index>=r.start)&(grid.index<r.end_exclusive)&grid.complete_subsurface]
+            expected=windows.loc[windows.start.eq(r.start)].iloc[0]
+            for sid in SUBSURFACE_IDS:
+                values=g[f'mean_{sid}'].tolist();mean=math.fsum(values)/len(values)
+                coefficient=sum((y-mean)*cmath.exp(-2j*math.pi*t) for y,t in zip(values,g.t_days))/len(values)
+                stored=complex(expected[f'F_real_{sid}'],expected[f'F_imag_{sid}'])
+                assert abs(coefficient-stored)<1e-10
+            independent.append(dict(start=str(r.start),bin_minutes=minutes,all_three_coefficients_match=True))
+    tests=subprocess.run([sys.executable,'-m','unittest',
+        'Project_description.sensorDB.tests.test_preliminary_fourier_phases.TemporalResolutionTests','-v'],cwd=ROOT,text=True,capture_output=True,check=True)
+    out.mkdir(parents=True,exist_ok=True)
+    for name,data in [('concentration_summary',concentration),('concentration_bins',bins),
+        ('phase_windows_15min',wf),('phase_windows_2h',wc),('phase_comparison',comparison),('phase_summary',summary),('phase_extrema_diagnostics',diagnostics)]:
+        data.to_csv(out/f'{name}.csv',index=False,float_format='%.17g')
+    for name,data,index in [('concentration_residuals',points,False),('matched_source_observations',cohort,True),('matched_grid_2h',coarse,True)]:
+        data.to_csv(out/f'{name}.csv.gz',index=index,float_format='%.17g',compression={'method':'gzip','mtime':0})
+    examples,captions=temporal_figures(points,concentration,bins,comparison,metadata,out)
+    examples.to_csv(out/'concentration_examples.csv',index=False)
+    for rel,sha in {**hashes,**meta_hashes,str(historical_path.relative_to(ROOT)):historical_sha}.items():
+        assert digest(ROOT/rel)==sha,rel
+    passport=dict(stage='0.5',baseline_commit='8c3b6ff79e679585ef8f34e77a3006909b2ca2d5',decision_date='2026-11-02',
+        accepted_passport=str(CANDIDATE_PASSPORT.relative_to(ROOT)),accepted_passport_sha256=digest(CANDIDATE_PASSPORT),
+        selector=accepted['selector'],metadata=metadata,time_basis=time_note,start=str(GRID_START),end_exclusive=str(GRID_END),
+        window_days=14,step_days=1,f0_cycles_per_day=1,time_origin=str(START),
+        common_observations_per_sensor=len(cohort),source_counts=INTRABIN_COUNTS,
+        concentration='Own-sensor 2h means mapped to identical actual source timestamps; each accepted point weight 1/N',
+        phase_support='Intersection of occupied 15min calendar cells across all three sensors, one observation per sensor per cell; exactly the same source records in 2h aggregates',
+        phase_times='Calendar centers: fine start +7min30s; coarse start +1h. Actual source timestamps retained separately. No interpolation.',
+        weights='Fine: 1/N per occupied fine cell. Coarse: 1/K per occupied 2h cell, hence 1/(K*n_b) per constituent observation. Each representation subtracts its own equally weighted window mean.',
+        phase='wrap(Arg(F_upper*conj(F_lower))) in [-pi,pi); positive ideal sinusoidal phase indicates lower-channel lag',
+        difference='wrap(Arg(exp(i*(phase_15min-phase_2h)))); no acceptance threshold',
+        input_sha256={**used,**meta_hashes,str(historical_path.relative_to(ROOT)):historical_sha},
+        upstream_hashes_verified=len(hashes),reference_document_updates=updates,
+        implementation_sha256=digest(Path(__file__)),captions=captions,
+        versions=dict(python=sys.version.split()[0],numpy=np.__version__,pandas=pd.__version__,matplotlib=matplotlib.__version__))
+    (out/'passport.json').write_text(json.dumps(passport,ensure_ascii=False,indent=2)+'\n')
+    validation=dict(tests_passed=True,test_log=tests.stderr+tests.stdout,accepted_counts=INTRABIN_COUNTS,
+        own_sensor_means_and_counts_match_intrabin_exactly=True,common_source_counts_match_in_every_window=True,
+        max_abs_bin_residual_sum_ppm=float(bins.sum_residual_ppm.abs().max()),numeric_zero_sum_bound_ppm=float(zero_bound),
+        independent_scalar_fourier_checks=independent,windows=505,window_days=14,step_days=1,
+        fine_common_cells=len(cohort),coarse_common_cells=int(coarse.complete_subsurface.sum()),
+        upstream_hashes_verified=len(hashes),upstream_inputs_unchanged=True,
+        artifact_sha256={p.name:digest(p) for p in out.iterdir() if p.is_file() and p.name!='validation.json'})
+    (out/'validation.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2)+'\n')
+    return concentration,summary,diagnostics,validation
+
+
+def load_temporal_resolution(out=TEMPORAL_OUT):
+    """Short research notebook reads published results only."""
+    out=Path(out)
+    return tuple(pd.read_csv(out/f'{name}.csv',float_precision='round_trip')
+        for name in ('concentration_summary','phase_summary','phase_extrema_diagnostics','concentration_examples'))
+
+
 def browser_cross_check(grid):
     """Numerical validation of the actual embedded data at two UI settings."""
     engine = Path(__file__).with_suffix('.js')
@@ -1342,10 +1570,13 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, default=OUT)
     parser.add_argument('--grid-resolution', action='store_true', help='Run only the accepted-input 15min/2h diagnostic')
     parser.add_argument('--intrabin-2h', action='store_true', help='Only accepted raw concentration within 2h bins; no Fourier calculation')
+    parser.add_argument('--temporal-resolution-14d', action='store_true', help='Only matched-observation 15min/2h comparison with 14-day windows')
     args = parser.parse_args()
-    if args.grid_resolution and args.intrabin_2h:
+    if sum((args.grid_resolution,args.intrabin_2h,args.temporal_resolution_14d)) > 1:
         parser.error('Choose one diagnostic')
-    if args.intrabin_2h:
+    if args.temporal_resolution_14d:
+        _, _, _, report = generate_temporal_resolution(TEMPORAL_OUT if args.output == OUT else args.output)
+    elif args.intrabin_2h:
         _, _, _, report = generate_intrabin_2h(INTRABIN_OUT if args.output == OUT else args.output)
     elif args.grid_resolution:
         _, _, _, _, report = generate_grid_resolution(RESOLUTION_OUT if args.output == OUT else args.output)

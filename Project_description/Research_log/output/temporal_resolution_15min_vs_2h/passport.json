@@ -1,0 +1,136 @@
+{
+  "stage": "0.5",
+  "baseline_commit": "8c3b6ff79e679585ef8f34e77a3006909b2ca2d5",
+  "decision_date": "2026-11-02",
+  "accepted_passport": "Project_description/Research_log/output/stage02_candidate_selection/passport.json",
+  "accepted_passport_sha256": "1c1ce6e9968a33567751cf3f59533693b7c4c38868228de5f5885bd15b1d0f15",
+  "selector": "technically_retained & ~doubtful",
+  "metadata": [
+    {
+      "row": 106,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 996,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_1_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.05,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.75",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.05",
+        "dlevel": "1"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 107,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1012,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_2_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.2,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.6",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.2",
+        "dlevel": "2"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    },
+    {
+      "row": 108,
+      "table": "LEO_WEST.DATAVALUES",
+      "sensorid": 1035,
+      "variableid": 9,
+      "sensorcode": "LEO-W_4_1_4_GMM222",
+      "kind": "GMM222",
+      "x": 1.0,
+      "y": 4.0,
+      "z": -0.5,
+      "units": "ppm",
+      "oracle_location": {
+        "localx": "1",
+        "localy": "4",
+        "localz": "1.3",
+        "boxx": "1",
+        "boxy": "4",
+        "boxz": "0.5",
+        "dlevel": "4"
+      },
+      "oracle_nodata": "-9999",
+      "geometry_note": ""
+    }
+  ],
+  "time_basis": "Oracle localdatetime; timezone and clock correspondence unconfirmed",
+  "start": "2025-05-01 00:00:00",
+  "end_exclusive": "2026-10-01 00:00:00",
+  "window_days": 14,
+  "step_days": 1,
+  "f0_cycles_per_day": 1,
+  "time_origin": "2025-04-29 00:00:00",
+  "common_observations_per_sensor": 48463,
+  "source_counts": {
+    "996": 49311,
+    "1012": 49293,
+    "1035": 49267
+  },
+  "concentration": "Own-sensor 2h means mapped to identical actual source timestamps; each accepted point weight 1/N",
+  "phase_support": "Intersection of occupied 15min calendar cells across all three sensors, one observation per sensor per cell; exactly the same source records in 2h aggregates",
+  "phase_times": "Calendar centers: fine start +7min30s; coarse start +1h. Actual source timestamps retained separately. No interpolation.",
+  "weights": "Fine: 1/N per occupied fine cell. Coarse: 1/K per occupied 2h cell, hence 1/(K*n_b) per constituent observation. Each representation subtracts its own equally weighted window mean.",
+  "phase": "wrap(Arg(F_upper*conj(F_lower))) in [-pi,pi); positive ideal sinusoidal phase indicates lower-channel lag",
+  "difference": "wrap(Arg(exp(i*(phase_15min-phase_2h)))); no acceptance threshold",
+  "input_sha256": {
+    "Project_description/Research_log/data/stage02_candidate_selection/1275_candidate_measurements.parquet": "413002ac71106d9317bc2204dd75f0ff2db3f0db61f4902673c87b8198843037",
+    "Project_description/Research_log/data/stage02_final_admission/1275_measurements.parquet": "724c73ab80bff7bbf603b7ac73e1081a8f74c9e5fd53d484059ddb7e988a1236",
+    "Project_description/Research_log/data/stage02_candidate_selection/996_candidate_measurements.parquet": "1f140ecb95d8d6254936617ec5e9001818cd7f0efde85335cc51d2aa98a95a5d",
+    "Project_description/Research_log/data/stage02_final_admission/996_measurements.parquet": "51370ddfee5a97d16707ca12ba6276c6303dfc37d82e11ed069070bcc462152f",
+    "Project_description/Research_log/data/stage02_candidate_selection/1012_candidate_measurements.parquet": "aa79f513f3ec6fde1ebd20b955cc4bfe952cb7f919dbd3215ab9af6655540bb5",
+    "Project_description/Research_log/data/stage02_final_admission/1012_measurements.parquet": "8378655d26f9b783337a2a4f46c70e83bcc6c505b41aa77dd366c08a24f80c6a",
+    "Project_description/Research_log/data/stage02_candidate_selection/1035_candidate_measurements.parquet": "53cd0212578d76a09861906765d29a7a9b742994505a7775be17d131c0f6a92a",
+    "Project_description/Research_log/data/stage02_final_admission/1035_measurements.parquet": "29e68aa5cddf6e7db85ce1b27df1f094ef02299a3441f01854d38f66ada2f3f6",
+    "Project_description/sensorDB/Row_data/LEO_West_full/20261002T061358Z-264980/manifest.json": "2346fbb77db20ad2396d38d2b7d3577cca808ed2d6701d2a9ebc41c07949056c",
+    "Sensors_Description/variables_schema.xlsx": "f4bec37990e121826dcc223210a3deda1866182476e3c45ef3bb7c49f165fd24",
+    "Project_description/Research_log/output/preliminary_fourier_phases/intrabin_2h/intrabin_2h_all.csv": "ccd53f86ba6e16514ce5589150d0a34e729b026adb9e8a709348ff42f5984d4d"
+  },
+  "upstream_hashes_verified": 1433,
+  "reference_document_updates": {
+    "Project_description/Research_log/README.md": {
+      "passport_sha256": "0488f03c9c25924c2f674eb2e3950f98e8455016f5aed3670bdf6a761e47ddac",
+      "current_sha256": "f2a053877db843ceacc948acaeb7f68d5552e41f7530cff659b6659acd5d0d79",
+      "historical_commit": "9c677cacd2a6a1b008a3cc7b73aa30b63e998c8d"
+    },
+    "Project_description/Research_log/PLAN.md": {
+      "passport_sha256": "dc3e76d1a5ef71f6ae7de9f58f395be5266ca46980030db0f5df30022a3d5d42",
+      "current_sha256": "af97e2ff2e7085b11c99d0347cffc230efab0675203820c66103091b22e13dca",
+      "historical_commit": "9c677cacd2a6a1b008a3cc7b73aa30b63e998c8d"
+    }
+  },
+  "implementation_sha256": "531c26cb3b4ec8c175a3d4473e6e6a6ca364e56b3f7131ce33855235267ee9db",
+  "captions": {
+    "concentration_examples": "I compare real observations with their own-sensor two-hour mean. Vertical segments show residuals, not imputed observations. The two intervals are selected from the 5 cm sensor by fixed ranks, and all three depths are shown.",
+    "concentration_errors": "I report MAE and RMSE over actual accepted observations separately at each depth. These are aggregation discrepancies, not errors relative to an unknown true concentration.",
+    "phase_comparison_14d": "I compare two representations of the same accepted subsurface observations. The lower panels show the circular difference; gaps at branch crossings are display breaks. Aggregation changes values, calendar-center times and weights."
+  },
+  "versions": {
+    "python": "3.14.4",
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.7+dfsg1"
+  }
+}

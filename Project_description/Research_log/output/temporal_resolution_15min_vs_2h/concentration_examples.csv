@@ -1,0 +1,3 @@
+kind,bin_start,bin_end_exclusive,selector_sensorid,rule
+Typical,2025-11-01 06:00:00,2025-11-01 08:00:00,996,5 cm: bin RMSE closest to its median; earliest exact tie
+Largest deviation,2026-01-01 10:00:00,2026-01-01 12:00:00,996,5 cm: maximum absolute deviation from own 2h mean; earliest exact tie
