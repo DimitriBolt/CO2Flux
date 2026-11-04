@@ -549,5 +549,44 @@ class TemporalResolutionTests(unittest.TestCase):
         with self.assertRaises(ValueError):matched_resolution_grids(f,GRID_START,GRID_START+pd.Timedelta(days=14))
 
 
+class DailyConcentrationScaleTests(unittest.TestCase):
+    def calculate(self, times, values, days=3):
+        from preliminary_fourier_phases import daily_concentration_ranges
+        points=pd.DataFrame(dict(sensorid=996,localdatetime=[pd.Timestamp(t) for t in times],datavalue=values))
+        return daily_concentration_ranges(points,GRID_START,GRID_START+pd.Timedelta(days=days))
+
+    def test_calendar_boundaries_and_insufficient_days(self):
+        d=self.calculate(['2025-05-01','2025-05-01 23:59:59','2025-05-02','2025-05-04'],[10,40,99,1000])
+        self.assertEqual(d.n.tolist(),[2,1,0])
+        self.assertEqual(d.D_ppm.iloc[0],30)
+        self.assertTrue(d.D_ppm.iloc[1:].isna().all())
+        self.assertEqual(d.longest_missing_cells.tolist(),[94,95,96])
+        self.assertEqual(d.day_end_exclusive.iloc[-1],GRID_START+pd.Timedelta(days=3))
+
+    def test_cell_coverage_is_not_point_count(self):
+        from preliminary_fourier_phases import daily_concentration_ranges
+        times=pd.date_range(GRID_START,periods=96,freq='15min')+pd.Timedelta(seconds=1)
+        d=self.calculate(times,np.arange(96),days=1)
+        self.assertTrue(d.full_day.iloc[0]);self.assertEqual(d.D_ppm.iloc[0],95)
+        # 96 points in 95 cells: still incomplete, actual points define extrema.
+        times=times.to_list();times[-1]=times[0]+pd.Timedelta(seconds=1)
+        d=self.calculate(times,np.arange(96),days=1)
+        self.assertEqual(d.n.iloc[0],96);self.assertEqual(d.occupied_15min_cells.iloc[0],95)
+        self.assertFalse(d.full_day.iloc[0]);self.assertEqual(d.D_ppm.iloc[0],95)
+        self.assertEqual(d.longest_missing_cells.iloc[0],1)
+
+    def test_scale_ratio_and_descriptive_subsets(self):
+        from preliminary_fourier_phases import daily_scale_summary
+        d=self.calculate(['2025-05-01','2025-05-01 01:00','2025-05-02','2025-05-02 01:00'],[10,30,40,100])
+        s,a,n=daily_scale_summary(d,pd.DataFrame(dict(sensorid=[996],MAE_ppm=[8.])))
+        self.assertEqual(s.days.iloc[0],2);self.assertEqual(s.insufficient_days.iloc[0],1)
+        self.assertEqual(s.D_typ_ppm.iloc[0],40);self.assertEqual(s.R.iloc[0],.2)
+        self.assertEqual(a.days.tolist(),[2,0,2]);self.assertTrue(np.isnan(a.D_typ_ppm.iloc[1]))
+        self.assertEqual(n.calendar_days.sum(),3)
+        d.D_ppm=0
+        s,_,_=daily_scale_summary(d,pd.DataFrame(dict(sensorid=[996],MAE_ppm=[0.])))
+        self.assertTrue(np.isnan(s.R.iloc[0])) # no invented ratio when D_typ=0
+
+
 if __name__=='__main__':
     unittest.main()

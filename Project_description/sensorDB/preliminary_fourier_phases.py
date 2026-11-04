@@ -1486,6 +1486,195 @@ def load_temporal_resolution(out=TEMPORAL_OUT):
         for name in ('concentration_summary','phase_summary','phase_extrema_diagnostics','concentration_examples'))
 
 
+# Stage 0.5: concentration-scale context; no Fourier evaluation.
+DAILY_SCALE_OUT = TEMPORAL_OUT/'daily_scale'
+
+
+def daily_concentration_ranges(points, start=GRID_START, end=GRID_END):
+    """Observed calendar-day ranges, with explicit coverage; n<2 is undefined.
+
+    `points` contains already accepted, own-sensor source observations, not
+    the three-sensor phase intersection. No new admission threshold or mask.
+    """
+    if start != start.normalize() or end != end.normalize() or end <= start:
+        raise ValueError('Use a nonempty half-open calendar-day interval')
+    days = pd.date_range(start, end, freq='D', inclusive='left')
+    rows = []
+    for sid, source in points.groupby('sensorid', sort=True):
+        source = source.loc[source.localdatetime.ge(start) & source.localdatetime.lt(end)].sort_values('localdatetime')
+        if not np.isfinite(source.datavalue.to_numpy(float)).all():
+            raise ValueError('Accepted source concentration must be finite')
+        if source.localdatetime.duplicated().any():
+            raise ValueError('Duplicate source timestamp')
+        groups = {day:g for day,g in source.groupby(source.localdatetime.dt.floor('D'))}
+        for day in days:
+            g = groups.get(day, source.iloc[:0])
+            slots = pd.date_range(day, day+pd.Timedelta(days=1), freq='15min', inclusive='left')
+            occupied = slots.isin(g.localdatetime.dt.floor('15min'))
+            n = len(g)
+            rows.append(dict(sensorid=int(sid), day=day, day_end_exclusive=day+pd.Timedelta(days=1),
+                n=n, occupied_15min_cells=int(occupied.sum()), expected_15min_cells=96,
+                coverage_fraction=float(occupied.mean()), full_day=bool(occupied.all()),
+                longest_missing_cells=longest_missing_run(occupied),
+                first_time=g.localdatetime.iloc[0] if n else pd.NaT,
+                last_time=g.localdatetime.iloc[-1] if n else pd.NaT,
+                min_ppm=float(g.datavalue.min()) if n else np.nan,
+                max_ppm=float(g.datavalue.max()) if n else np.nan,
+                D_ppm=float(g.datavalue.max()-g.datavalue.min()) if n>=2 else np.nan))
+    return pd.DataFrame(rows)
+
+
+def daily_scale_summary(daily, metrics):
+    """Unweighted median of observed daily ranges; saved global MAE unchanged.
+
+    Full/partial days and exact observation counts are descriptive subsets,
+    never new quality masks. Their calendars differ: no causal missingness claim.
+    """
+    summary, sensitivity, counts = [], [], []
+    for sid, g in daily.groupby('sensorid', sort=True):
+        mae = float(metrics.set_index('sensorid').loc[sid, 'MAE_ppm'])
+        valid = g.D_ppm.notna()
+        def row(subset, name):
+            typ = float(subset.D_ppm.median()) if len(subset) else np.nan
+            return dict(sensorid=int(sid), subset=name, days=len(subset), D_typ_ppm=typ,
+                        MAE_ppm=mae, R=mae/typ if typ>0 else np.nan)
+        for name, mask in [('all_defined',valid), ('full_96_cells',valid & g.full_day),
+                           ('partial_defined',valid & ~g.full_day)]:
+            sensitivity.append(row(g.loc[mask],name))
+        for n, group in g.groupby('n', sort=True):
+            counts.append(dict(n=int(n),calendar_days=len(group),**row(group.loc[group.D_ppm.notna()], 'exact_n')))
+        summary.append(dict(**row(g.loc[valid],'all_defined'), depth_cm={996:5,1012:20,1035:50}.get(int(sid)),
+            vertical='W_x1_y4',x_m=1,y_m=4,calendar_days=len(g),insufficient_days=int((~valid).sum()),
+            full_days=int(g.full_day.sum()),partial_days=int((valid & ~g.full_day).sum()),
+            n_min=int(g.n.min()),n_max=int(g.n.max()),coverage_min=float(g.coverage_fraction.min()),
+            coverage_max=float(g.coverage_fraction.max())))
+    return pd.DataFrame(summary),pd.DataFrame(sensitivity),pd.DataFrame(counts)
+
+
+def daily_scale_figure(points, daily, summary, out):
+    """One English JPG: an observed day and separate global scale bars."""
+    selected_day = pd.Timestamp('2025-11-01')
+    d = daily.loc[daily.sensorid.eq(996) & daily.day.eq(selected_day)].iloc[0]
+    if not d.full_day:
+        # Fully covered days are a display choice only. Nearest date, earliest tie.
+        candidates = daily.loc[daily.sensorid.eq(996) & daily.full_day].copy()
+        if candidates.empty:
+            raise ValueError('No complete day available for the daily illustration')
+        candidates['distance'] = (candidates.day-selected_day).abs()
+        d = candidates.sort_values(['distance','day']).iloc[0]
+    g = points.loc[points.sensorid.eq(996) & points.localdatetime.ge(d.day)
+                   & points.localdatetime.lt(d.day_end_exclusive)].sort_values('localdatetime')
+    bins = g[['bin_start','mean_2h_ppm']].drop_duplicates().sort_values('bin_start')
+    if bins.bin_start.duplicated().any():
+        raise ValueError('Inconsistent saved 2h means')
+    r = summary.loc[summary.sensorid.eq(996)].iloc[0]
+    fig,(ax,scale) = plt.subplots(1,2,figsize=(14,5.8),gridspec_kw={'width_ratios':[2.5,1]},layout='constrained')
+    fig.suptitle('CO₂ concentration (ppm) — LEO West W_x1_y4, x=1 m, y=4 m\nDepth 5 cm · GMM222 996',fontsize=13)
+    ax.scatter(g.localdatetime,g.datavalue,s=18,color='#174d75',label='Accepted 15-minute observations',zorder=3)
+    for k,b in enumerate(bins.itertuples()):
+        ax.plot([b.bin_start,b.bin_start+pd.Timedelta(hours=2)],[b.mean_2h_ppm]*2,
+                color='#b44b12',lw=2,label='2-hour means (step representation)' if k==0 else None)
+        if k and b.bin_start == bins.iloc[k-1].bin_start+pd.Timedelta(hours=2):
+            ax.plot([b.bin_start]*2,[bins.iloc[k-1].mean_2h_ppm,b.mean_2h_ppm],color='#b44b12',lw=2)
+    ax.axhline(d.min_ppm,color='#657167',ls=':',lw=1)
+    ax.axhline(d.max_ppm,color='#657167',ls=':',lw=1)
+    arrow_time = d.day+pd.Timedelta(hours=23.5)
+    ax.annotate('',xy=(arrow_time,d.max_ppm),xytext=(arrow_time,d.min_ppm),
+                arrowprops={'arrowstyle':'<->','color':'#3a6743','lw':2})
+    ax.text(.97,.97,f'Observed day range: {d.D_ppm:.3f} ppm\n{int(d.n)}/96 occupied 15-min cells',
+            transform=ax.transAxes,ha='right',va='top',fontsize=10,
+            bbox={'facecolor':'white','edgecolor':'#ccd3cc','alpha':.95})
+    ax.set(title=f'A. Selected day: {d.day:%d.%b.%Y}',ylabel='CO₂ concentration (ppm)',xlabel='Time (LOCALDATETIME)')
+    ax.set_xlim(d.day,d.day_end_exclusive)
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,25,4)))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.margins(y=.3)
+    ax.legend(loc='lower left',fontsize=9)
+    ax.grid(alpha=.2)
+    scale.set(title='B. Whole-period scales\n01.May.2025–30.Sep.2026',xlabel='Concentration scale (ppm)')
+    scale.barh([1,0],[r.MAE_ppm,r.D_typ_ppm],height=.32,color=['#b44b12','#3a6743'])
+    scale.set_yticks([1,0],['MAE','Median daily\nrange'])
+    scale.set_xlim(0,max(r.MAE_ppm,r.D_typ_ppm)*1.6)
+    for y,value in [(1,r.MAE_ppm),(0,r.D_typ_ppm)]:
+        scale.text(value+scale.get_xlim()[1]*.025,y,f'{value:.3f} ppm',va='center',fontsize=10)
+    scale.set_ylim(-.65,1.7)
+    scale.text(.02,.98,f'Ratio of scales R = {r.R:.4f} ({100*r.R:.2f}%)',transform=scale.transAxes,
+               va='top',fontsize=10)
+    scale.grid(axis='x',alpha=.2)
+    out=Path(out); out.mkdir(parents=True,exist_ok=True)
+    fig.savefig(out/'daily_scale_5cm.jpg',dpi=300,pil_kwargs={'quality':95,'subsampling':0})
+    plt.close(fig)
+    return dict(requested_day='2025-11-01', selected_day=str(d.day), n=int(d.n),
+                D_ppm=float(d.D_ppm), min_ppm=float(d.min_ppm),max_ppm=float(d.max_ppm),
+                rule='Requested day if all 96 cells occupied; otherwise nearest fully occupied day, earliest tie')
+
+
+def generate_daily_concentration_scale(out=DAILY_SCALE_OUT, source=TEMPORAL_OUT):
+    """Use immutable saved own-sensor accepted points; never call Fourier code."""
+    out,source=Path(out),Path(source)
+    input_names=('concentration_residuals.csv.gz','concentration_summary.csv','passport.json','validation.json')
+    hashes={name:digest(source/name) for name in input_names}
+    previous=json.loads((source/'validation.json').read_text())
+    for name in input_names[:3]:
+        if hashes[name] != previous['artifact_sha256'][name]:
+            raise ValueError(f'Published input hash mismatch: {name}')
+    points=pd.read_csv(source/input_names[0],parse_dates=['localdatetime','bin_start'],float_precision='round_trip')
+    metrics=pd.read_csv(source/input_names[1],float_precision='round_trip')
+    assert points.groupby('sensorid').size().to_dict()==INTRABIN_COUNTS
+    daily=daily_concentration_ranges(points)
+    summary,sensitivity,counts=daily_scale_summary(daily,metrics)
+    out.mkdir(parents=True,exist_ok=True)
+    for name,frame in [('daily_ranges',daily),('daily_summary',summary),
+                       ('daily_coverage_sensitivity',sensitivity),('daily_coverage_counts',counts)]:
+        frame.to_csv(out/f'{name}.csv',index=False,float_format='%.17g')
+    selected=daily_scale_figure(points,daily,summary,out)
+    # Independent scalar checks: requested, first, last and least-covered days.
+    import statistics
+    checks=[]
+    for sid in SUBSURFACE_IDS:
+        raw=points.loc[points.sensorid.eq(sid)]
+        g=daily.loc[daily.sensorid.eq(sid)]
+        calendar={}
+        for t,value in zip(raw.localdatetime,raw.datavalue):
+            calendar.setdefault(t.date(),[]).append(float(value))
+        expected_typ=statistics.median(max(v)-min(v) for v in calendar.values() if len(v)>=2)
+        actual=float(summary.loc[summary.sensorid.eq(sid),'D_typ_ppm'].iloc[0])
+        assert actual==expected_typ
+        dates=sorted(set([g.day.iloc[0],g.day.iloc[-1],g.sort_values(['n','day']).day.iloc[0],pd.Timestamp('2025-11-01')]))
+        for day in dates:
+            values=calendar[day.date()]
+            r=g.loc[g.day.eq(day)].iloc[0]
+            expected=max(values)-min(values) if len(values)>=2 else np.nan
+            assert r.n==len(values) and r.D_ppm==expected
+            checks.append(dict(sensorid=sid,day=str(day),n=len(values),D_ppm=expected))
+    assert all(digest(source/name)==sha for name,sha in hashes.items())
+    passport=dict(stage='0.5 concentration scale supplement',baseline_commit='f22d651299fd053c5dd941086539b76dfbf92ab3',
+        source='Saved own-sensor accepted source observations (localdatetime, datavalue), not 2h means or phase cohort',
+        selector='technically_retained & ~doubtful; unchanged accepted stage 0.2 selection',
+        period_start=str(GRID_START),period_end_exclusive=str(GRID_END),time_basis='Unchanged LOCALDATETIME',
+        input_sha256=hashes,input_directory=str(source.relative_to(ROOT)),
+        formulas=dict(D='observed max(C)-min(C) in [day,day+1day), undefined for n<2',
+                      D_typ='unweighted median of defined observed daily ranges',R='saved whole-period MAE / D_typ'),
+        coverage='n observations, occupied/96 nominal 15min cells, longest missing run; full means all 96 cells occupied',
+        sensitivity='all defined days / full 96-cell days / incomplete defined days, plus exact-n strata; descriptive only, no new QC mask',
+        limitations=['Daily range includes all observed intraday changes, not an isolated daily harmonic',
+                     'Missing observations can hide extrema; subset calendars differ, so subset comparison is not a causal missingness experiment',
+                     'R is a ratio of two scales, not the fraction of daily variability lost'],
+        selected_day=selected,fourier_calculation_performed=False,implementation_sha256=digest(Path(__file__)))
+    (out/'passport.json').write_text(json.dumps(passport,ensure_ascii=False,indent=2)+'\n')
+    validation=dict(independent_scalar_days=checks,independent_medians='Exact scalar max/min plus statistics.median for all three sensors',
+        input_hashes_unchanged=True,fourier_calculation_performed=False,
+        artifact_sha256={p.name:digest(p) for p in out.iterdir() if p.is_file() and p.name!='validation.json'})
+    (out/'validation.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2)+'\n')
+    return summary,sensitivity,counts,validation
+
+
+def load_daily_concentration_scale(out=DAILY_SCALE_OUT):
+    """Load saved supplement only; no scientific recomputation in notebook."""
+    return tuple(pd.read_csv(Path(out)/f'{name}.csv',float_precision='round_trip')
+                 for name in ('daily_summary','daily_coverage_sensitivity','daily_coverage_counts'))
+
+
 def browser_cross_check(grid):
     """Numerical validation of the actual embedded data at two UI settings."""
     engine = Path(__file__).with_suffix('.js')
@@ -1571,10 +1760,13 @@ if __name__ == '__main__':
     parser.add_argument('--grid-resolution', action='store_true', help='Run only the accepted-input 15min/2h diagnostic')
     parser.add_argument('--intrabin-2h', action='store_true', help='Only accepted raw concentration within 2h bins; no Fourier calculation')
     parser.add_argument('--temporal-resolution-14d', action='store_true', help='Only matched-observation 15min/2h comparison with 14-day windows')
+    parser.add_argument('--daily-concentration-scale', action='store_true', help='Only observed daily ranges and their scale relative to saved concentration MAE; no Fourier')
     args = parser.parse_args()
-    if sum((args.grid_resolution,args.intrabin_2h,args.temporal_resolution_14d)) > 1:
+    if sum((args.grid_resolution,args.intrabin_2h,args.temporal_resolution_14d,args.daily_concentration_scale)) > 1:
         parser.error('Choose one diagnostic')
-    if args.temporal_resolution_14d:
+    if args.daily_concentration_scale:
+        _, _, _, report = generate_daily_concentration_scale(DAILY_SCALE_OUT if args.output == OUT else args.output)
+    elif args.temporal_resolution_14d:
         _, _, _, report = generate_temporal_resolution(TEMPORAL_OUT if args.output == OUT else args.output)
     elif args.intrabin_2h:
         _, _, _, report = generate_intrabin_2h(INTRABIN_OUT if args.output == OUT else args.output)

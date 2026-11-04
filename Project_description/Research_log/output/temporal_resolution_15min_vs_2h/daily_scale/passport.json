@@ -1,0 +1,39 @@
+{
+  "stage": "0.5 concentration scale supplement",
+  "baseline_commit": "f22d651299fd053c5dd941086539b76dfbf92ab3",
+  "source": "Saved own-sensor accepted source observations (localdatetime, datavalue), not 2h means or phase cohort",
+  "selector": "technically_retained & ~doubtful; unchanged accepted stage 0.2 selection",
+  "period_start": "2025-05-01 00:00:00",
+  "period_end_exclusive": "2026-10-01 00:00:00",
+  "time_basis": "Unchanged LOCALDATETIME",
+  "input_sha256": {
+    "concentration_residuals.csv.gz": "46732710c6777896f44d8968138e61429f33773ed09ac5472c657c3ff18f987f",
+    "concentration_summary.csv": "57237242031d5e299e3778e1d8141c1b0c1f8e43d91b515d21303bbc12a804f0",
+    "passport.json": "548e5e25d6cd54652322040394f26c570a89064f1d02414892c811f5952e4d85",
+    "validation.json": "b63c052074d9f1e406fa37fa365ea4b5a4e33975bce6657b5a4032683bc4890e"
+  },
+  "input_directory": "Project_description/Research_log/output/temporal_resolution_15min_vs_2h",
+  "formulas": {
+    "D": "observed max(C)-min(C) in [day,day+1day), undefined for n<2",
+    "D_typ": "unweighted median of defined observed daily ranges",
+    "R": "saved whole-period MAE / D_typ"
+  },
+  "coverage": "n observations, occupied/96 nominal 15min cells, longest missing run; full means all 96 cells occupied",
+  "sensitivity": "all defined days / full 96-cell days / incomplete defined days, plus exact-n strata; descriptive only, no new QC mask",
+  "limitations": [
+    "Daily range includes all observed intraday changes, not an isolated daily harmonic",
+    "Missing observations can hide extrema; subset calendars differ, so subset comparison is not a causal missingness experiment",
+    "R is a ratio of two scales, not the fraction of daily variability lost"
+  ],
+  "selected_day": {
+    "requested_day": "2025-11-01",
+    "selected_day": "2025-11-01 00:00:00",
+    "n": 96,
+    "D_ppm": 69.72788200000002,
+    "min_ppm": 538.943434,
+    "max_ppm": 608.671316,
+    "rule": "Requested day if all 96 cells occupied; otherwise nearest fully occupied day, earliest tie"
+  },
+  "fourier_calculation_performed": false,
+  "implementation_sha256": "54ea2d255b68b2288f0ea2bfb42230154d1409a0c5eb7d0bd631cb9d4049e90b"
+}
