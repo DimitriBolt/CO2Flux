@@ -23,7 +23,10 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 STAGE = HERE / "data/stage0"
 BASE = HERE / "data/ch02/archive/raw.parquet"
-OLD_AIR = ROOT / "Project_description/sensorDB/Row_data/LEO_West/LEO-W_4_0_1_air.parquet"
+ROW_DATA = ROOT / "Project_description/sensorDB/Row_data"
+OLD_AIR = ROW_DATA / "LEO_West_full/_legacy_W_x1_y4/LEO-W_4_0_1_air.parquet"
+if not OLD_AIR.exists():
+    OLD_AIR = ROW_DATA / "LEO_West/LEO-W_4_0_1_air.parquet"
 EXPECTED = {
     BASE: "89e69150734e8ae18ce00ebb554e6cd0dfc605172d54af2febf71c1c086ab40a",
     OLD_AIR: "2e9b081b3f0012c43a4324ffbefbe2b8a0e8b44a37e1837985e33da50cad8c83",
