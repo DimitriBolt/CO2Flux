@@ -1,0 +1,111 @@
+{
+  "scalar_Pearson_checks": {
+    "5_to_20:2026-02-20": {
+      "15": {
+        "lags": 33,
+        "max_abs_r_error": 1.8041124150158794e-16
+      },
+      "120": {
+        "lags": 5,
+        "max_abs_r_error": 1.1102230246251565e-16
+      }
+    },
+    "5_to_20:2025-08-22": {
+      "15": {
+        "lags": 33,
+        "max_abs_r_error": 6.938893903907228e-17
+      },
+      "120": {
+        "lags": 5,
+        "max_abs_r_error": 1.1102230246251565e-16
+      }
+    },
+    "20_to_50:2025-09-19": {
+      "15": {
+        "lags": 33,
+        "max_abs_r_error": 8.326672684688674e-17
+      },
+      "120": {
+        "lags": 5,
+        "max_abs_r_error": 1.1102230246251565e-16
+      }
+    },
+    "20_to_50:2025-06-06": {
+      "15": {
+        "lags": 33,
+        "max_abs_r_error": 5.551115123125783e-17
+      },
+      "120": {
+        "lags": 5,
+        "max_abs_r_error": 1.1102230246251565e-16
+      }
+    }
+  },
+  "conversion_reference_minutes": [
+    0,
+    60,
+    120,
+    720
+  ],
+  "source_files_unchanged": true,
+  "artifacts_sha256": {
+    "candidate_physical_hypothesis.jpg": "05c27f703e7bb6167099e096dc63ee92baff8420c80cbb9fdd8312df6dc01339",
+    "candidate_physical_hypothesis.pdf": "c2d18f9a2014222245e6cf2432c735b3045da37cd7bfe11a4f5cb3758c00c0fe",
+    "candidate_physical_hypothesis.svg": "2c25c76d2fcafeecd7c97fc3ff61bc17409f22001f2cdffbe10bc324e2e4b4b2",
+    "candidate_screen.csv": "81c23ab5e80337e551c60a39ca04357c7f50d54181a481a93244efeb5e1d39cb",
+    "lag_curves.csv": "31504226b521b781074af6c0b33eb6dcca8dc38024d45413f4d85d4a2496b8d8",
+    "passport.json": "e53ff396a014a5c4475d35bb59e0e6992f6e03427a3370120cdae9155967e07e",
+    "phase_delay_discrepancy_min.jpg": "97a84885411794d082a206ccdbcc6de8902ba93badcf41d4722625bc2032e8ac",
+    "phase_delay_discrepancy_summary.csv": "0a4e15ee95b06c992257ae3db5193ad9cbba1ac08bcc416b1100f3fcf2499a19",
+    "phase_delay_discrepancy_windows.csv": "28dec6a019930f4f2c6bb72345cc735823675df45741b5d81a2437b724093b2f",
+    "selected_source_points.csv.gz": "3c5c466cb16b122e1b90b5a702a6e9fd83c45ba0dc68b42468ec880316da4ed1",
+    "short_lag_summary.csv": "fbd6fff1b8d07625e8230e5b1b5cfe73b1a2135b1721bb36092f429567affd35",
+    "short_lags_20_to_50.jpg": "60eb6642a8ddda1cd6ce498fcb964b5ac9fcc5f5e32ce7c477ca6a86f4102cbb",
+    "short_lags_5_to_20.jpg": "205af1810264eb3af1f2ba3ce1896d615db388d114dd856cebca767a5a0628c8",
+    "two_hour_membership.csv.gz": "d2e3cb05197c9c478e336009888224f85f3bd97b505d31f3e5d3f1ee971e9751",
+    "variant_support.csv.gz": "bd73582d2b8b0e1f3b07513b4a4c2971e2879ea3fc3cff0cd71d6b380621b251"
+  },
+  "synthetic_unittest_cases_passed": 8,
+  "executed_notebook_cells": 30,
+  "old_notebook_cells_identical": 20,
+  "selected_intervals": 4,
+  "numeric_formulas_rendered": 26,
+  "reproduced_tables_and_figures_byte_identical": 14,
+  "fourier_recomputed": false,
+  "api_or_archive_access_used": false,
+  "original_files_sha256": {
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/validation.json": "b63c052074d9f1e406fa37fa365ea4b5a4e33975bce6657b5a4032683bc4890e",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_windows_2h.csv": "ddea5d0862f8034ee98753cf3f47d87a6b301138c98829107501eedff8c75c5f",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_windows_15min.csv": "1d5ccf94c5fce4141a135204c0c60024add46da77e7e71766b298a626d0a18ce",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_summary.csv": "97d16a5d4e3e98d1827e49c33f47320c932d8aeeafbfd13961d5c1079c6e9dbf",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_extrema_diagnostics.csv": "e8e95734dc7ac56716af83144182f3c350bdb83a863c67518464c63aa94c3675",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_comparison_14d.jpg": "77cbdfaebfba4beebe4157ad2a7fbf71ed57eda136520417a91d97122190b38b",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/phase_comparison.csv": "15f7483c4a302e2b0bb4bbc64c646ac7155831794e6033eec55433eff2b7f6b8",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/passport.json": "548e5e25d6cd54652322040394f26c570a89064f1d02414892c811f5952e4d85",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/matched_source_observations.csv.gz": "c5ccb6d17aae509413c441c1741a8355b316136887cc6302b7c7d75fae241cd9",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/matched_grid_2h.csv.gz": "8068ae2aa65d8afdbc9ab8392685095eac149c3b791ffb3df14052b7901ae29f",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_summary.csv": "57237242031d5e299e3778e1d8141c1b0c1f8e43d91b515d21303bbc12a804f0",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_residuals.csv.gz": "46732710c6777896f44d8968138e61429f33773ed09ac5472c657c3ff18f987f",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_examples.jpg": "ba9033c85512d07a8a02cdce6b151a8598b7840f5adbacbe8175777aef9ca46a",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_examples.csv": "8021ebba761da062146098ea694077b0b9e8badd092daadbe5adbf3a18df8fba",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_errors.jpg": "7eb1cbf8d2f03527224323b29eed7c96fb716c373788fe72b8d0a459fdaaa07f",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/concentration_bins.csv": "f8ed3c8cd7449fec7175332010145287da4c72a807e1d173b81e7f059850d428",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/validation.json": "fa170f137eb945ff43f83a9de8b8b7fe5445bdb525496157966a66e8386259f5",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/passport.json": "530ef11a2209d3eb31576f1cd7fd61885b1d156ab95ef24a04c78a154cd0ea3a",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/daily_summary.csv": "878cd22a62dd3cd76ab8bb6366f3851000278449b8ce518a1405ca4a9b742bb2",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/daily_scale_5cm.jpg": "7e1e0783d7caef1bf2da95d9507885ef47f10e3bf49c1809a507b49775ec1088",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/daily_ranges.csv": "25ca5e17aec34f826672ff7a55ed1c695e7ba3b6411b437267fc7de6edfa92db",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/daily_coverage_sensitivity.csv": "d0a2c5db9b6bdcb827cca21b7bbb240507ac1fbd47151583f072670484907aab",
+    "Project_description/Research_log/output/temporal_resolution_15min_vs_2h/daily_scale/daily_coverage_counts.csv": "370a0b00c0ae6fb9adb8efafb6fc635460933dd6481a2cd8868f4e5fbee187dc",
+    "Project_description/Research_log/PLAN.md": "801558ceb74e609a9b13af83b5545902b435e17d9ae8959449c089943587b7a4",
+    "Project_description/Research_log/README.md": "20048a286c096aa7f665a3f756115bcdeb86c810c7b429e2d412b56422e68646",
+    "Project_description/sensorDB/preliminary_fourier_phases.py": "54ea2d255b68b2288f0ea2bfb42230154d1409a0c5eb7d0bd631cb9d4049e90b"
+  },
+  "original_MAE_RMSE_and_fourier_outputs_unchanged": true,
+  "original_figures_unchanged": true,
+  "hypothesis_formats_verified": [
+    "jpg",
+    "pdf_vector_text",
+    "svg_editable_text"
+  ]
+}

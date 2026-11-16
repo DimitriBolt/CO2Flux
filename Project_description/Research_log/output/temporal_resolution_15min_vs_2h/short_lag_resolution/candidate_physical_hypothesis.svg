@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="662.4pt" height="396pt" viewBox="0 0 662.4 396" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.7+dfsg1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 396
+L 662.4 396
+L 662.4 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #1b3039" x="331.2" y="31.416788" transform="rotate(-0 331.2 31.416788)">Candidate physical hypothesis</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #724333" x="331.2" y="56.208466" transform="rotate(-0 331.2 56.208466)">Hypothesized relationships — not established causality</text>
+   </g>
+   <g id="text_3">
+    <g id="patch_2">
+     <path d="M 301.685938 104.840912
+L 360.714063 104.840912
+Q 367.734063 104.840912 367.734063 97.820912
+L 367.734063 85.23935
+Q 367.734063 78.21935 360.714063 78.21935
+L 301.685938 78.21935
+Q 294.665938 78.21935 294.665938 85.23935
+L 294.665938 97.820912
+Q 294.665938 104.840912 301.685938 104.840912
+z
+" style="fill: #dceced; stroke: #698489; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #16333b" x="331.2" y="95.117319" transform="rotate(-0 331.2 95.117319)">Irrigation</text>
+   </g>
+   <g id="text_4">
+    <g id="patch_3">
+     <path d="M 231.341719 151.250855
+L 431.058281 151.250855
+Q 438.078281 151.250855 438.078281 144.230855
+L 438.078281 131.649293
+Q 438.078281 124.629293 431.058281 124.629293
+L 231.341719 124.629293
+Q 224.321719 124.629293 224.321719 131.649293
+L 224.321719 144.230855
+Q 224.321719 151.250855 231.341719 151.250855
+z
+" style="fill: #dceced; stroke: #698489; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #16333b" x="331.2" y="141.527261" transform="rotate(-0 331.2 141.527261)">Changes in substrate moisture</text>
+   </g>
+   <g id="patch_4">
+    <path d="M 331.2 110.301619
+Q 331.2 114.736838 331.2 117.886318
+" style="fill: none; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 333.2 113.886318
+L 331.2 117.886318
+L 329.2 113.886318
+z
+" style="fill: #698489; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="text_5">
+    <g id="patch_5">
+     <path d="M 190.822344 197.660798
+L 471.577656 197.660798
+Q 478.597656 197.660798 478.597656 190.640798
+L 478.597656 178.059236
+Q 478.597656 171.039236 471.577656 171.039236
+L 190.822344 171.039236
+Q 183.802344 171.039236 183.802344 178.059236
+L 183.802344 190.640798
+Q 183.802344 197.660798 190.822344 197.660798
+z
+" style="fill: #dceced; stroke: #698489; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #16333b" x="331.2" y="187.937204" transform="rotate(-0 331.2 187.937204)">Possible changes in effective CO₂ transport</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 331.2 156.711562
+Q 331.2 161.146781 331.2 164.296261
+" style="fill: none; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 333.2 160.296261
+L 331.2 164.296261
+L 329.2 160.296261
+z
+" style="fill: #698489; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <g id="patch_7">
+     <path d="M 196.901875 244.070741
+L 465.498125 244.070741
+Q 472.518125 244.070741 472.518125 237.050741
+L 472.518125 224.469178
+Q 472.518125 217.449178 465.498125 217.449178
+L 196.901875 217.449178
+Q 189.881875 217.449178 189.881875 224.469178
+L 189.881875 237.050741
+Q 189.881875 244.070741 196.901875 244.070741
+z
+" style="fill: #dceced; stroke: #698489; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #16333b" x="331.2" y="234.347147" transform="rotate(-0 331.2 234.347147)">Changes in characteristic response times</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 331.2 203.121505
+Q 331.2 207.556724 331.2 210.706204
+" style="fill: none; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 333.2 206.706204
+L 331.2 210.706204
+L 329.2 206.706204
+z
+" style="fill: #698489; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="text_7">
+    <g id="patch_9">
+     <path d="M 187.855703 290.480684
+L 474.544297 290.480684
+Q 481.564297 290.480684 481.564297 283.460684
+L 481.564297 270.879121
+Q 481.564297 263.859121 474.544297 263.859121
+L 187.855703 263.859121
+Q 180.835703 263.859121 180.835703 270.879121
+L 180.835703 283.460684
+Q 180.835703 290.480684 187.855703 290.480684
+z
+" style="fill: #dceced; stroke: #698489; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #16333b" x="331.2" y="280.75709" transform="rotate(-0 331.2 280.75709)">Possible changes in relative spectral phases</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 331.2 249.531448
+Q 331.2 253.966667 331.2 257.116147
+" style="fill: none; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 333.2 253.116147
+L 331.2 257.116147
+L 329.2 253.116147
+z
+" style="fill: #698489; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <g id="patch_11">
+     <path d="M 161.831328 367.179176
+L 500.568672 367.179176
+Q 507.588672 367.179176 507.588672 360.159176
+L 507.588672 333.020458
+Q 507.588672 326.000458 500.568672 326.000458
+L 161.831328 326.000458
+Q 154.811328 326.000458 154.811328 333.020458
+L 154.811328 360.159176
+Q 154.811328 367.179176 161.831328 367.179176
+z
+" style="fill: #f3e7cf; stroke: #a18a56; stroke-width: 0.9; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #16333b" transform="translate(161.831328 342.898426)">Research question: Does 2-hour averaging preserve</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #16333b" transform="translate(170.120859 357.455583)">the information needed to detect these changes?</text>
+   </g>
+   <g id="patch_12">
+    <path d="M 331.2 295.940391
+Q 331.2 307.396248 331.2 317.566366
+" style="fill: none; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 333.2 313.566366
+L 331.2 317.566366
+L 329.2 313.566366
+z
+" style="fill: #698489; stroke: #698489; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,62 @@
+{
+  "baseline_commit": "f71ca35b1b4a0e01941adae8c049e83f4643866d",
+  "stage": "0.5",
+  "selector": "technically_retained & ~doubtful",
+  "vertical": "W_x1_y4",
+  "x_m": 1,
+  "y_m": 4,
+  "sensor_depth_cm": {
+    "996": 5,
+    "1012": 20,
+    "1035": 50
+  },
+  "acquisition_calendar": "[2025-05-01, 2026-10-01), LOCALDATETIME",
+  "part_a": "Absolute time equivalent of saved cyclic daily phase discrepancy (1 cycle/day, 14-day windows, 1-day step)",
+  "part_b": {
+    "window_days": 7,
+    "step_minutes": [
+      15,
+      120
+    ],
+    "permitted_lag_bounds_min": [
+      -240,
+      240
+    ],
+    "coverage_minima": {
+      "ordinary": {
+        "15": 384,
+        "120": 48,
+        "anchor_dates": 5
+      },
+      "drop_day": {
+        "15": 288,
+        "120": 36,
+        "anchor_dates": 4
+      }
+    },
+    "analysis_time": "Calendar centers, raw timestamps and actual per-bin mean source times retained",
+    "own_clock_note": "Oracle localdatetime; timezone and clock correspondence unconfirmed",
+    "amplitude": "Linear empirical 90th percentile of absolute q at unshifted anchors on each grid",
+    "selection": "Positive upper fine amplitude; two fixed eligible windows (max, nearest median excluding max); earlier ties",
+    "fixed_support": "Both channels have q at each shifted anchor; q requires adjacent occupied calendar cells",
+    "perturbations": "Window ±1 day, two background alternatives, each day, C extrema, both cells forming max |q| per sensor, full 2h subset",
+    "peak_criterion": "All required core curves defined; unique interior envelope candidate with lower correlation > 0. Full-bin variant included only when jointly supported. A stable discrete peak alone does not establish a resolved delay.",
+    "ties": "64 machine epsilons for Pearson equality only",
+    "sensitivity": "Min/max across defined variants, not a statistical confidence interval"
+  },
+  "input_sha256": {
+    "concentration_residuals.csv.gz": "46732710c6777896f44d8968138e61429f33773ed09ac5472c657c3ff18f987f",
+    "phase_summary.csv": "97d16a5d4e3e98d1827e49c33f47320c932d8aeeafbfd13961d5c1079c6e9dbf",
+    "phase_comparison.csv": "15f7483c4a302e2b0bb4bbc64c646ac7155831794e6033eec55433eff2b7f6b8",
+    "phase_extrema_diagnostics.csv": "e8e95734dc7ac56716af83144182f3c350bdb83a863c67518464c63aa94c3675",
+    "passport.json": "548e5e25d6cd54652322040394f26c570a89064f1d02414892c811f5952e4d85"
+  },
+  "accepted_passport_sha256": "1c1ce6e9968a33567751cf3f59533693b7c4c38868228de5f5885bd15b1d0f15",
+  "implementation_sha256": "84c5a37716ba148e4d733931ba98b78ab85848a0d426dcd1a4fa0541f0688dac",
+  "fourier_recomputed": false,
+  "version": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.7+dfsg1"
+  }
+}
