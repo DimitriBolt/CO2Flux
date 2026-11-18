@@ -60,8 +60,8 @@
     "phase_delay_discrepancy_windows.csv": "28dec6a019930f4f2c6bb72345cc735823675df45741b5d81a2437b724093b2f",
     "selected_source_points.csv.gz": "3c5c466cb16b122e1b90b5a702a6e9fd83c45ba0dc68b42468ec880316da4ed1",
     "short_lag_summary.csv": "fbd6fff1b8d07625e8230e5b1b5cfe73b1a2135b1721bb36092f429567affd35",
-    "short_lags_20_to_50.jpg": "60eb6642a8ddda1cd6ce498fcb964b5ac9fcc5f5e32ce7c477ca6a86f4102cbb",
-    "short_lags_5_to_20.jpg": "205af1810264eb3af1f2ba3ce1896d615db388d114dd856cebca767a5a0628c8",
+    "short_lags_20_to_50.jpg": "832e116852c582b40e3bb110ba9ac3143c469957d176981398e42ae46b06c108",
+    "short_lags_5_to_20.jpg": "10f61d04346c9ba56629e517e4972ce995ea44b1de6c1b61c67e08ee7047d4aa",
     "two_hour_membership.csv.gz": "d2e3cb05197c9c478e336009888224f85f3bd97b505d31f3e5d3f1ee971e9751",
     "variant_support.csv.gz": "bd73582d2b8b0e1f3b07513b4a4c2971e2879ea3fc3cff0cd71d6b380621b251"
   },
@@ -107,5 +107,10 @@
     "jpg",
     "pdf_vector_text",
     "svg_editable_text"
-  ]
+  ],
+  "figure_label_revision": {
+    "source_commit": "873f2e63b26fc35dc4357800dca53f4d9be6780b",
+    "change": "Time axis label on the two short-lag figures. The passport identifies the original analysis implementation.",
+    "plotting_module_sha256": "167257d30732d99b0b0d992cd3f581cf36b514a934303af7c66bad0f0077f64d"
+  }
 }

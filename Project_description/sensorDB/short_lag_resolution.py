@@ -461,7 +461,7 @@ def figure_pair(pair, episodes, out):
             ax.grid(alpha=.16)
         axes[0,column].set_title(f"{selected.selection.capitalize()} · {selected.start:%d %b %Y} to {end:%d %b %Y} (exclusive)",
                                  loc="left", fontsize=9)
-        axes[1,column].set_xlabel("Time (LOCALDATETIME)")
+        axes[1,column].set_xlabel("Time")
         ax = axes[2,column]
         for h, (shifts, line, low, high, peak) in curves.items():
             name = "15 min" if h == 15 else "2 h"
