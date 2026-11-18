@@ -38,7 +38,7 @@ def latest_complete():
     raise ValueError(f"В {ARCHIVE} нет завершённых выгрузок")
 
 
-def export(version, manifest, staging):
+def export(version, manifest, staging, channels_by_table=CHANNELS):
     if not manifest.get("download_complete_at") or any(
         block["status"] != "complete" for block in manifest["blocks"]
     ):
@@ -48,17 +48,17 @@ def export(version, manifest, staging):
         (channel["table"], channel["sensorid"], channel["variableid"])
         for channel in manifest["channels"]
     }
-    for table, channels in CHANNELS.items():
+    for table, channels in channels_by_table.items():
         for sensor_id, variable_id in channels:
             if (table, sensor_id, variable_id) not in inventory:
                 raise ValueError(f"В манифесте отсутствует канал {table}, {sensor_id}, {variable_id}")
 
-    chunks = {name: [] for channels in CHANNELS.values() for name in channels.values()}
+    chunks = {name: [] for channels in channels_by_table.values() for name in channels.values()}
 
     # Читаем каждую физическую часть один раз. У разбитого блока свои части
     # могут быть и у родителя, и у дочерних блоков.
     for block in manifest["blocks"]:
-        channels = CHANNELS.get(block["table"], {})
+        channels = channels_by_table.get(block["table"], {})
         sensor_ids = pa.array([sensor_id for sensor_id, _ in channels], type=pa.int64())
         for part in block["parts"]:
             counts = part["sensor_counts"]
@@ -89,7 +89,7 @@ def export(version, manifest, staging):
                 if not rows.empty:
                     chunks[name].append(rows)
 
-    for table, channels in CHANNELS.items():
+    for table, channels in channels_by_table.items():
         roots = [
             block for block in manifest["blocks"]
             if block["table"] == table and not block.get("parent")
