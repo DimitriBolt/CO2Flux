@@ -1,0 +1,22 @@
+{
+  "baseline_commit": "cc4cf82ad61abe672dc307fc617193a794592c2a",
+  "protocol": "PLAN.md#short-lag-resolution",
+  "protocol_sha256_at_run": "fd656a4111404daae80522753bcafe5d11503df093c9ec0e1bd916ce9a0e3464",
+  "input_sha256": {
+    "output/temporal_resolution_15min_vs_2h/short_lag_resolution/variant_support.csv.gz": "bd73582d2b8b0e1f3b07513b4a4c2971e2879ea3fc3cff0cd71d6b380621b251",
+    "output/temporal_resolution_15min_vs_2h/short_lag_resolution/short_lag_summary.csv": "fbd6fff1b8d07625e8230e5b1b5cfe73b1a2135b1721bb36092f429567affd35",
+    "output/temporal_resolution_15min_vs_2h/short_lag_resolution/lag_curves.csv": "31504226b521b781074af6c0b33eb6dcca8dc38024d45413f4d85d4a2496b8d8",
+    "output/temporal_resolution_15min_vs_2h/concentration_residuals.csv.gz": "46732710c6777896f44d8968138e61429f33773ed09ac5472c657c3ff18f987f",
+    "output/temporal_resolution_15min_vs_2h/passport.json": "548e5e25d6cd54652322040394f26c570a89064f1d02414892c811f5952e4d85"
+  },
+  "artifact_sha256": {
+    "summary.csv": "6618e578b0e8a43ee977deaedb4ddcc1b1b2eedbca4402b7c6629aa1e87ccd38",
+    "curves_ab.csv.gz": "5a9aa8e28cc63ab896fc04670623ff8ea91b1498979bd67799601c0509992cad",
+    "support_ab.csv.gz": "47abd1ef2913f7b31c082038093011cc6d44274db56768158918eb42918653de",
+    "correlations_5_to_20.jpg": "97c4f3c791dc1366254981f13861140325e4bd3904ea748aea4267321086029f",
+    "correlations_20_to_50.jpg": "8babb8417eb4eee0adac6da2383d9268008337555542f515ec23c2bc1d061a28"
+  },
+  "new_coarse_curves": 0,
+  "method_c_source": "archived tables",
+  "fourier_recomputed": false
+}
