@@ -1,4 +1,4 @@
-"""Поиск соседних вертикалей LEO West по строгому месячному допуску I.G."""
+"""Поиск соседних вертикалей LEO West по месячному допуску с заданным порогом амплитуды."""
 
 import argparse
 from concurrent.futures import ProcessPoolExecutor
@@ -7,7 +7,7 @@ import inspect
 from itertools import combinations, groupby
 import json
 import multiprocessing
-from math import dist
+from math import dist, isfinite, isnan
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 import sys
@@ -19,7 +19,8 @@ import export_west_x1_y4 as exporter
 HERE = Path(__file__).resolve().parent
 RESEARCH = HERE.parent / "Research_log"
 sys.path.insert(0, str(RESEARCH))
-from chapter02 import monthly_admission
+from chapter02 import ADMISSION_PARAMETERS, monthly_admission
+from stage02_candidate_selection import classify_months
 
 TABLE = "LEO_WEST.DATAVALUES"
 
@@ -45,10 +46,10 @@ def sensor_months(job):
             months.to_csv(temp.name, index=False)
         Path(temp.name).replace(path)
     print(f"Месячные решения готовы: {sid}", flush=True)
-    return sid, set(pd.read_csv(path).query("status == 'pass'").month)
+    return sid, pd.read_csv(path, float_precision="round_trip")
 
 
-def best_group(verticals, passes, occupancy, count, max_distance, min_months=1):
+def best_group(verticals, passes, occupancy, count, max_distance, min_months=1, rank_by="distance"):
     best = None
     for group in combinations(sorted(verticals), count):
         diameter = max((dist(a, b) for a, b in combinations(group, 2)), default=0.)
@@ -66,24 +67,57 @@ def best_group(verticals, passes, occupancy, count, max_distance, min_months=1):
             if len(run) < min_months:
                 continue
             cells = int(observed.isin(run).sum())
-            # Сначала самый компактный набор, затем самый длинный период,
-            # при равенстве — больше общих двухчасовых ячеек.
-            rank = (diameter, -len(run), -cells, group, run[0])
+            # При равенстве двух основных критериев сравниваем общее покрытие.
+            priority = (-len(run), diameter) if rank_by == "duration" else (diameter, -len(run))
+            rank = (*priority, -cells, group, run[0])
             if best is None or rank < best[0]:
-                best = rank, group, run, cells
+                best = rank, group, run, cells, diameter
     return best
+
+
+def load_occupancy(diagnostics, checks, ids, bin_minutes):
+    grids = {}
+    for sid in ids:
+        suffix = "2h_counts" if bin_minutes == 120 else "working"
+        name = f"sensors/{sid}_{suffix}.parquet"
+        path = diagnostics / name
+        if digest(path) != checks[name]:
+            raise ValueError(f"Контрольная сумма данных для сетки изменилась: {sid}")
+        if bin_minutes == 120:
+            grids[sid] = pd.read_parquet(path, columns=["retained"]).retained.gt(0)
+        else:
+            # Ячейка занята, когда в ней есть измерение после технической очистки.
+            work = pd.read_parquet(path, columns=["localdatetime", "technically_retained"])
+            times = work.loc[work.technically_retained, "localdatetime"].dropna()
+            bins = times.dt.floor(f"{bin_minutes}min").drop_duplicates()
+            grids[sid] = pd.Series(True, index=pd.DatetimeIndex(bins), dtype="boolean")
+    return pd.DataFrame(grids).fillna(False).astype(bool)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--count", type=int, default=3)
+    parser.add_argument(
+        "--amplitude-min", type=float, default=ADMISSION_PARAMETERS["monthly_amplitude_min"],
+        help="Минимум месячной медианы суточной амплитуды, ppm (по умолчанию 8)",
+    )
+    parser.add_argument(
+        "--rank-by", choices=("distance", "duration"), default="distance",
+        help="Первый критерий отбора: диаметр группы или длительность общего периода",
+    )
     parser.add_argument("--max-distance", type=float, default=float("inf"), help="Диаметр группы, м")
+    parser.add_argument(
+        "--bin-minutes", type=int, choices=(15, 120), default=15,
+        help="Шаг сетки для проверки общих измерений, минуты (по умолчанию 15)",
+    )
     parser.add_argument("--min-months", type=int, default=1, help="Минимум последовательных месяцев")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--archive", type=Path, default=exporter.ARCHIVE)
     parser.add_argument("--output", type=Path, help="Папка для экспорта полных исходных рядов")
     args = parser.parse_args()
-    if args.min_months < 1 or args.workers < 1 or args.max_distance < 0:
+    if not isfinite(args.amplitude_min) or args.amplitude_min <= 0:
+        parser.error("--amplitude-min должен быть конечным положительным числом")
+    if args.min_months < 1 or args.workers < 1 or isnan(args.max_distance) or args.max_distance < 0:
         parser.error("Проверьте число месяцев, процессов и максимальное расстояние")
     exporter.ARCHIVE = args.archive
     version, manifest = exporter.latest_complete()
@@ -104,20 +138,26 @@ def main():
     ids = sorted(c["sensorid"] for channels in verticals.values() for c in channels)
     jobs = [(version, sid, checks[f"sensors/{sid}_working.parquet"], method) for sid in ids]
     with ProcessPoolExecutor(args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
-        passes = dict(pool.map(sensor_months, jobs))
-    grids = {}
-    for sid in ids:
-        name = f"sensors/{sid}_2h_counts.parquet"
-        if digest(diagnostics / name) != checks[name]:
-            raise ValueError(f"Контрольная сумма сетки изменилась: {sid}")
-        grids[sid] = pd.read_parquet(diagnostics / name, columns=["retained"]).retained.gt(0)
-    occupancy = pd.DataFrame(grids).fillna(False)
-    best = best_group(verticals, passes, occupancy, args.count, args.max_distance, args.min_months)
+        metrics = dict(pool.map(sensor_months, jobs))
+    # Границы месячных показателей не зависят от порога. Меняем только решение.
+    passes = {}
+    for sid, months in metrics.items():
+        decisions = classify_months(months, args.amplitude_min)
+        passes[sid] = set(decisions.loc[decisions.status.eq("pass"), "month"])
+    occupancy = load_occupancy(diagnostics, checks, ids, args.bin_minutes)
+    best = best_group(
+        verticals, passes, occupancy, args.count, args.max_distance, args.min_months, args.rank_by,
+    )
     if best is None:
         print("Общего допустимого месяца не найдено.")
         return
-    rank, group, run, cells = best
-    print(version.name, group, "диаметр, м", rank[0], "период", run[0], run[-1], "общих ячеек", cells)
+    _, group, run, cells, diameter = best
+    start = run[0].start_time
+    end = (run[-1] + 1).start_time
+    expected_cells = int((end - start) / pd.Timedelta(minutes=args.bin_minutes))
+    print(f"{version.name} · порог {args.amplitude_min:g} ppm · диаметр {diameter:.3f} м")
+    print(f"Общий период: [{start.date()}, {end.date()}) · {len(run)} мес. · "
+          f"{cells}/{expected_cells} общих ячеек по {args.bin_minutes} мин")
     selected = {}
     for xy in group:
         for c in sorted(verticals[xy], key=lambda c: -c["z"]):
