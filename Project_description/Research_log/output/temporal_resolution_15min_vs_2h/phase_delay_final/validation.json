@@ -1,0 +1,14 @@
+{
+  "source": "phase_comparison.csv",
+  "source_sha256": "15f7483c4a302e2b0bb4bbc64c646ac7155831794e6033eec55433eff2b7f6b8",
+  "branch_min": "[-720, 720)",
+  "convention": "archive F_upper * conjugate(F_lower); new change 2 h minus 15 min",
+  "comparison": "Independent scalar CSV, atan2, degrees*4 and inclusive quantiles",
+  "verified_windows": 1010,
+  "cyclic_boundary_cases_passed": 4,
+  "artifacts_sha256": {
+    "phase_delay_summary.csv": "596e6a55a638b99d252a194d50b6012ce0867368ad5767f1ff08563ce41a2207",
+    "phase_delays_and_signed_change.jpg": "7f22473eb5c4b394ee173be283cfa6bf8bb5ce6ebdd531d0ee4cf3aa2be5a799",
+    "phase_delays_by_window.csv": "b8be83913222ec25e34cd9319cc3c68eb17b06c65b9cf907233ad18c1aa2227e"
+  }
+}
