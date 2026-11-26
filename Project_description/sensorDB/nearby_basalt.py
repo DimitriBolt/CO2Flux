@@ -170,6 +170,8 @@ def main():
             selected[c["sensorid"], 9] = name
             print(xy, c["sensorid"], c["z"], name)
     if args.output:
+        if (args.output / "selection.json").is_file():
+            raise SystemExit("Эта папка содержит ряды с месячным допуском. Для LEO West используйте make co2-west-admitted.")
         args.output.mkdir(parents=True, exist_ok=True)
         with TemporaryDirectory(dir=args.output) as temp:
             stage = Path(temp)

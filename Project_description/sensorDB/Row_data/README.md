@@ -1,14 +1,14 @@
 Row_data — how CO2 row data files are created
 =============================================
 
-This folder contains raw per-sensor CO2 time-series saved as parquet files. Current layout:
+Здесь хранятся ряды CO₂ по склонам. Для западного склона рабочим набором служит папка с месячным отбором.
 
-- `LEO_West/`  — existing LEO West parquet files (moved here)
+- [LEO_West/](LEO_West) — рабочие ряды LEO West с месячным допуском ≥ 2 ppm. [Порядок обновления](#west-admitted).
 - `LEO_East/`  — placeholder; run the generator to populate
 - `LEO_Center/`— placeholder; run the generator to populate
 
-How files are produced
-----------------------
+Legacy export for LEO East and Center
+------------------------------------
 
 1. The workbook `Sensors_Description/variables_schema.xlsx` contains inventory and query templates.
    The script `scripts/update_co2_sheet.py` shows how sensor inventory rows and Oracle queries are constructed.
@@ -22,14 +22,13 @@ Usage
 Set Oracle credentials in `~/Documents/.env` then run (example):
 
 ```bash
-python3 Project_description/sensorDB/save_leo_slope_co2_row_data.py west
 python3 Project_description/sensorDB/save_leo_slope_co2_row_data.py east
 python3 Project_description/sensorDB/save_leo_slope_co2_row_data.py center
 ```
 
 Notes
 -----
-- The script will create files named like `LEO-W_4_-4_1_basalt.parquet` and `LEO-W_4_0_1_air.parquet`.
+- The legacy script uses the slope letter and location in each filename.
 - If Oracle environment (Instant Client) is missing the script will attempt to set `LD_LIBRARY_PATH` and
   restart the process; if that fails, ensure `ORACLE_CLIENT_LIB_DIR` is set in your environment.
 - Existing files are preserved; the script will skip files that already exist.
@@ -182,33 +181,29 @@ python3 -B -m unittest discover -s Project_description/sensorDB/tests -p 'test_c
 python3 -B -m unittest discover -s Project_description/sensorDB/tests -p 'test_co2_full_diagnostics.py' -v
 ```
 
-## Индивидуальный месячный допуск для всех 53 каналов LEO West
+<a id="west-admitted"></a>
 
-[Программа экспорта](../export_admitted_series.py) проверяет всю историю каждого из 48 датчиков GMM222 и пяти приземных каналов LI-COR. К обоим типам применяется [методика главы 2](../../Research_log/details/02_data_checks.md). В этой выборке нижняя граница месячной медианы амплитуды 24-часовой гармоники должна быть ≥ 2 ppm (для воздуха численно то же значение в мкмоль/моль). Для допуска нужны также не менее десяти гарантированно допустимых суток и медианная концентрация в пределах 100–2000 включительно.
+## Рабочие ряды LEO West
 
-Команда для запуска из корня проекта:
+[LEO_West](LEO_West) — единственное место публикации обновлённых временных рядов западного склона. В папке 56 Parquet-файлов: 48 базальтовых GMM222, пять приземных LI-COR (25 см) и три служебных воздушных канала AirInflow (1302), AirOutflow (1303), Vent (1305). Создание отдельного набора требует явного согласования с Димитрием.
 
-```bash
-./transcription_env/bin/python Project_description/sensorDB/export_admitted_series.py \
-  --amplitude-min 2 --output Project_description/sensorDB/Row_data/LEO_West_2ppm
-```
-
-В каждом Parquet один столбец `datavalue` (`float64`) и индекс `localdatetime` с точностью до микросекунд. Файл содержит технически принятые измерения этого датчика в месяцах со статусом `pass`. Точные дубли объединены, конфликтующие метки исключены, пропуски сохранены. Каждый датчик имеет свой календарь. Если ни один месяц не прошёл допуск, файл сохраняет ту же схему с нулём строк.
-
-В папке результата `months.csv` содержит решение, причину, границы амплитуды и число записанных строк по каждому датчику и месяцу. В `selection.json` указаны версия исходной выгрузки, порог, идентификаторы датчиков, единицы, координаты, число строк и контрольные суммы. По умолчанию программа берёт последнюю завершённую локальную выгрузку. Для повторения на конкретном снимке укажите `--version` и путь к папке с его `manifest.json`.
-
-Для следующей задачи меняйте порог, тип среды (`--kind air` или `--kind basalt`) и, при необходимости, список `--sensor-id`. Например, команда ниже создаёт отдельную выборку двух датчиков при 8 ppm. Повторные запуски используют ранее рассчитанные месячные границы.
+Обновление из корня репозитория на рабочей машине:
 
 ```bash
-./transcription_env/bin/python Project_description/sensorDB/export_admitted_series.py \
-  --amplitude-min 8 --sensor-id 1032 1294 --output Project_description/sensorDB/Row_data/LEO_West_8ppm_1032_1294
+make co2-west-admitted
 ```
+
+[Программа](../refresh_west_admitted.py) читает всю историю в одной транзакции Oracle, сверяет количество и крайние даты измерений по каждому каналу и заменяет рабочую папку после проверки всего набора. Git-публикация выполняется отдельным шагом. Команда `make co2-refresh` выше обслуживает локальный архив источника.
+
+В каждом файле индекс `localdatetime` и столбец `datavalue` типа float64. Сохраняются исходные времена и технически допустимые значения в месяцах, прошедших отбор у данного датчика. Допуск требует минимум десяти гарантированно допустимых суток за календарный месяц, границ медианной концентрации в пределах 100–2000 и нижней границы месячной медианы амплитуды суточной гармоники ≥ 2 ppm. Пропуски сохраняются. Пустой ряд имеет ту же схему.
+
+В [selection.json](LEO_West/selection.json) указаны момент снимка Oracle, период каждого исходного ряда, число исходных и сохранённых измерений и контрольные суммы файлов. [months.csv](LEO_West/months.csv) содержит решения и их численные основания по каждому месяцу. Текущий календарный месяц оценивается по данным, поступившим к моменту снимка.
 
 ## Поиск одновременно работающих базальтовых вертикалей LEO West
 
-### Текущая выборка при 2 ppm с приоритетом близости
+### Историческая выборка при 2 ppm с приоритетом близости
 
-В [LEO_West](LEO_West) лежат девять исходных рядов GMM222. По архиву `20261002T061358Z-264980` проверены все 560 троек из 16 вертикалей. Минимальный диаметр равен 5 м. Среди троек такого диаметра самый длинный совместно допустимый период длится восемь месяцев, с 1 июня 2014 года по 31 января 2015 года включительно.
+В прежнюю выборку входили девять исходных рядов GMM222. По архиву `20261002T061358Z-264980` проверены все 560 троек из 16 вертикалей. Минимальный диаметр равен 5 м. Среди троек такого диаметра самый длинный совместно допустимый период длится восемь месяцев, с 1 июня 2014 года по 31 января 2015 года включительно.
 
 | Вертикаль | Датчик на 5 см | Датчик на 20 см | Глубокий датчик |
 |---|---:|---:|---|
@@ -244,7 +239,7 @@ python3 Project_description/sensorDB/nearby_basalt.py --count 3 --bin-minutes 12
 python3 Project_description/sensorDB/nearby_basalt.py --count 3 --amplitude-min 2 --rank-by duration --bin-minutes 15
 ```
 
-Для записи выбранных каналов укажите папку через `--output`. Для новой выборки удобно указать пустую папку, поскольку программа сохраняет прочие файлы в указанном каталоге. Каждый файл содержит всю исходную историю одного датчика с индексом `localdatetime` и концентрацией `datavalue` в ppm. Общий допустимый период указан в выводе программы.
+Поиск выводит результат в терминал. Параметр `--output` для экспорта исходных рядов применяют только при явном согласовании отдельной выборки. Каждый файл содержит всю исходную историю одного датчика с индексом `localdatetime` и концентрацией `datavalue` в ppm. Общий допустимый период указан в выводе программы.
 
 По выгрузке `20261002T061358Z-264980` поиск среди 16 вертикалей (560 троек) при пороге 8 ppm с приоритетом близости дал следующий результат:
 

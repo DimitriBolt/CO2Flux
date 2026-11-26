@@ -7,3 +7,7 @@ co2-refresh:
 
 co2-status:
 	$(PYTHON) -B Project_description/sensorDB/co2_refresh.py status
+
+.PHONY: co2-west-admitted
+co2-west-admitted:
+	LD_LIBRARY_PATH="$(ORACLE_LIBRARY_PATH):$(HOME)/.local/lib:$$LD_LIBRARY_PATH" ./transcription_env/bin/python -B Project_description/sensorDB/refresh_west_admitted.py

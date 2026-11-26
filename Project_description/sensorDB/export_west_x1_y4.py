@@ -113,6 +113,8 @@ def export(version, manifest, staging, channels_by_table=CHANNELS):
 
 
 def main():
+    if (DESTINATION / "selection.json").is_file():
+        raise SystemExit("Эта папка содержит ряды с месячным допуском. Для LEO West используйте make co2-west-admitted.")
     # Блокировка исключает одновременное обновление из двух запусков программы.
     with (ARCHIVE / "export_west_x1_y4.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)

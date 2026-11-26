@@ -13,6 +13,10 @@ This project focuses on analyzing **CO2 vertical profile data** and measuring CO
 
 ## Quick Start
 
+### Рабочие временные ряды LEO West
+
+Обновлённые ряды публиковать в `Project_description/sensorDB/Row_data/LEO_West/` ветки main. Создавать отдельные наборы только с явного согласия Димитрия. Команда `make co2-west-admitted` обновляет все 56 рабочих рядов с утверждённым порогом ≥ 2 ppm.
+
 ### Full LEO West CO2 refresh
 
 По команде Dimitri Bolt «Обнови все 53 канала» выполнять `make co2-refresh`.

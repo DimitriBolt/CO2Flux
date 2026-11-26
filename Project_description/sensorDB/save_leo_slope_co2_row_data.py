@@ -152,6 +152,8 @@ def main(slope: str) -> None:
 
     schema_prefix, slope_letter = mapping[slope]
     out_dir = OUTPUT_DIR / f"LEO_{slope.capitalize()}"
+    if (out_dir / "selection.json").is_file():
+        raise SystemExit("Эта папка содержит ряды с месячным допуском. Для LEO West используйте make co2-west-admitted.")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Saving LEO {slope.capitalize()} CO2 row data to {out_dir}")
