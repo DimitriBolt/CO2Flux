@@ -49,6 +49,13 @@ def sensor_months(job):
     return sid, pd.read_csv(path, float_precision="round_trip")
 
 
+def basalt_months_method():
+    """Ключ уже рассчитанных границ. Численный порог на них не влияет."""
+    signature = (digest(RESEARCH / "chapter02.py") + digest(HERE / "diurnal_analysis.py")
+                 + inspect.getsource(sensor_months))
+    return hashlib.sha256(signature.encode()).hexdigest()[:16]
+
+
 def best_group(verticals, passes, occupancy, count, max_distance, min_months=1, rank_by="distance"):
     best = None
     for group in combinations(sorted(verticals), count):
@@ -132,9 +139,7 @@ def main():
         parser.error("--count вне диапазона")
     diagnostics = version / "diagnostics"
     checks = json.loads((diagnostics / "summary.json").read_text())["files_sha256"]
-    signature = (digest(RESEARCH / "chapter02.py") + digest(HERE / "diurnal_analysis.py")
-                 + inspect.getsource(sensor_months))
-    method = hashlib.sha256(signature.encode()).hexdigest()[:16]
+    method = basalt_months_method()
     ids = sorted(c["sensorid"] for channels in verticals.values() for c in channels)
     jobs = [(version, sid, checks[f"sensors/{sid}_working.parquet"], method) for sid in ids]
     with ProcessPoolExecutor(args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
