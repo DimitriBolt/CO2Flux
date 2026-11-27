@@ -19,6 +19,11 @@ Sensors_Description/config.toml
 # Versioned full LEO West raw archives and diagnostic working files.
 Project_description/sensorDB/Row_data/LEO_West_full/
 
+# Exact-source hydrology checkpoints and temporary build folders stay local.
+Project_description/sensorDB/Row_data/LEO_West_hydrology_raw/
+Project_description/sensorDB/Row_data/.hydrology-export-*/
+Project_description/sensorDB/Row_data/.hydrology-previous-*/
+
 # Large reproducible per-measurement decisions for final stage 0.2 admission.
 Project_description/Research_log/data/stage02_final_admission/
 
