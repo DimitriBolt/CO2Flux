@@ -29,3 +29,8 @@ Project_description/Research_log/data/stage02_final_admission/
 
 # Separate reproducible candidate input; original strict decisions stay intact.
 Project_description/Research_log/data/stage02_candidate_selection/
+
+# Oracle temperature snapshots, checkpoints, staging and offline selections.
+Project_description/sensorDB/Row_data/LEO_West_temperature_raw/
+Project_description/sensorDB/Row_data/.temperature-stage-*/
+Project_description/sensorDB/Row_data/.temperature-publish.json*

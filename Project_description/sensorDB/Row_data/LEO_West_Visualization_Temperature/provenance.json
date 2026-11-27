@@ -1,0 +1,2472 @@
+{
+  "dataset": "LEO West temperature",
+  "version": "20261126_full_history",
+  "created_utc": "2026-11-27T07:28:30.372924+00:00",
+  "capture": {
+    "created_utc": "2026-11-27T05:52:28.642672+00:00",
+    "cutoff_local": "2026-11-26 22:48:45",
+    "tables": [
+      "DATAVALUES",
+      "DATAVALUESCSAT3",
+      "DATAVALUESLICOR",
+      "DATAVALUESREU24",
+      "DATAVALUESVIZ",
+      "OUTFLOWS_NEW",
+      "OUTFLOWS_OLD"
+    ],
+    "unavailable": {
+      "DATAVALUESAHU": "ORA-00942"
+    },
+    "predicate": "variableid IN (3,20,29,30,41,49,59,61,69,92)",
+    "reference_sha256": {
+      "DATAVALUESREU24_counts.json": "1c1f6428b256e6cb410aac6f4d61cc761c7443274eae99e0057f57f78694c0fe",
+      "DATAVALUES_counts.json": "ceefbe115141f2692f5633d298a449e153a9100e95a09e003d5b02a3258d77a5",
+      "columns.json": "383442cce9219e230ee8b6a78bd5839150487863758aef153c09fcdf5769261f",
+      "extra_metadata.json": "87588afb707a43372400823d66e47e22e466af1e4e450891a94e93edc20187a6",
+      "locations.json": "f383b6f93dae18c2114657791ae8bfa34e355e1585e5881b28047c8a821fc505",
+      "sensoroutput.json": "0a78b5cf90e19a4b76ff2eab49ee0b13f1367c11ffe94bf3182e7c014d60b310",
+      "sensors.json": "21daa2673d1f5ba7aa388fdd4d4f6a7c84b0bb24e4f29596cfc2060497b5116f",
+      "sensortypes.json": "2ec1b31c6c5c18686de1935c351ebabddc004107800d60b4e63d40aa6daedb5b",
+      "units.json": "b2fbabeac5df1036cbb137beec7a5eea9f2f41d80762f50397e2243efbfe30c2",
+      "variables.json": "fa7605f9225403aa60b7a2d928c4bea6a20bc588cd439b6aa07aad0781d773cd"
+    },
+    "inventory_xlsx_sha256": "1fb130181305436819ad0aa9345bd6c29f7402c3de1055c0c4682037e1775a97",
+    "base_commit": "7c4fc5e3155ce7acc859350eb6c3875872b8623c",
+    "metadata_sha256": {
+      "DATAVALUESVIZ.json": "348e29ba205c1750750f56d5a92e966efe726b945a21c85f1f7bee0dfc009c7f",
+      "DATAVALUESREU24.json": "19aa001e173934a3a60c4f216595fee74219bf29bd505ef5c1f2718bfffbda07",
+      "DATAVALUESCSAT3.json": "c16320f49cf2f235dfad3e1152d716c0a98045b8fd121f08825056752c3cda05",
+      "columns.json": "68703dc67de966d92d146c54f850c4c34b2d621fb418d31d9328eb99d041b821",
+      "OUTFLOWS_NEW.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "sensortypes.json": "343e142c3f2d58eb4ad8e97b81259845a07c447a17551b964e5a9c4d34bf8fcd",
+      "sensorlog.json": "593ce67ca68321bc3b4c58ca69355c0649abd9659fb118ea3a005d7af3abcc68",
+      "variables.json": "8fcb13d91427eeecdacc83ea8f2c3699a3a05727d9058a995c61e211e75ef70f",
+      "OUTFLOWS_OLD.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "sensoroutput.json": "6859a4d764f785696fd2bd37a21d161e6455d56a3de44eacc2d1a29d307499df",
+      "DATAVALUESLICOR.json": "b0d7684336304de9f9fb340b382e5612f45c4ef50ef38bffc0a8ab876b5c149b",
+      "units.json": "973142478a2a6ad7d13189764f88078d0a121ac5b49dc3010d8358262531cea0",
+      "locations.json": "98fc5acf4d820b02ed6724ec755ca67f744fdfb371f86867d4cc51dbdbf0a70e",
+      "DATAVALUES.json": "473db14f11c165d17674ff59cd61a35e7ecd3f5d30fb60e7dc9132d93577cd42",
+      "sensors.json": "f18577a871a8014b08c45d59b9892179b3083bae7b4e3d1944d8e06ce225ba18"
+    }
+  },
+  "methods_sha256": "e856d33cf3462c582cd0dc124610c8b70e4296de75724ad0cb3e4339b771da4f",
+  "category": "viz",
+  "inventory_changes": {
+    "previous_archive": false
+  },
+  "rows": 1462067,
+  "source_rows": 2295684,
+  "excluded": 833617,
+  "files_bytes": 4950140,
+  "full_archive": true,
+  "selection": {
+    "version": null,
+    "status": false,
+    "local_only": false,
+    "download_only": false,
+    "output_dir": null,
+    "workers": 4,
+    "replace": true,
+    "keep_service_values": false,
+    "start": null,
+    "end": null,
+    "min_value": null,
+    "max_value": null,
+    "x": null,
+    "x_min": null,
+    "x_max": null,
+    "y": null,
+    "y_min": null,
+    "y_max": null,
+    "depth_m": null,
+    "depth_m_min": null,
+    "depth_m_max": null,
+    "height_m": null,
+    "height_m_min": null,
+    "height_m_max": null,
+    "quantity": null,
+    "source_table": null,
+    "sensor_id": null,
+    "sensor_type": null,
+    "variable_id": null
+  },
+  "filters": {
+    "start": null,
+    "end": null,
+    "keep_service_values": false,
+    "drop_nonfinite": true,
+    "min_value": null,
+    "max_value": null
+  },
+  "source_blocks": [
+    {
+      "table": "DATAVALUES",
+      "start": "2013-09-01 00:00:00",
+      "end": "2013-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:28",
+      "rows": 1890139,
+      "sha256": "ba869bfc3d4b938cf1e518f8be0c3d2afafca083b4d97530a7d7db07840b79ad",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2013-10-01 00:00:00",
+      "end": "2013-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:29",
+      "rows": 2996801,
+      "sha256": "9ef1a36e608d90513cb42b6abe68462822a454f166c7176ee143faf2aa7c1ad3",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2013-11-01 00:00:00",
+      "end": "2013-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:43",
+      "rows": 2900190,
+      "sha256": "bd9ba4a2a22162591bd50b008af062ef3ec5aabe9194443acefc0d78b67ae4f6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2013-12-01 00:00:00",
+      "end": "2014-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:56",
+      "rows": 2996832,
+      "sha256": "b53913a2c8baa7aca756c236e94f8854b27e20116da1d15052976eba0317ece9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-01-01 00:00:00",
+      "end": "2014-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:54:18",
+      "rows": 2996832,
+      "sha256": "c927537a787db982fe356beed6096d2a54484c91fe68f35d2fd350b5c2935ae6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-02-01 00:00:00",
+      "end": "2014-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:54:47",
+      "rows": 2706816,
+      "sha256": "814f687331c7bad1844189d836dc87396b68257a1c95319cb27936d9850b9664",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-03-01 00:00:00",
+      "end": "2014-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:54:59",
+      "rows": 2995830,
+      "sha256": "dd0dba9528e149aaed331c225ca56a39e4044cb1fa5339b48fdc008b730a62c0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-04-01 00:00:00",
+      "end": "2014-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:55:16",
+      "rows": 2895037,
+      "sha256": "aeb02f8323cbc96e3da5ada23758cab8366cf1a75ba46b50a558a6079ef2b88a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-05-01 00:00:00",
+      "end": "2014-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:55:33",
+      "rows": 1305073,
+      "sha256": "a99bcebe10fe7ee5b481d4478d9131f84a5486ec1836669385177c9475ceaa20",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-06-01 00:00:00",
+      "end": "2014-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:55:57",
+      "rows": 2734025,
+      "sha256": "781dad2713ee9c5eaff456c52393fa3eed96f2947f90568a70f2ac4f2ee4055a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-07-01 00:00:00",
+      "end": "2014-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:56:12",
+      "rows": 2989147,
+      "sha256": "122d30e386badc2ecb6280533fd12335ef8a0b185254c8dfbd6f189703a1cd90",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-08-01 00:00:00",
+      "end": "2014-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:56:22",
+      "rows": 2996832,
+      "sha256": "f4c8997850492087c4f6d39250e2133f5108c6a74d480a12314e54dc5262f5bb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-09-01 00:00:00",
+      "end": "2014-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:56:29",
+      "rows": 2900160,
+      "sha256": "b7a1a325658ca00fc91381305ea9b26e1915d5cb5912c0d699a2b9f9cbe6ccbf",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-10-01 00:00:00",
+      "end": "2014-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:57:07",
+      "rows": 2996827,
+      "sha256": "b34eb282687bc7ed029b7692e12faacbc50a24a2bea45e6db34fd7b4bf00a549",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-11-01 00:00:00",
+      "end": "2014-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:57:27",
+      "rows": 2900160,
+      "sha256": "9735d359549a7ed394d72efcf3a15f1225dfc73fff18026af05e648fc69b3b69",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2014-12-01 00:00:00",
+      "end": "2015-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:57:45",
+      "rows": 2996832,
+      "sha256": "25e0914bde349f4939149c4aa7d11ea39c6f120b049f5a12888c3912ef0d3112",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-01-01 00:00:00",
+      "end": "2015-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:57:48",
+      "rows": 3021313,
+      "sha256": "c94ba6fe06da2a1861617bbe33ec5f1f4855820f2cb081e09736d0604d87cbe8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-02-01 00:00:00",
+      "end": "2015-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:58:23",
+      "rows": 2747136,
+      "sha256": "48805f90496c4fd41bc5d6bc2fc02297ce1733944efb90a1c530368e350cfd30",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-03-01 00:00:00",
+      "end": "2015-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:58:48",
+      "rows": 3033291,
+      "sha256": "522572d5ed68e9b5adc7c98e93adbf0837d171e727749734bf9f80b14a4d58e8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-04-01 00:00:00",
+      "end": "2015-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:59:04",
+      "rows": 2939287,
+      "sha256": "cbdf63de9a293e00ae2d50763843583d99b6fee407f654d5ccb7da1a28d6e5e1",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-05-01 00:00:00",
+      "end": "2015-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:59:09",
+      "rows": 3041467,
+      "sha256": "8b025ca367b4aea69e9b4803303568df7bedeafbb585dfabb30ba9f26326f454",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-06-01 00:00:00",
+      "end": "2015-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:59:29",
+      "rows": 2968047,
+      "sha256": "898c7b5211f4829f63a399e511e9c7e9317158a9780e51e5b719ec92f31990ae",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-07-01 00:00:00",
+      "end": "2015-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:00:13",
+      "rows": 3115790,
+      "sha256": "79b5dd204f66939b3275a5a49e2097702105082308838a46c4429876d75981e4",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-08-01 00:00:00",
+      "end": "2015-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:00:26",
+      "rows": 3116752,
+      "sha256": "52610d352b66bada86351f2946f1bb1c799e3e392d08c830087ac2c44232fe4d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-09-01 00:00:00",
+      "end": "2015-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:00:29",
+      "rows": 3003630,
+      "sha256": "08794c910b6e02a5655eaffe167f0c4682124e3f18082c9ddb8cb68c32d936f7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-10-01 00:00:00",
+      "end": "2015-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:00:44",
+      "rows": 3118848,
+      "sha256": "422b0c85af6d6d1c5d89608d512f3956ed24aba9278eb3e0d10d6bb3b89d1e54",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-11-01 00:00:00",
+      "end": "2015-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:01:44",
+      "rows": 2957511,
+      "sha256": "961baf335a98eecc4ae063ad73cb465bfeae9c0869195fd12133240ed8bb6d04",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2015-12-01 00:00:00",
+      "end": "2016-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:02:00",
+      "rows": 3052175,
+      "sha256": "b3f6f4782898dcfc6b2b703d97530b19327b220869009720567856b8e8be6e33",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-01-01 00:00:00",
+      "end": "2016-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:02:00",
+      "rows": 3119770,
+      "sha256": "6cbf8b748e1293453a378f7b6c8672ec060ed0ce59528c65ba7801976b2422da",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-02-01 00:00:00",
+      "end": "2016-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:02:16",
+      "rows": 2917632,
+      "sha256": "1ab3eb0fd6e33664b251fd3f59a8206bbb9fd48d3705e9f83d31c2f95869a54f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-03-01 00:00:00",
+      "end": "2016-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:03",
+      "rows": 42968,
+      "sha256": "0a7822e7cdaaaaa4d9b13ce3018ba8e31f526d60002989f51666bdd28e1fe35a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-04-01 00:00:00",
+      "end": "2016-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:13",
+      "rows": 0,
+      "sha256": "6ad981983daffe53ae01b0a44afe72e2acc1435a427f060550c1b9065de697e9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-05-01 00:00:00",
+      "end": "2016-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:14",
+      "rows": 0,
+      "sha256": "527aff4fee6c7cf77ebc95e19bdefff13751e43f382b87c3f5263987af07d2bd",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-06-01 00:00:00",
+      "end": "2016-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:15",
+      "rows": 0,
+      "sha256": "c704b6c42cba64e8d43ec2ff242eb3bf589befe5ca476a0daad0cdade93b955f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-07-01 00:00:00",
+      "end": "2016-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:16",
+      "rows": 1321397,
+      "sha256": "c9e566d2f0d46d96e6f93f994b097588ac99a1cd0ed515c8a8cb4e200a761970",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-08-01 00:00:00",
+      "end": "2016-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:29",
+      "rows": 4741118,
+      "sha256": "9e5514411c56728884b27ff7aee012082e6d91888b1541fd82df015248ff832b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-09-01 00:00:00",
+      "end": "2016-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:36",
+      "rows": 4557293,
+      "sha256": "cb5c0ea6442708a230e8c2fc908c9ec4382d3f368a7b5999df75333789cd9522",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-10-01 00:00:00",
+      "end": "2016-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:03:38",
+      "rows": 4431059,
+      "sha256": "98710926d1721b8b84f54aece3947a994a5e04af74095e8fe733bf8d3b7abc71",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-11-01 00:00:00",
+      "end": "2016-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:04:13",
+      "rows": 4601930,
+      "sha256": "f7dd8453c706a69ebb64b901aa1d4c891ce6b64a968360a5a2d051940e0eb8e8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2016-12-01 00:00:00",
+      "end": "2017-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:08:42",
+      "rows": 4798684,
+      "sha256": "17adce5559886cd6bcfa9cf182c43c10cd9efd04ece224e0cd2ac28a1778ee97",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-01-01 00:00:00",
+      "end": "2017-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:08:46",
+      "rows": 4732312,
+      "sha256": "a09122b52d36b77866854840d4c35c7885058d7a9a57ca25fc7dae58b481ed66",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-02-01 00:00:00",
+      "end": "2017-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:08:50",
+      "rows": 4272416,
+      "sha256": "4729c2dc6a51bd85bc5e3ebfa284859bbc8d998255f31dc9f761b672c4c1563e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-03-01 00:00:00",
+      "end": "2017-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:09:23",
+      "rows": 4730311,
+      "sha256": "9b9d72c52d2a52ed27db611098655e53bcd74d206414c22fe23c25814db4d2bf",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-04-01 00:00:00",
+      "end": "2017-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:13:28",
+      "rows": 5541197,
+      "sha256": "2f054d3a043b59534801d622d7582555563150ecba4e95d26f040406cfc0bcdc",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-05-01 00:00:00",
+      "end": "2017-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:13:57",
+      "rows": 9329760,
+      "sha256": "98ca1a0dc4e6c4a3889b755428a03cfafc63dd1da391dc2a39d9846d42941885",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-06-01 00:00:00",
+      "end": "2017-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:14:00",
+      "rows": 9028800,
+      "sha256": "725974573068a5ce3060b444dc9ff4fd5856712d7144b59ca7799ad80886a868",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-07-01 00:00:00",
+      "end": "2017-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:14:39",
+      "rows": 9329760,
+      "sha256": "1ae907b43a0efd99a83c4d97b8aa1994c012b247d4c7680247adf5979f770ae9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-08-01 00:00:00",
+      "end": "2017-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:18:35",
+      "rows": 9891001,
+      "sha256": "b1d858cb739e8456e0da72a0098f6082bd42f3c9a2aabe7b790b62ecfafc0bf4",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-09-01 00:00:00",
+      "end": "2017-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:19:48",
+      "rows": 7006687,
+      "sha256": "97627f10068c78d03c2187da89ab905bc2bb7c2896ea3833037f09ba18664d50",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-10-01 00:00:00",
+      "end": "2017-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:20:01",
+      "rows": 9242056,
+      "sha256": "c3875448180047a1b1200ccedc1d763eb8d2b79a56aefa0cb9cb8d7da6e26b4a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-11-01 00:00:00",
+      "end": "2017-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:20:20",
+      "rows": 11266639,
+      "sha256": "6cfd6e1c18fe53e100391271ab0dcf0ab2cada44710f5b2153292e1c533bce18",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2017-12-01 00:00:00",
+      "end": "2018-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:23:50",
+      "rows": 9527018,
+      "sha256": "5afd1821294729dc83df099f6ff08e7a7149c0c057b9487bb063e81a439a3643",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-01-01 00:00:00",
+      "end": "2018-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:24:58",
+      "rows": 3107830,
+      "sha256": "4e16e14b170a56db23ea8d7fdbfb372967cb6fc56228b9b32c655596d1f49479",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-02-01 00:00:00",
+      "end": "2018-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:25:25",
+      "rows": 2802652,
+      "sha256": "5639513ca5797127bcd223093fd6af65d5add627b194c46df509c4684af1804e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-03-01 00:00:00",
+      "end": "2018-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:26:05",
+      "rows": 3102120,
+      "sha256": "14b7bc5e1c83f76115767ab1f22dd5ceec403577ecd96a1d2f2938b99e2d33e1",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-04-01 00:00:00",
+      "end": "2018-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:26:27",
+      "rows": 3008555,
+      "sha256": "5092a3516c4b249350e5cad90f4bde0a397cdb1376f65b26474f8d831970bfcf",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-05-01 00:00:00",
+      "end": "2018-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:26:49",
+      "rows": 3105740,
+      "sha256": "f5e4cdb6fa5849d30eb8c589ce0304bc6865277a89fd338c5395d4006b792362",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-06-01 00:00:00",
+      "end": "2018-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:27:31",
+      "rows": 4139948,
+      "sha256": "f9a3d7d8fd43efde5ca545bd3e20deaefcbace31888e6059c4e7cfa019a03e35",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-07-01 00:00:00",
+      "end": "2018-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:27:47",
+      "rows": 3113055,
+      "sha256": "69d850faf4f73d5c91330e7e6d1f36ce6aff8f7fc19272fb2d10b44c6766424f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-08-01 00:00:00",
+      "end": "2018-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:27:50",
+      "rows": 3108913,
+      "sha256": "b7494275e11646a08cd7d25d198a61fa07d3754b4101316cde28388138a408df",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-09-01 00:00:00",
+      "end": "2018-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:28:10",
+      "rows": 3609791,
+      "sha256": "7fadd3668fe91f46f7a5da507ecb872d5f8cde93f8e2485d20ca05c6e2fd24c7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-10-01 00:00:00",
+      "end": "2018-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:29:19",
+      "rows": 3104771,
+      "sha256": "9377a57141cdd8081e4ad748697e4fb9100d5bbea0d6e35631271f6c695aaa74",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-11-01 00:00:00",
+      "end": "2018-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:29:22",
+      "rows": 3098767,
+      "sha256": "f75dd1eda9a1eafabee4fc0886b1630a7a274a320446b24be3d32cc5c8a77e81",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2018-12-01 00:00:00",
+      "end": "2019-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:29:27",
+      "rows": 3429557,
+      "sha256": "0cc1c70e2b0ca8c659c40a218017ec3da9b112d276bba38c9bab0649d0a28799",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-01-01 00:00:00",
+      "end": "2019-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:29:49",
+      "rows": 3109920,
+      "sha256": "90479f71560a6b0b2ad999a829e8dde9325abf30d5cf968bb89fd96751b9d60d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-02-01 00:00:00",
+      "end": "2019-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:30:42",
+      "rows": 2806832,
+      "sha256": "76de4735a5ac5b85ec8a343cb279ede723c6ca33d9bfb8274695b6ba2dc91708",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-03-01 00:00:00",
+      "end": "2019-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:30:56",
+      "rows": 3106785,
+      "sha256": "4ca427dba714e8d6405f54cc4ae31e8494e8aceb9c84b8c9f00791afc8ba4878",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-04-01 00:00:00",
+      "end": "2019-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:31:03",
+      "rows": 3046821,
+      "sha256": "1d3402e8beec705bd864b02b3c96cb0d65e4eea64d910b405c6d45a8d8f9c15b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-05-01 00:00:00",
+      "end": "2019-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:31:23",
+      "rows": 3109920,
+      "sha256": "601ec71402f85375ca9d8d8b589010928516cd81c16633e5de0820fbfb945a85",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-06-01 00:00:00",
+      "end": "2019-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:31:56",
+      "rows": 3009600,
+      "sha256": "de1159245aac78ecc704de6265fcb9e7ceaf538965c203fb5bc30cd86840db74",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-07-01 00:00:00",
+      "end": "2019-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:32:21",
+      "rows": 3106785,
+      "sha256": "ce583350f90e9b09962308e2280a9e84f0398e90b95b95337de2ddd010b5267f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-08-01 00:00:00",
+      "end": "2019-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:32:31",
+      "rows": 3106972,
+      "sha256": "42a6f05c51133289ea47f63c01b16614ddffcdaf9db5e97703b107f1aea249f7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-09-01 00:00:00",
+      "end": "2019-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:32:53",
+      "rows": 2986071,
+      "sha256": "e1aaad1bc644f1eae5b6151e78b684a756f649ee44d17a90bbee46c7bd43f4ff",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-10-01 00:00:00",
+      "end": "2019-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:33:15",
+      "rows": 3103968,
+      "sha256": "caa424ad3d2f19d2f87bb449fc030be4cfe2cf6aeb591bbe7dcd81e52cf71a07",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-11-01 00:00:00",
+      "end": "2019-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:33:54",
+      "rows": 3003840,
+      "sha256": "22dfe6101b858fe6573ce52f65febba53e2c276810d3effe94f3debb7ac13288",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2019-12-01 00:00:00",
+      "end": "2020-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:34:07",
+      "rows": 3103968,
+      "sha256": "282bad5df768b0e7051b3d5af57ffa7531d6f0c38d5cbf6a821cfee9252b876d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-01-01 00:00:00",
+      "end": "2020-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:34:22",
+      "rows": 3103968,
+      "sha256": "388c8e91e6f10731be8b8846317ee47313fd1381dadb5ce550c8ff6c8df2ae8d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-02-01 00:00:00",
+      "end": "2020-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:34:49",
+      "rows": 3168202,
+      "sha256": "c9eb77cb69f3a5ab921f62cdcb4d3ae7f10fd78ee5d913c7c106667f8a76b793",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-03-01 00:00:00",
+      "end": "2020-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:35:26",
+      "rows": 3549494,
+      "sha256": "fd56ec32153c7d1d036118f40dfe1cb4460fc97889bb2f873d8198bb85df72e7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-04-01 00:00:00",
+      "end": "2020-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:35:40",
+      "rows": 3129211,
+      "sha256": "97717d5397bea588e0bdeadde206df73f7f7022db36a8f576021160b0edc8d42",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-05-01 00:00:00",
+      "end": "2020-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:35:57",
+      "rows": 3125304,
+      "sha256": "eb40d58381bb6b283108268bdf090641daa49b2255decdecab746d2dd05e8879",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-06-01 00:00:00",
+      "end": "2020-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:36:25",
+      "rows": 3032640,
+      "sha256": "ea0e8fa9920b507a9b5a284d7b1cd216ec61053bf4cca80a6087ec6c84c351ce",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-07-01 00:00:00",
+      "end": "2020-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:37:10",
+      "rows": 3128463,
+      "sha256": "17d6de05a5c1440e62d65716a13254a9dd22d0fc22669f246b3b0fe8360ff19f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-08-01 00:00:00",
+      "end": "2020-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:37:11",
+      "rows": 3133728,
+      "sha256": "0e42270af36c96c57c11ad4107a9b9ba07ad5490cd469203f3229f07c39678e0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-09-01 00:00:00",
+      "end": "2020-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:37:23",
+      "rows": 3002103,
+      "sha256": "cda223c8faddee84d732b92c791cfd304f09e58cc382bfcb922a18d0959b6dee",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-10-01 00:00:00",
+      "end": "2020-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:37:45",
+      "rows": 3133728,
+      "sha256": "49d88817d535a1757d4dbd77bbde6a89b2928bb87a45127c7e514decda4162ce",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-11-01 00:00:00",
+      "end": "2020-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:38:42",
+      "rows": 3032640,
+      "sha256": "51e1984d573e80a53496e3adfdd48500b2d4845c9d20ae8866f56ae617cddc7f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2020-12-01 00:00:00",
+      "end": "2021-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:38:43",
+      "rows": 3133728,
+      "sha256": "2cdfae6a3d81a823a828ee6e90c139deed4450ea1576d268c041a9600721f8af",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-01-01 00:00:00",
+      "end": "2021-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:38:51",
+      "rows": 3128463,
+      "sha256": "9b3241eb15a827a86e7f247d8c4f098153d9fd597ce10b1699debf7bff553314",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-02-01 00:00:00",
+      "end": "2021-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:39:11",
+      "rows": 2818881,
+      "sha256": "b763e4478bdf56f99ee32f88a52b6ac3fbb789093f522ce9a6ff1a2b8d8acff2",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-03-01 00:00:00",
+      "end": "2021-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:40:04",
+      "rows": 3133728,
+      "sha256": "7d3461e8796d841ce42008d75976ad3a372c1aedc6d74e5b1ef98aac0bd410a6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-04-01 00:00:00",
+      "end": "2021-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:40:10",
+      "rows": 3032640,
+      "sha256": "56167c336a3d40978954aedc9d3efb707a06ca17a7b4eb4a94284a593cf0c61c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-05-01 00:00:00",
+      "end": "2021-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:40:17",
+      "rows": 3133728,
+      "sha256": "d3fcc81bff3ee6a84a106f5736b0ecb493a97aa538e981700c33d49d584e80ce",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-06-01 00:00:00",
+      "end": "2021-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:40:27",
+      "rows": 3032640,
+      "sha256": "c22112438b198b7268827eb0fe6795f43b140511cad69c6b14f5962cab23cb2c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-07-01 00:00:00",
+      "end": "2021-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:41:36",
+      "rows": 3133728,
+      "sha256": "68f97d5f4d75ce267f6fef25f6dfc1671adad117e4d07ea6438e93cd66cbf83e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-08-01 00:00:00",
+      "end": "2021-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:41:39",
+      "rows": 3133728,
+      "sha256": "9e872f6605eaa5f4fdb0845289f6a402e79021c485dc1f36da2b31e5a329d8b7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-09-01 00:00:00",
+      "end": "2021-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:41:43",
+      "rows": 3028428,
+      "sha256": "a63c7c9eafbb69282238ad17b32e900dd450d8a550690b5f6af971b42a634108",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-10-01 00:00:00",
+      "end": "2021-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:41:50",
+      "rows": 3133728,
+      "sha256": "a95a12c991d8706de7c741a01866215483248dcd66ae0b1c3c310564942de3e6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-11-01 00:00:00",
+      "end": "2021-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:43:02",
+      "rows": 3032640,
+      "sha256": "06a555864f1b281ed2013a099353f58857e1f68549770b2e267334ffa2fd6732",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2021-12-01 00:00:00",
+      "end": "2022-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:43:09",
+      "rows": 3133728,
+      "sha256": "7ba792f6ce5017deb855a2d3bb161ce75049a4043895af30a1be4b028c7926c9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-01-01 00:00:00",
+      "end": "2022-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:43:14",
+      "rows": 3133728,
+      "sha256": "df25bd838d6e07d3dc4fd363b4ed20a8d833e5bf08d9ec69d8ce878f75f7e01a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-02-01 00:00:00",
+      "end": "2022-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:43:23",
+      "rows": 2827305,
+      "sha256": "cbb8ef1c9da712c0a55ca4dadf935bcb6589f60d7ce7bdb39dc5b11ba83dcf6f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-03-01 00:00:00",
+      "end": "2022-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:44:30",
+      "rows": 3133728,
+      "sha256": "a86bc907c0262be93775fe82fd7b3903ae3c586d4da04e6fcecebe9e8891a64c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-04-01 00:00:00",
+      "end": "2022-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:44:37",
+      "rows": 3032784,
+      "sha256": "d960dc1e63a4085c6c19d9736cc4a7e035b5c11fc393f6238d67f8a68bd4c834",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-05-01 00:00:00",
+      "end": "2022-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:44:48",
+      "rows": 3556909,
+      "sha256": "beb18166dc9acda0a6610b21185e818b79cff93e53b1868fb10ab1c92d01283c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-06-01 00:00:00",
+      "end": "2022-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:44:49",
+      "rows": 3435840,
+      "sha256": "82fed89762fa4755c132902cf072c4d1df6eec6a84b6eb204162a31554dd6553",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-07-01 00:00:00",
+      "end": "2022-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:46:04",
+      "rows": 5119579,
+      "sha256": "7cbb022580679f57d5700305f2edd987091f36fc87432cc6b7ebcc95438a509b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-08-01 00:00:00",
+      "end": "2022-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:46:13",
+      "rows": 6443703,
+      "sha256": "a5cec121d206e9162d4d44fe538bd89b248cc194c8fb85f5107230f2116fedc7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-09-01 00:00:00",
+      "end": "2022-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:46:42",
+      "rows": 6253663,
+      "sha256": "da3b31ce3f904768d8652c350e4eee802426c083d343533461213fe1b0a917d7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-10-01 00:00:00",
+      "end": "2022-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:46:43",
+      "rows": 3700366,
+      "sha256": "29f22348478cf24156d1cdf2f77727cccd4990d0b48129d02fc2d7655e6a468a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-11-01 00:00:00",
+      "end": "2022-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:48:31",
+      "rows": 3435840,
+      "sha256": "1112576cff6e896bbf4b102f5eb723295d06213c745ebf6f0005fff99417f841",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2022-12-01 00:00:00",
+      "end": "2023-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:48:34",
+      "rows": 3550308,
+      "sha256": "9d67d89a3aed0089271406a007381750acbdc74ed49745b3940737951d22bc58",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-01-01 00:00:00",
+      "end": "2023-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:50:15",
+      "rows": 3548012,
+      "sha256": "5da8ce9286495c2cac146709f60f507926fc8cb5a930d3b9e17cdcffe367d398",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-02-01 00:00:00",
+      "end": "2023-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:50:28",
+      "rows": 3204461,
+      "sha256": "9749a1019f19a2ca9811b6cfdddb8e0b35e18304ba391392168b527ed700587f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-03-01 00:00:00",
+      "end": "2023-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:51:01",
+      "rows": 3549145,
+      "sha256": "cd08b65d6b1d3017015f489085e5aaa2afa41c75e0ccc0d9f0efe007f3cdd41e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-04-01 00:00:00",
+      "end": "2023-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:51:07",
+      "rows": 3038431,
+      "sha256": "5146555d0c3d25fe13009d28d9a3d90bf57db71340d00231a8ab225a3ed25e86",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-05-01 00:00:00",
+      "end": "2023-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:52:03",
+      "rows": 3015067,
+      "sha256": "8ee4b809d14ed59892482f89438f046a905c7996fec4fa2563302c168bf9645c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-06-01 00:00:00",
+      "end": "2023-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:52:09",
+      "rows": 3023163,
+      "sha256": "d5879288fdc7ae33fa6b7c3da0ef9b5b846343e18853be7156853f65c0ada315",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-07-01 00:00:00",
+      "end": "2023-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:52:44",
+      "rows": 3123687,
+      "sha256": "48bf64e40166bee064633dbf4c050d9ba926577e0d0d398d150f8e6ad27bd8b6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-08-01 00:00:00",
+      "end": "2023-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:52:49",
+      "rows": 3132675,
+      "sha256": "81d2159517e7f5ebce6801de22824975492895d3527b31aaaddf85b2efdbff0e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-09-01 00:00:00",
+      "end": "2023-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:53:29",
+      "rows": 3032640,
+      "sha256": "dfa5fb0c9bbfd7abc4c2560dcb876e0f4f34f20630e2c44c5e15e5df4fa227be",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-10-01 00:00:00",
+      "end": "2023-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:53:36",
+      "rows": 3133728,
+      "sha256": "277c9970c0b4356c25377532b93656c969593653b0a9516456871a1de12bcd16",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-11-01 00:00:00",
+      "end": "2023-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:54:15",
+      "rows": 3031632,
+      "sha256": "cc690b43950242fbf75b48efb5152fdfa6c79bdb323cf332619ca0bc3da5b6aa",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2023-12-01 00:00:00",
+      "end": "2024-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:54:16",
+      "rows": 3133728,
+      "sha256": "6b65d3aef20db2013ab449c44d5f728baf9fa0a8069f5e4c8962860219ecfb8b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-01-01 00:00:00",
+      "end": "2024-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:54:55",
+      "rows": 3133728,
+      "sha256": "7af9debae86cd9d7e4d644f27a17fe5b44cb701f7cffa7bdcb3d1682ecd4c02b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-02-01 00:00:00",
+      "end": "2024-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:55:03",
+      "rows": 2931919,
+      "sha256": "7d19cbf87b2002adc3751b47c73f3f2cbbfe63da1da216f43db643744cd872f3",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-03-01 00:00:00",
+      "end": "2024-04-01 00:00:00",
+      "snapshot": "2026-11-26 23:55:43",
+      "rows": 3130617,
+      "sha256": "5d4d9806d1abdf3d51b4848ae0a468e9f823671fabd531f79e1cd9d3a0d12547",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-04-01 00:00:00",
+      "end": "2024-05-01 00:00:00",
+      "snapshot": "2026-11-26 23:55:50",
+      "rows": 3032640,
+      "sha256": "b1f4931c6742aac9cb0145689e5f442eec610be01861a2c0c862c3e948dd4e46",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-05-01 00:00:00",
+      "end": "2024-06-01 00:00:00",
+      "snapshot": "2026-11-26 23:56:32",
+      "rows": 3130665,
+      "sha256": "f00579639d847c8361f87cda5fbd5db5a1aa22740bd521eeed4eb5f22e8f941f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-06-01 00:00:00",
+      "end": "2024-07-01 00:00:00",
+      "snapshot": "2026-11-26 23:56:34",
+      "rows": 3032640,
+      "sha256": "525357025ba8cfe52aeec71928d29b82f098ab098fdea08dd55b7c03b9f70c32",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-07-01 00:00:00",
+      "end": "2024-08-01 00:00:00",
+      "snapshot": "2026-11-26 23:57:09",
+      "rows": 3133728,
+      "sha256": "463c04adabbfba2bd2045f9deae22e6742825ccc215695c159bf08734c38aa0b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-08-01 00:00:00",
+      "end": "2024-09-01 00:00:00",
+      "snapshot": "2026-11-26 23:57:20",
+      "rows": 3128463,
+      "sha256": "9897ad2f1d8b565399e101e9c8a474b8cc829e8bc53388be3b0d8c364068b904",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-09-01 00:00:00",
+      "end": "2024-10-01 00:00:00",
+      "snapshot": "2026-11-26 23:58:05",
+      "rows": 3032640,
+      "sha256": "5bd57130f3a3d7f3cbccb22166ff0bcb96514f27e756c0daa496edb0589cdbcb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-10-01 00:00:00",
+      "end": "2024-11-01 00:00:00",
+      "snapshot": "2026-11-26 23:58:06",
+      "rows": 3502178,
+      "sha256": "12301f3d012e5106df7d9b1ee5873b6620cec11e84acfd2e5c2092e813bf4407",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-11-01 00:00:00",
+      "end": "2024-12-01 00:00:00",
+      "snapshot": "2026-11-26 23:58:44",
+      "rows": 4751328,
+      "sha256": "dc39e02c495efaec134e7171ecc6c593180754c72af44ac5f5e1616e7e76b3cd",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2024-12-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "snapshot": "2026-11-26 23:58:53",
+      "rows": 4911168,
+      "sha256": "da2d35ad29f5663d70e7dd26ed90f63d58a7ceffebcc4ba08604812ee5ba80e0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-01-01 00:00:00",
+      "end": "2025-02-01 00:00:00",
+      "snapshot": "2026-11-26 23:59:32",
+      "rows": 4912368,
+      "sha256": "891838df64484d7646081862926006b01373dab1cbd9d50a8c2324e1b7cc50e1",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-02-01 00:00:00",
+      "end": "2025-03-01 00:00:00",
+      "snapshot": "2026-11-26 23:59:50",
+      "rows": 4436976,
+      "sha256": "7026f63ce33ddad287e8db3cd9034586164b2f236fef3111190e0ffb34968c95",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-03-01 00:00:00",
+      "end": "2025-04-01 00:00:00",
+      "snapshot": "2026-11-27 00:00:53",
+      "rows": 3194638,
+      "sha256": "05d23407410d01c5779537809058400a7ca611fea89f9c385bc1e820777a014f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-04-01 00:00:00",
+      "end": "2025-05-01 00:00:00",
+      "snapshot": "2026-11-27 00:01:07",
+      "rows": 2229120,
+      "sha256": "a3c93186da21c1a8088a294e13aa3a0aa9b8851487098aca5550ca0c9f64120f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-05-01 00:00:00",
+      "end": "2025-06-01 00:00:00",
+      "snapshot": "2026-11-27 00:02:02",
+      "rows": 2303424,
+      "sha256": "2e57dc41578dbbf65fe706471aa3161a424ac528acffa75a11604416137d9b89",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-06-01 00:00:00",
+      "end": "2025-07-01 00:00:00",
+      "snapshot": "2026-11-27 00:02:08",
+      "rows": 2229120,
+      "sha256": "2cfbc11e3954267ba8947c3e66325660e7ed5a8bed32c7965dd16ae09c67c9b6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-07-01 00:00:00",
+      "end": "2025-08-01 00:00:00",
+      "snapshot": "2026-11-27 00:02:18",
+      "rows": 2303424,
+      "sha256": "7f8db6561df35716234c1a609c6df2f6d8d568bc1c0d82840c37a2f66a672a80",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-08-01 00:00:00",
+      "end": "2025-09-01 00:00:00",
+      "snapshot": "2026-11-27 00:02:30",
+      "rows": 2303424,
+      "sha256": "d2f4f6402b735d848728714e0a2b6077e567d506353e5633a9fcded3f08fa0c5",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-09-01 00:00:00",
+      "end": "2025-10-01 00:00:00",
+      "snapshot": "2026-11-27 00:03:16",
+      "rows": 2229120,
+      "sha256": "1e39380ffe7c4619b5892ece97d458029dce1f23f31ab5f71f3ce350c8354f64",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-10-01 00:00:00",
+      "end": "2025-11-01 00:00:00",
+      "snapshot": "2026-11-27 00:03:19",
+      "rows": 2303424,
+      "sha256": "a3d4132f1ffb19728ddcb43d17a5a83cdacf2c3d3fb563692857aaeef162a23f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-11-01 00:00:00",
+      "end": "2025-12-01 00:00:00",
+      "snapshot": "2026-11-27 00:03:29",
+      "rows": 2229120,
+      "sha256": "6fa7cb74a8d74abece0cfdbaf912b449eec706104096ec330a11594fef8834dd",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2025-12-01 00:00:00",
+      "end": "2026-01-01 00:00:00",
+      "snapshot": "2026-11-27 00:03:38",
+      "rows": 2303424,
+      "sha256": "8c227fd3cbe0b619857eb0f2a833abeb5f073dc6c2f8f9b50d519b420bf5fb3f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-01-01 00:00:00",
+      "end": "2026-02-01 00:00:00",
+      "snapshot": "2026-11-27 00:04:22",
+      "rows": 2303424,
+      "sha256": "e7541c29f6062fd1a99fa0940a2a45c1c45c501374da62f9acc3285e07d31728",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-02-01 00:00:00",
+      "end": "2026-03-01 00:00:00",
+      "snapshot": "2026-11-27 00:04:29",
+      "rows": 2080512,
+      "sha256": "5ba21af7e8a4722376a6b1c277eb0f4ffa3a70efad91eba8c3fe4f1a4823900b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-03-01 00:00:00",
+      "end": "2026-04-01 00:00:00",
+      "snapshot": "2026-11-27 00:04:39",
+      "rows": 2300328,
+      "sha256": "d86972cb555afdd48fa509befb56df45da4b9b12a0887ab8499b62797f620de0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-04-01 00:00:00",
+      "end": "2026-05-01 00:00:00",
+      "snapshot": "2026-11-27 00:04:44",
+      "rows": 2229120,
+      "sha256": "e88910dd9c6fe86b8be3d1a97600eb2d1bdd87044eddde19834e4c0a9fc057c4",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-05-01 00:00:00",
+      "end": "2026-06-01 00:00:00",
+      "snapshot": "2026-11-27 00:05:31",
+      "rows": 2303424,
+      "sha256": "f92ef2bd0a289629214fa44771be5b8b8d10940a30d2e9ce3d714c7e273cd5b8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-06-01 00:00:00",
+      "end": "2026-07-01 00:00:00",
+      "snapshot": "2026-11-27 00:05:31",
+      "rows": 2229120,
+      "sha256": "5d297f2fcf0ad566cc369cbe508c4bcf0d9210ae825789fbf283a7bd35cebbff",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-07-01 00:00:00",
+      "end": "2026-08-01 00:00:00",
+      "snapshot": "2026-11-27 00:05:50",
+      "rows": 2303424,
+      "sha256": "d34b4843b5ddc5912c35a32abf98f02bdb11fd3ebc93ea3961006ae8093342c3",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-08-01 00:00:00",
+      "end": "2026-09-01 00:00:00",
+      "snapshot": "2026-11-27 00:05:53",
+      "rows": 2303424,
+      "sha256": "83d9ddc96fc47626cceb32e80a22f53c59ae2c6838269149789515471d753a86",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-09-01 00:00:00",
+      "end": "2026-10-01 00:00:00",
+      "snapshot": "2026-11-27 00:06:38",
+      "rows": 2229120,
+      "sha256": "d4556d9b7dd6352916b2f1b75c4d08bbd57f69c4b364f9d9437e44e66baadde0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-10-01 00:00:00",
+      "end": "2026-11-01 00:00:00",
+      "snapshot": "2026-11-27 00:06:40",
+      "rows": 2302650,
+      "sha256": "233296be23a48aad75bcec1134c9161648e3b349363f0b783e1a3f7a305d631d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUES",
+      "start": "2026-11-01 00:00:00",
+      "end": "2026-12-01 00:00:00",
+      "snapshot": "2026-11-27 00:06:57",
+      "rows": 1928808,
+      "sha256": "9b023aaf1d6d4a115346253ce3a844798253faeba07235745ed359a166f9cfa9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-06-01 00:00:00",
+      "end": "2024-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:29",
+      "rows": 70504,
+      "sha256": "892f89edcfd8bef60b8c95a163708d00d46e6653f6b1961f422cb3b8f4e7f6fb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-07-01 00:00:00",
+      "end": "2024-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:29",
+      "rows": 89284,
+      "sha256": "7e18f6572c607cb53c7229947c8e6ea9acb0dd7e162324101ae5e8e8faad2439",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-08-01 00:00:00",
+      "end": "2024-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:29",
+      "rows": 89280,
+      "sha256": "ce3ac18a59ddceae09a15946aaf6fc724f265b57ed2606e553373a74af913a8b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-09-01 00:00:00",
+      "end": "2024-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:29",
+      "rows": 86400,
+      "sha256": "c248eb80ccb351e804fb84cabae28c34e5015c66758d3d38113b5eefa4bae3c5",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-10-01 00:00:00",
+      "end": "2024-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:34",
+      "rows": 89280,
+      "sha256": "e6e6f390942f6ac4bca7974c8102d532b50b3fc6f0c238c42629971c077f3ecb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-11-01 00:00:00",
+      "end": "2024-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:34",
+      "rows": 86400,
+      "sha256": "8ce3e22eb0b2a4f222170e3e7adf30c3d37aa2fef2e3d2bae8dcbe645e058e64",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2024-12-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:34",
+      "rows": 89280,
+      "sha256": "e757a782d40a519843cc1ed8e9a23782f8e84675b25dbbec61713ddd0ddca9e8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-01-01 00:00:00",
+      "end": "2025-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:34",
+      "rows": 89280,
+      "sha256": "46d392224ca7f7a15560a17a75d4fbd538370cf0744604b3cd1e14f49186cd8b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-02-01 00:00:00",
+      "end": "2025-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:37",
+      "rows": 80640,
+      "sha256": "a328995df79601afed7e232876cc071fca33a52ec1ff961540216adca5713322",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-03-01 00:00:00",
+      "end": "2025-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:38",
+      "rows": 89280,
+      "sha256": "6550d2c741f995f33a7fb51b928b7410b8a8b3ced209847001ebabe1060d77ec",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-04-01 00:00:00",
+      "end": "2025-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:38",
+      "rows": 86400,
+      "sha256": "b97884c8123893daf96908eef31fc640189a30486f6c3d2dfd920ea80d0df51b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-05-01 00:00:00",
+      "end": "2025-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:39",
+      "rows": 89280,
+      "sha256": "463872c261cf2318025d6c0bef7a602474d4bdb0469c85b8394954353bd821a9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-06-01 00:00:00",
+      "end": "2025-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:40",
+      "rows": 86400,
+      "sha256": "7c9f46502a0defd26f1bc1b099e2eaea6b3a279c7d90cf64c0860a67f924bdc3",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-07-01 00:00:00",
+      "end": "2025-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:42",
+      "rows": 89280,
+      "sha256": "b23b52505049433b65732126bcf16b4ed6430cf269e6177c2559e06b02e640a7",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-08-01 00:00:00",
+      "end": "2025-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:42",
+      "rows": 89282,
+      "sha256": "6485c0ae1d619b18cd6b37f89a4e5ade1ea9afa8477782819e1a7cdd033c6a99",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-09-01 00:00:00",
+      "end": "2025-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:43",
+      "rows": 86400,
+      "sha256": "a4327a69225f5aee53fb94a63efba7e6f5ca86fe392a9f796760d8a687b9ac79",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-10-01 00:00:00",
+      "end": "2025-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:44",
+      "rows": 89280,
+      "sha256": "bad0cab9b20900fad9c2e65850b26cb11d8243f3843c0325a1e39a751a10f917",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-11-01 00:00:00",
+      "end": "2025-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:45",
+      "rows": 86400,
+      "sha256": "618d432184dcfe7abcc14003a7e04f9ddb2394d3db9e7bb3ad5effb38bcfef2a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2025-12-01 00:00:00",
+      "end": "2026-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:46",
+      "rows": 89280,
+      "sha256": "c9fc265078f68dbf305f9f504d9de99f30f20de1f44b72db5d665fad027c8972",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-01-01 00:00:00",
+      "end": "2026-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:47",
+      "rows": 89280,
+      "sha256": "fd27d515d45bffebdd11015ec081869ec0c683330806751784ba028afaec5e6b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-02-01 00:00:00",
+      "end": "2026-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:48",
+      "rows": 80640,
+      "sha256": "ce3b05a0b38d4336055813c480ca689f2257f1b38c6fc947b23ef1bd47810e32",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-03-01 00:00:00",
+      "end": "2026-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:49",
+      "rows": 89280,
+      "sha256": "c13f692f49fc72daf06e9e539d7a484f453ef34fae0c318d7e44c56c66658305",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-04-01 00:00:00",
+      "end": "2026-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:51",
+      "rows": 86400,
+      "sha256": "2bcb7bfcb1a267c5d1b815eb2b4fb15f51b6df550aafbd4fac8a74120928486f",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-05-01 00:00:00",
+      "end": "2026-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:51",
+      "rows": 88080,
+      "sha256": "c5f81e753c232c8bdd49264305a234d45d7266bf27f6e5856b48cfc9d262dfea",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-06-01 00:00:00",
+      "end": "2026-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:52",
+      "rows": 86400,
+      "sha256": "01e5efb8a20e7c3088fe984c79d24036382adc1cb5706b5011d93fab46702b58",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-07-01 00:00:00",
+      "end": "2026-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:54",
+      "rows": 89280,
+      "sha256": "3ef47cff33c281db6dd561a168f4c09366eeca4637a3e127c5349cadda2bf0bd",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-08-01 00:00:00",
+      "end": "2026-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:56",
+      "rows": 89280,
+      "sha256": "342ae26b156ce1a818d20fbf10c82ae58fd5eefa753b9317762c872c52bb4d8b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-09-01 00:00:00",
+      "end": "2026-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:56",
+      "rows": 86400,
+      "sha256": "69bf60bca795bbd90da6ecebabd4d3a722941181bbee9d4852b0c1c133e88a77",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-10-01 00:00:00",
+      "end": "2026-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:57",
+      "rows": 89280,
+      "sha256": "fbd4c8ae2183ed6cee7d941a4ef6a08147b4fa1e49ea338a496c1a8c8c857f99",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESCSAT3",
+      "start": "2026-11-01 00:00:00",
+      "end": "2026-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:52:59",
+      "rows": 74738,
+      "sha256": "500005ee1bb20ab111b722d817848039e31139bf1541ff0d71ac544d7a2c20ae",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-07-01 00:00:00",
+      "end": "2023-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:01",
+      "rows": 13625,
+      "sha256": "dd3ee793732c121b8921c8748ce7005631ceab703dfad0db1679e44385978345",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-08-01 00:00:00",
+      "end": "2023-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:02",
+      "rows": 0,
+      "sha256": "355a0f088637cf8ab94d55e873422f13f176322fe4aba72a413414ea0d5a16e5",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-09-01 00:00:00",
+      "end": "2023-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:02",
+      "rows": 0,
+      "sha256": "b0b9cd2208e77c96fbaabc421910d3cf1ff080caf32faebe79e70bf9ab96aaee",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-10-01 00:00:00",
+      "end": "2023-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:02",
+      "rows": 0,
+      "sha256": "bdd6059d41ca78fb4432ec552916a56d799d387c6ecea9b6699c57a5b272b202",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-11-01 00:00:00",
+      "end": "2023-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:03",
+      "rows": 0,
+      "sha256": "e0dd896b70026665d686ef1f47e5122982bdf040fc4a555ffe242a9446bd4a38",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2023-12-01 00:00:00",
+      "end": "2024-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:03",
+      "rows": 0,
+      "sha256": "affc42c0c372a4a91c0736984f68a8fd1d3f888ac35aaa38691c2009663cf0bc",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-01-01 00:00:00",
+      "end": "2024-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:03",
+      "rows": 0,
+      "sha256": "f56d211f73a704c5e677aff3336176c047c661f97abbb4900e0f1b307b46ea1a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-02-01 00:00:00",
+      "end": "2024-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:04",
+      "rows": 0,
+      "sha256": "a23329749a8c169f544d9babb31613f0af462a06c842f34a802d34ad9cb8fd1e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-03-01 00:00:00",
+      "end": "2024-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:04",
+      "rows": 0,
+      "sha256": "1c6784a2f40b52f8b46544bc3ebb99aa1452a68da79c6a43ccf4c468c9b18824",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-04-01 00:00:00",
+      "end": "2024-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:05",
+      "rows": 0,
+      "sha256": "f55fe115c989c589882a20e35c8ca415e11dce0042fa82f7b1f127ce2331ddf2",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-05-01 00:00:00",
+      "end": "2024-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:05",
+      "rows": 0,
+      "sha256": "18192232fed3d99deaca0c208591e4f2b3c210c62794baf1c2fe5be154e8ca04",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-06-01 00:00:00",
+      "end": "2024-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:05",
+      "rows": 0,
+      "sha256": "1231800d454453025c655ffc127c95ba721607bf966f1539608a98ac514ffa32",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-07-01 00:00:00",
+      "end": "2024-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:05",
+      "rows": 18502,
+      "sha256": "1dc47ada74c67dac6155cc36ceeef0cb8b7e567abafad306f97305bd9ad884c6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-08-01 00:00:00",
+      "end": "2024-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:06",
+      "rows": 17701,
+      "sha256": "59c25c875afad26f212643363b21b15a43e5d89eefdd688a7c7dde3976d1183e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-09-01 00:00:00",
+      "end": "2024-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:06",
+      "rows": 12473,
+      "sha256": "a806986b225433cfed021fc0226e7ddc404185bff85b22dab445380cb9363e2b",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-10-01 00:00:00",
+      "end": "2024-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:06",
+      "rows": 19650,
+      "sha256": "8eb91121233a9a58276b46b4407c4477dddafc2fe7b67bd17538690cbf48a484",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-11-01 00:00:00",
+      "end": "2024-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:07",
+      "rows": 18384,
+      "sha256": "b90ac89672cca8c6e310acbd885cb446c4df97a68f9666b1e4e87ceae8d1a693",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2024-12-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:07",
+      "rows": 8347,
+      "sha256": "f6694f0e081eddcd0af00fd62a1634e216c4ef45bdd2a3e362d4be5550b47172",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-01-01 00:00:00",
+      "end": "2025-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:07",
+      "rows": 7984,
+      "sha256": "5fd6d50fdd6ad86d0e4632a88c26df869e908ffe0540fcfff9bb20c03b7e6805",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-02-01 00:00:00",
+      "end": "2025-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:08",
+      "rows": 9649,
+      "sha256": "de72d44be633c12986a711b31e2f0d53deb5bbb0fbed8b21efb91aee4ee95470",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-03-01 00:00:00",
+      "end": "2025-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:09",
+      "rows": 13704,
+      "sha256": "6837b56d2a795352a239d26e564290be0155920e71009bf400dafaeadeafbf83",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-04-01 00:00:00",
+      "end": "2025-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:09",
+      "rows": 19055,
+      "sha256": "781fe49d8d39c2ba20f80937d9c9cb1a97e88e5277b19f2d89465380ca150a2d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-05-01 00:00:00",
+      "end": "2025-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:09",
+      "rows": 19691,
+      "sha256": "9c9ff67469c7fb4d14a7535e911c02255520c29729e3fcd2cd886be0353a2e41",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-06-01 00:00:00",
+      "end": "2025-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:10",
+      "rows": 18849,
+      "sha256": "0d34b1d2a5bf4108bf7037132bc8549ce222479b38444e8586d0e7f0e7d978bc",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-07-01 00:00:00",
+      "end": "2025-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:10",
+      "rows": 17210,
+      "sha256": "5337b87d89d78b68fd8d4565fc819c81be4707fcd35f36c7809428a867c189d6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-08-01 00:00:00",
+      "end": "2025-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:11",
+      "rows": 12886,
+      "sha256": "c22aeeabbef6f987f018817b225ceaa0b0a00a2f0a6ab76a4377fb683f220a65",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-09-01 00:00:00",
+      "end": "2025-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:11",
+      "rows": 13219,
+      "sha256": "c52cee8ec56dff0371a50e1e94cb893a84e6d7a4efa00b35efea415e2772a304",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-10-01 00:00:00",
+      "end": "2025-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:11",
+      "rows": 10348,
+      "sha256": "a2bb5842bf70b48fcb2ac7c85d728405f0e8d76f77bb182a2c667de2e27a5113",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-11-01 00:00:00",
+      "end": "2025-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:12",
+      "rows": 9057,
+      "sha256": "66cd504edf064f0b6b6df1fac27434428d90fb67f4e68ae3b0b6347690558fe5",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2025-12-01 00:00:00",
+      "end": "2026-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:12",
+      "rows": 9747,
+      "sha256": "f3c88e2e079fc49d17489a0986b8e7c277608766cbfd336866cb50541e8867a8",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-01-01 00:00:00",
+      "end": "2026-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:12",
+      "rows": 9747,
+      "sha256": "9612fc5b6501c3fcbd05ee65e868f78a6ed4e3b43863cc1d8e6ce253e98e2a7d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-02-01 00:00:00",
+      "end": "2026-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:13",
+      "rows": 8802,
+      "sha256": "a97b8bf635c2daef6c4cdbd942fefd5624289a74282aaf81cab2c93ca7771193",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-03-01 00:00:00",
+      "end": "2026-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:13",
+      "rows": 9747,
+      "sha256": "daade6355964108f1e7a5fe89d0d9eadbb6964f2aaf5f56a94474a07c30eaec9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-04-01 00:00:00",
+      "end": "2026-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:14",
+      "rows": 9431,
+      "sha256": "5d7ea3546ba67e849939352aabe3bb2586baad83498faa8b3dbcc429098304b6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-05-01 00:00:00",
+      "end": "2026-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:14",
+      "rows": 9679,
+      "sha256": "e7ecff7ae325e1dd7e32111f609765d04f0ce9824f160b0ab8dc7e3045bd343e",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-06-01 00:00:00",
+      "end": "2026-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:14",
+      "rows": 9427,
+      "sha256": "ea348682b9924982e5147ae7a3483d478149941734860e7986ee8daa6609ba32",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-07-01 00:00:00",
+      "end": "2026-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:15",
+      "rows": 9746,
+      "sha256": "49dd1c5e998e20b2aca356a07729def5c298cc1e418e937bccbefba14d86368a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-08-01 00:00:00",
+      "end": "2026-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:16",
+      "rows": 9747,
+      "sha256": "3e47b8207500c5a256bc205afa202214b84be6601294961d2e381fd253ab1392",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-09-01 00:00:00",
+      "end": "2026-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:16",
+      "rows": 9420,
+      "sha256": "08651a10c26e6c2efb46b0c31a09bba9455136690a77d86183e7355f9d2759d9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-10-01 00:00:00",
+      "end": "2026-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:16",
+      "rows": 9746,
+      "sha256": "42eeb97887a52d1965dd5387901d87504126cb6944d0a6d8edd85c71d9d2efca",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESLICOR",
+      "start": "2026-11-01 00:00:00",
+      "end": "2026-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:17",
+      "rows": 8159,
+      "sha256": "f17782f004d7dcb08f8b18f2365d95a609bb2d48549bee97b23675ecb44758b0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-06-01 00:00:00",
+      "end": "2024-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:17",
+      "rows": 890,
+      "sha256": "7cb183fa1e62d63bd46fff49fcc98a5e672d738c6283fa7751c43b34c7fed588",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-07-01 00:00:00",
+      "end": "2024-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:17",
+      "rows": 5952,
+      "sha256": "1c1e7cbf293ba31eaf70df2e2a7551670e0005913ede8665fd1ba4801b0cffba",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-08-01 00:00:00",
+      "end": "2024-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:18",
+      "rows": 5952,
+      "sha256": "94ddab3c02205e49fb2d2b9874023b2a405f6081dadf8be007034ce859b62a34",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-09-01 00:00:00",
+      "end": "2024-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:18",
+      "rows": 5760,
+      "sha256": "8176f73430fb84a710b20900e6a410ffaa00a8d7af635f73943ead003eb26a46",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-10-01 00:00:00",
+      "end": "2024-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:18",
+      "rows": 6622,
+      "sha256": "cdbccc9202dd216c467131bfaacd377c4de145737a5e5a54cc6f48a2e208b181",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-11-01 00:00:00",
+      "end": "2024-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:19",
+      "rows": 9074,
+      "sha256": "af1f2a587bac71c436b72a9583854ea9bab495f1453a3cfdaa89f9d2d5541b72",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2024-12-01 00:00:00",
+      "end": "2025-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:19",
+      "rows": 9178,
+      "sha256": "99144111cce313a26714a2c75d57b38699525e4aae4bbd178aa0522ef84849b0",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-01-01 00:00:00",
+      "end": "2025-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:19",
+      "rows": 9076,
+      "sha256": "95e171f2e6c2e8f3f714ae9dbd3780c8fb232b2880c602272bd67fabe47eb7e9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-02-01 00:00:00",
+      "end": "2025-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:20",
+      "rows": 8560,
+      "sha256": "b6d66d8e449d13df72c386becd19a9dfd4eed368c8bbeb39a21c0ed737853845",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-03-01 00:00:00",
+      "end": "2025-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:20",
+      "rows": 7194,
+      "sha256": "c4a09c562c84656ee162ec5b51ff81343c6ab482d31fd3131aececccb04fb9d3",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-04-01 00:00:00",
+      "end": "2025-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:20",
+      "rows": 5760,
+      "sha256": "34f3f75f8c1da6c02202ddf0d29c56f31bf608f221f897c7ab1c6eda4a3c7e86",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-05-01 00:00:00",
+      "end": "2025-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:21",
+      "rows": 5952,
+      "sha256": "07fcb5da30010e550147cfce33d5b5251dbc529436bbc02e0f42e9b6dc0f6b1c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-06-01 00:00:00",
+      "end": "2025-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:21",
+      "rows": 5760,
+      "sha256": "312237751a921ce1166ba3e30958db63ce6cc692cfa2152689f579b0e4017e0a",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-07-01 00:00:00",
+      "end": "2025-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:21",
+      "rows": 5952,
+      "sha256": "e28c7614f260ebc082e99ea071a994e1e86b9337892832af83850ef7f4172efb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-08-01 00:00:00",
+      "end": "2025-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:22",
+      "rows": 5952,
+      "sha256": "8700d45ac434ac1924e6893a2598dd5fbfe91a03510e403841dd17c1492aa5eb",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-09-01 00:00:00",
+      "end": "2025-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:22",
+      "rows": 5760,
+      "sha256": "d8b11c68339979a1a4afee4eb700d5bafc12593773885ad7bcbec8afbfa63398",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-10-01 00:00:00",
+      "end": "2025-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:22",
+      "rows": 5952,
+      "sha256": "0d901f06e00445e54aa2130d5b70fa6eded4171aeb46ff163e869967addf3a02",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-11-01 00:00:00",
+      "end": "2025-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:23",
+      "rows": 5760,
+      "sha256": "c832ceefb2011b6ddd66a24fea6e1b81599d8e6134bad26098b3bbcb3430ba62",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2025-12-01 00:00:00",
+      "end": "2026-01-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:23",
+      "rows": 5952,
+      "sha256": "f6b76a63df3b3fd8fd071d3710be6ec89d2ca2322cd63f12ba2a696c927bfd60",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-01-01 00:00:00",
+      "end": "2026-02-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:24",
+      "rows": 5952,
+      "sha256": "4a8a973bbdb90d5503eedcff382eada84c8f54760932e1a12ca822a702b05129",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-02-01 00:00:00",
+      "end": "2026-03-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:24",
+      "rows": 5376,
+      "sha256": "72331617d7ee0f6784cf232da7b109cf10f2f2f3edf456eee03a60ae587da944",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-03-01 00:00:00",
+      "end": "2026-04-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:24",
+      "rows": 5944,
+      "sha256": "fd973d85bab414118f1aee1c38287f0ea52425e21052d91ee755ae3bf0035dcc",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-04-01 00:00:00",
+      "end": "2026-05-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:24",
+      "rows": 5760,
+      "sha256": "b3a606e33935525475656974e94e683b58a645c89837eab67fb0819b9a6dc617",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-05-01 00:00:00",
+      "end": "2026-06-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:25",
+      "rows": 5952,
+      "sha256": "3b7e33b6a3267b776bfea282fbd5ff2517602f1c096308f6a90052b298233eb2",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-06-01 00:00:00",
+      "end": "2026-07-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:25",
+      "rows": 8140,
+      "sha256": "261233a46f54c30daf73544b3b5972672f0d4f3e64b5f5b1e6c993ee8aed73a9",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-07-01 00:00:00",
+      "end": "2026-08-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:26",
+      "rows": 11904,
+      "sha256": "d0c5031049554e3a67fc8d4a4a19494eaf7f6d9e887f094ea5480a7dd72f570d",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-08-01 00:00:00",
+      "end": "2026-09-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:26",
+      "rows": 11892,
+      "sha256": "297127fe7603b91c200877e567f9ca14f41fc9b5b8adc578dc8a02f1d0cf1f92",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-09-01 00:00:00",
+      "end": "2026-10-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:26",
+      "rows": 11520,
+      "sha256": "0a7d2ac6c686fdea7f6021c677d356acf9a4071917e0ec994dea7c7327765e41",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-10-01 00:00:00",
+      "end": "2026-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:27",
+      "rows": 11900,
+      "sha256": "78e6e0dbb8076e53623f86bc6a70cbd914cbcf8c28316ab9ad37149d0decb383",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESREU24",
+      "start": "2026-11-01 00:00:00",
+      "end": "2026-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:27",
+      "rows": 9968,
+      "sha256": "9011a7b42c18acbaf92d6762571f5723a8a29288784ad5f38397f043767dc3fc",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESVIZ",
+      "start": "2026-10-01 00:00:00",
+      "end": "2026-11-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:27",
+      "rows": 367650,
+      "sha256": "9117578f6545b3ce95267091e11da7a9978faa55dea9897c0f82cc17c94dfa7c",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    },
+    {
+      "table": "DATAVALUESVIZ",
+      "start": "2026-11-01 00:00:00",
+      "end": "2026-12-01 00:00:00",
+      "snapshot": "2026-11-26 22:53:28",
+      "rows": 1928034,
+      "sha256": "33389ea3c0c7238b1fcad775c63459c25b8c46a41524b6d74abdd0f3020fe0f6",
+      "reader_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2"
+    }
+  ],
+  "code_sha256": "b2805b32c46a166820e321c64ffd96fd9516bfdfc5c8916bd7754e2fe95cf2c4",
+  "source_module_sha256": "7df06ffb896c0cd75c048a251e5bc331f86fb0e9583735176b0bf0f58d9e87d2",
+  "row_filters_module_sha256": "fc5dca244edccc93752f6e27ee74bafd29c2d315f9859a315a80e31175c7a62b",
+  "catalog_sha256": "fdcfe0dce2e00b373aedbb34128ac0dbf2217b42cd009cb1df3e0059d1c2cc5f",
+  "duplicates_sha256": "d70a85f9162dda4c5becbbdd00460996e0e85ff92444a2a7b7dbf0d2e83c1131",
+  "pilot_sha256": null,
+  "consistency": "Separate monthly read-only transactions, fixed source-clock cutoff; no global SCN.",
+  "data_sql_template": "SELECT VALUEID,SENSORID,VARIABLEID,LOCALDATETIME,TO_CHAR(DATAVALUE,'TM9') with explicit decimal point; exact SQL in raw manifests",
+  "limitations": "Original source clock and unit. VIZ is separate. Unknown heights and inaccessible tables are marked.",
+  "retry_events": []
+}

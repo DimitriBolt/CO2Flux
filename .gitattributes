@@ -1,0 +1,4 @@
+# Temperature provenance hashes the exported bytes, including CSV line endings.
+Project_description/sensorDB/Row_data/LEO_West_*_Temperature/*.csv -text
+Project_description/sensorDB/Row_data/LEO_West_*_Temperature/*.json -text
+Project_description/sensorDB/Row_data/LEO_West_*_Temperature/*.parquet -text
