@@ -34,3 +34,9 @@ Project_description/Research_log/data/stage02_candidate_selection/
 Project_description/sensorDB/Row_data/LEO_West_temperature_raw/
 Project_description/sensorDB/Row_data/.temperature-stage-*/
 Project_description/sensorDB/Row_data/.temperature-publish.json*
+
+# Keep the soil-temperature catalogues and provenance on the export machine.
+/Project_description/sensorDB/Row_data/LEO_West_Soil_Temperature/channels.csv
+/Project_description/sensorDB/Row_data/LEO_West_Soil_Temperature/duplicate_times.csv
+/Project_description/sensorDB/Row_data/LEO_West_Soil_Temperature/pilot_coverage.csv
+/Project_description/sensorDB/Row_data/LEO_West_Soil_Temperature/provenance.json
